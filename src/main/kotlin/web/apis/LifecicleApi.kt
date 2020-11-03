@@ -9,24 +9,15 @@
 * https://github.com/swagger-api/swagger-codegen.git
 * Do not edit the class manually.
 */
-package io.swagger.server.apis
+package web.apis
 
 import com.google.gson.Gson
 import io.ktor.application.call
-import io.ktor.auth.UserIdPrincipal
-import io.ktor.auth.authentication
-import io.ktor.auth.basicAuthentication
-import io.ktor.auth.oauth
-import io.ktor.auth.OAuthAccessTokenResponse
-import io.ktor.auth.OAuthServerSettings
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.locations.*
 import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.*
-
-import kotlinx.coroutines.experimental.asCoroutineDispatcher
 
 // ktor 0.9.x is missing io.ktor.locations.DELETE, this adds it.
 // see https://github.com/ktorio/ktor/issues/288
@@ -39,6 +30,33 @@ fun Route.LifecicleApi() {
     route("/lifecycle/clean") {
         post {
             call.respond(HttpStatusCode.NotImplemented)
+        }
+    }
+    
+
+    route("/lifecycle/cycle") {
+        post {
+            val exampleContentType = "application/json"
+            val exampleContentString = """{
+              "bestCost_Euro" : 1.46581298050294517310021547018550336360931396484375,
+              "maxCost_Euro" : 0.80082819046101150206595775671303272247314453125,
+              "name" : "name",
+              "minCost_Euro" : 6.02745618307040320615897144307382404804229736328125,
+              "id" : "id",
+              "bestRout" : [ {
+                "lattitude" : 0.80082819046101150206595775671303272247314453125,
+                "longitude" : 6.02745618307040320615897144307382404804229736328125
+              }, {
+                "lattitude" : 0.80082819046101150206595775671303272247314453125,
+                "longitude" : 6.02745618307040320615897144307382404804229736328125
+              } ]
+            }"""
+            
+            when(exampleContentType) {
+                "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
+                "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
+                else -> call.respondText(exampleContentString)
+            }
         }
     }
     
@@ -67,6 +85,33 @@ fun Route.LifecicleApi() {
     route("/lifecycle/start") {
         post {
             call.respond(HttpStatusCode.NotImplemented)
+        }
+    }
+    
+
+    route("/lifecycle/step") {
+        post {
+            val exampleContentType = "application/json"
+            val exampleContentString = """{
+              "bestCost_Euro" : 1.46581298050294517310021547018550336360931396484375,
+              "maxCost_Euro" : 0.80082819046101150206595775671303272247314453125,
+              "name" : "name",
+              "minCost_Euro" : 6.02745618307040320615897144307382404804229736328125,
+              "id" : "id",
+              "bestRout" : [ {
+                "lattitude" : 0.80082819046101150206595775671303272247314453125,
+                "longitude" : 6.02745618307040320615897144307382404804229736328125
+              }, {
+                "lattitude" : 0.80082819046101150206595775671303272247314453125,
+                "longitude" : 6.02745618307040320615897144307382404804229736328125
+              } ]
+            }"""
+            
+            when(exampleContentType) {
+                "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
+                "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
+                else -> call.respondText(exampleContentString)
+            }
         }
     }
     

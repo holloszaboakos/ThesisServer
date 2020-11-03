@@ -9,7 +9,7 @@
 * https://github.com/swagger-api/swagger-codegen.git
 * Do not edit the class manually.
 */
-package io.swagger.server.apis
+package web.apis
 
 import com.google.gson.Gson
 import io.ktor.application.call
@@ -18,19 +18,29 @@ import io.ktor.locations.*
 import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.*
-
+import io.ktor.routing.get
 import web.Paths
-
-// ktor 0.9.x is missing io.ktor.locations.DELETE, this adds it.
-// see https://github.com/ktorio/ktor/issues/288
 
 fun Route.UpdateApi() {
     val gson = Gson()
     val empty = mutableMapOf<String, Any?>()
 
-    get<Paths.getBestCost> { it: Paths.getBestCost ->
+    get { it: Paths.getBestResult ->
         val exampleContentType = "application/json"
-        val exampleContentString = """0.80082819046101150206595775671303272247314453125"""
+        val exampleContentString = """{
+          "bestCost_Euro" : 1.46581298050294517310021547018550336360931396484375,
+          "maxCost_Euro" : 0.80082819046101150206595775671303272247314453125,
+          "name" : "name",
+          "minCost_Euro" : 6.02745618307040320615897144307382404804229736328125,
+          "id" : "id",
+          "bestRout" : [ {
+            "lattitude" : 0.80082819046101150206595775671303272247314453125,
+            "longitude" : 6.02745618307040320615897144307382404804229736328125
+          }, {
+            "lattitude" : 0.80082819046101150206595775671303272247314453125,
+            "longitude" : 6.02745618307040320615897144307382404804229736328125
+          } ]
+        }"""
         
         when(exampleContentType) {
             "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
@@ -40,7 +50,32 @@ fun Route.UpdateApi() {
     }
     
 
-    get<Paths.getBestResult> { it: Paths.getBestResult ->
+    get{  it: Paths.getProgress ->
+        val exampleContentType = "application/json"
+        val exampleContentString = """{
+          "bestCost_Euro" : 1.46581298050294517310021547018550336360931396484375,
+          "maxCost_Euro" : 0.80082819046101150206595775671303272247314453125,
+          "name" : "name",
+          "minCost_Euro" : 6.02745618307040320615897144307382404804229736328125,
+          "id" : "id",
+          "bestRout" : [ {
+            "lattitude" : 0.80082819046101150206595775671303272247314453125,
+            "longitude" : 6.02745618307040320615897144307382404804229736328125
+          }, {
+            "lattitude" : 0.80082819046101150206595775671303272247314453125,
+            "longitude" : 6.02745618307040320615897144307382404804229736328125
+          } ]
+        }"""
+        
+        when(exampleContentType) {
+            "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
+            "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
+            else -> call.respondText(exampleContentString)
+        }
+    }
+    
+
+    get{  it: Paths.getRootBetween ->
         val exampleContentType = "application/json"
         val exampleContentString = """[ {
           "lattitude" : 0.80082819046101150206595775671303272247314453125,
@@ -49,18 +84,6 @@ fun Route.UpdateApi() {
           "lattitude" : 0.80082819046101150206595775671303272247314453125,
           "longitude" : 6.02745618307040320615897144307382404804229736328125
         } ]"""
-        
-        when(exampleContentType) {
-            "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-            "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-            else -> call.respondText(exampleContentString)
-        }
-    }
-    
-
-    get<Paths.getRootBetween> { it: Paths.getRootBetween ->
-        val exampleContentType = "application/json"
-        val exampleContentString = """[ [ 0.80082819046101150206595775671303272247314453125, 0.80082819046101150206595775671303272247314453125 ], [ 0.80082819046101150206595775671303272247314453125, 0.80082819046101150206595775671303272247314453125 ] ]"""
         
         when(exampleContentType) {
             "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))

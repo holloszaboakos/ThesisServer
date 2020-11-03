@@ -15,20 +15,16 @@ package data.web
  * 
  * @param id 
  * @param name 
- * @param iterLimit 
- * @param timeLimit_Second 
  * @param center 
- * @param objectives 
  * @param salesmen 
+ * @param costGraph 
  */
-data class Setup (
+data class Task (
     val id: kotlin.String,
     val name: kotlin.String,
-    val iterLimit: java.math.BigDecimal,
-    val timeLimit_Second: java.math.BigDecimal,
     val center: GPS,
-    val objectives: kotlin.Array<Objective>,
-    val salesmen: kotlin.Array<Salesman>
+    val salesmen: kotlin.Array<Salesman>,
+    val costGraph: Graph
 ) {
 
 }

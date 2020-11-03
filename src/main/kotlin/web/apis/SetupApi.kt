@@ -19,12 +19,12 @@ import io.ktor.locations.*
 import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.*
-
+import io.ktor.routing.get
 import web.Paths
-import web.delete
 
 // ktor 0.9.x is missing io.ktor.locations.DELETE, this adds it.
 // see https://github.com/ktorio/ktor/issues/288
+import web.delete
 
 fun Route.SetupApi() {
     val gson = Gson()
@@ -58,7 +58,7 @@ fun Route.SetupApi() {
     }
     
 
-    route("/setup/setup") {
+    route("/setup/algorithm") {
         post {
             val exampleContentType = "application/json"
             val exampleContentString = """"""""
@@ -72,9 +72,29 @@ fun Route.SetupApi() {
     }
     
 
-    get<Paths.getState> { it: Paths.getState ->
+    route("/setup/task") {
+        post {
+            val exampleContentType = "application/json"
+            val exampleContentString = """"""""
+            
+            when(exampleContentType) {
+                "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
+                "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
+                else -> call.respondText(exampleContentString)
+            }
+        }
+    }
+    
+
+    get { it: Paths.loadAlgorithm ->
         val exampleContentType = "application/json"
-        val exampleContentString = """"""""
+        val exampleContentString = """{
+          "timeLimit_Second" : 6.02745618307040320615897144307382404804229736328125,
+          "name" : "name",
+          "id" : "id",
+          "iterLimit" : 0.80082819046101150206595775671303272247314453125,
+          "algorithm" : "algorithm"
+        }"""
         
         when(exampleContentType) {
             "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
@@ -84,38 +104,85 @@ fun Route.SetupApi() {
     }
     
 
-    get<Paths.loadSetup> { it: Paths.loadSetup ->
+    get{ it: Paths.loadTask ->
         val exampleContentType = "application/json"
         val exampleContentString = """{
-          "iterLimit_Second" : 6.02745618307040320615897144307382404804229736328125,
+          "costGraph" : {
+            "name" : "name",
+            "edges" : [ [ {
+              "root" : [ {
+                "lattitude" : 0.80082819046101150206595775671303272247314453125,
+                "longitude" : 6.02745618307040320615897144307382404804229736328125
+              }, {
+                "lattitude" : 0.80082819046101150206595775671303272247314453125,
+                "longitude" : 6.02745618307040320615897144307382404804229736328125
+              } ],
+              "name" : "name",
+              "id" : "id",
+              "length_Meter" : 0.80082819046101150206595775671303272247314453125
+            }, {
+              "root" : [ {
+                "lattitude" : 0.80082819046101150206595775671303272247314453125,
+                "longitude" : 6.02745618307040320615897144307382404804229736328125
+              }, {
+                "lattitude" : 0.80082819046101150206595775671303272247314453125,
+                "longitude" : 6.02745618307040320615897144307382404804229736328125
+              } ],
+              "name" : "name",
+              "id" : "id",
+              "length_Meter" : 0.80082819046101150206595775671303272247314453125
+            } ], [ {
+              "root" : [ {
+                "lattitude" : 0.80082819046101150206595775671303272247314453125,
+                "longitude" : 6.02745618307040320615897144307382404804229736328125
+              }, {
+                "lattitude" : 0.80082819046101150206595775671303272247314453125,
+                "longitude" : 6.02745618307040320615897144307382404804229736328125
+              } ],
+              "name" : "name",
+              "id" : "id",
+              "length_Meter" : 0.80082819046101150206595775671303272247314453125
+            }, {
+              "root" : [ {
+                "lattitude" : 0.80082819046101150206595775671303272247314453125,
+                "longitude" : 6.02745618307040320615897144307382404804229736328125
+              }, {
+                "lattitude" : 0.80082819046101150206595775671303272247314453125,
+                "longitude" : 6.02745618307040320615897144307382404804229736328125
+              } ],
+              "name" : "name",
+              "id" : "id",
+              "length_Meter" : 0.80082819046101150206595775671303272247314453125
+            } ] ],
+            "objectives" : [ {
+              "weight_Gramm" : 5.63737665663332876420099637471139430999755859375,
+              "volume_Stere" : 5.962133916683182377482808078639209270477294921875,
+              "name" : "name",
+              "location" : {
+                "lattitude" : 0.80082819046101150206595775671303272247314453125,
+                "longitude" : 6.02745618307040320615897144307382404804229736328125
+              },
+              "id" : "id",
+              "time_Second" : 1.46581298050294517310021547018550336360931396484375
+            }, {
+              "weight_Gramm" : 5.63737665663332876420099637471139430999755859375,
+              "volume_Stere" : 5.962133916683182377482808078639209270477294921875,
+              "name" : "name",
+              "location" : {
+                "lattitude" : 0.80082819046101150206595775671303272247314453125,
+                "longitude" : 6.02745618307040320615897144307382404804229736328125
+              },
+              "id" : "id",
+              "time_Second" : 1.46581298050294517310021547018550336360931396484375
+            } ],
+            "id" : "id"
+          },
           "center" : {
             "lattitude" : 0.80082819046101150206595775671303272247314453125,
             "longitude" : 6.02745618307040320615897144307382404804229736328125
           },
           "name" : "name",
-          "objectives" : [ {
-            "weight_Gramm" : 5.63737665663332876420099637471139430999755859375,
-            "volume_Stere" : 5.962133916683182377482808078639209270477294921875,
-            "name" : "name",
-            "location" : {
-              "lattitude" : 0.80082819046101150206595775671303272247314453125,
-              "longitude" : 6.02745618307040320615897144307382404804229736328125
-            },
-            "id" : "id",
-            "time_Second" : 1.46581298050294517310021547018550336360931396484375
-          }, {
-            "weight_Gramm" : 5.63737665663332876420099637471139430999755859375,
-            "volume_Stere" : 5.962133916683182377482808078639209270477294921875,
-            "name" : "name",
-            "location" : {
-              "lattitude" : 0.80082819046101150206595775671303272247314453125,
-              "longitude" : 6.02745618307040320615897144307382404804229736328125
-            },
-            "id" : "id",
-            "time_Second" : 1.46581298050294517310021547018550336360931396484375
-          } ],
           "id" : "id",
-          "iterLimit" : 0.80082819046101150206595775671303272247314453125,
           "salesmen" : [ {
             "vechicleSpeed_MeterPerSecond" : 5.962133916683182377482808078639209270477294921875,
             "fuelConsuption_LiterPerMeter" : 2.3021358869347654518833223846741020679473876953125,
@@ -149,86 +216,6 @@ fun Route.SetupApi() {
     }
     
 
-    get<Paths.loadState> { it: Paths.loadState ->
-        val exampleContentType = "application/json"
-        val exampleContentString = """{
-          "maxCost_Euro" : "maxCost_Euro",
-          "name" : "name",
-          "minCost_Euro" : "minCost_Euro",
-          "iteration" : "iteration",
-          "setup" : {
-            "iterLimit_Second" : 6.02745618307040320615897144307382404804229736328125,
-            "center" : {
-              "lattitude" : 0.80082819046101150206595775671303272247314453125,
-              "longitude" : 6.02745618307040320615897144307382404804229736328125
-            },
-            "name" : "name",
-            "objectives" : [ {
-              "weight_Gramm" : 5.63737665663332876420099637471139430999755859375,
-              "volume_Stere" : 5.962133916683182377482808078639209270477294921875,
-              "name" : "name",
-              "location" : {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              },
-              "id" : "id",
-              "time_Second" : 1.46581298050294517310021547018550336360931396484375
-            }, {
-              "weight_Gramm" : 5.63737665663332876420099637471139430999755859375,
-              "volume_Stere" : 5.962133916683182377482808078639209270477294921875,
-              "name" : "name",
-              "location" : {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              },
-              "id" : "id",
-              "time_Second" : 1.46581298050294517310021547018550336360931396484375
-            } ],
-            "id" : "id",
-            "iterLimit" : 0.80082819046101150206595775671303272247314453125,
-            "salesmen" : [ {
-              "vechicleSpeed_MeterPerSecond" : 5.962133916683182377482808078639209270477294921875,
-              "fuelConsuption_LiterPerMeter" : 2.3021358869347654518833223846741020679473876953125,
-              "weightCapacity_Gramm" : 1.46581298050294517310021547018550336360931396484375,
-              "payment_EuroPerSecond" : 5.63737665663332876420099637471139430999755859375,
-              "volumeCapacity_Stere" : 6.02745618307040320615897144307382404804229736328125,
-              "name" : "name",
-              "fuelPrice_EuroPerLiter" : 7.061401241503109105224211816675961017608642578125,
-              "id" : "id",
-              "workTime_SecondPerDay" : 0.80082819046101150206595775671303272247314453125,
-              "basePrice_Euro" : 9.301444243932575517419536481611430644989013671875
-            }, {
-              "vechicleSpeed_MeterPerSecond" : 5.962133916683182377482808078639209270477294921875,
-              "fuelConsuption_LiterPerMeter" : 2.3021358869347654518833223846741020679473876953125,
-              "weightCapacity_Gramm" : 1.46581298050294517310021547018550336360931396484375,
-              "payment_EuroPerSecond" : 5.63737665663332876420099637471139430999755859375,
-              "volumeCapacity_Stere" : 6.02745618307040320615897144307382404804229736328125,
-              "name" : "name",
-              "fuelPrice_EuroPerLiter" : 7.061401241503109105224211816675961017608642578125,
-              "id" : "id",
-              "workTime_SecondPerDay" : 0.80082819046101150206595775671303272247314453125,
-              "basePrice_Euro" : 9.301444243932575517419536481611430644989013671875
-            } ]
-          },
-          "id" : "id",
-          "runtime_Second" : "runtime_Second",
-          "bestRout" : [ {
-            "lattitude" : 0.80082819046101150206595775671303272247314453125,
-            "longitude" : 6.02745618307040320615897144307382404804229736328125
-          }, {
-            "lattitude" : 0.80082819046101150206595775671303272247314453125,
-            "longitude" : 6.02745618307040320615897144307382404804229736328125
-          } ]
-        }"""
-        
-        when(exampleContentType) {
-            "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-            "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-            else -> call.respondText(exampleContentString)
-        }
-    }
-    
-
     delete{ it: Paths.removeObjective ->
         call.respond(HttpStatusCode.NotImplemented)
     }
@@ -239,8 +226,15 @@ fun Route.SetupApi() {
     }
     
 
-    route("/setup/save") {
-        post {
+    route("/setup/algorithm") {
+        put {
+            call.respond(HttpStatusCode.NotImplemented)
+        }
+    }
+    
+
+    route("/setup/task") {
+        put {
             call.respond(HttpStatusCode.NotImplemented)
         }
     }

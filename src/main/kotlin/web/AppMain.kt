@@ -1,6 +1,6 @@
-package io.swagger.server
+package web
 
-import com.codahale.metrics.*
+import com.codahale.metrics.Slf4jReporter
 import com.typesafe.config.ConfigFactory
 import io.ktor.application.*
 import io.ktor.client.HttpClient
@@ -8,15 +8,15 @@ import io.ktor.client.engine.apache.Apache
 import io.ktor.config.HoconApplicationConfig
 import io.ktor.features.*
 import io.ktor.gson.GsonConverter
-import io.ktor.http.ContentType
+import io.ktor.http.*
 import io.ktor.locations.*
-import io.ktor.metrics.*
+import io.ktor.metrics.dropwizard.*
 import io.ktor.routing.*
-import java.util.concurrent.*
-import io.swagger.server.apis.*
-import web.ApplicationCompressionConfiguration
-import web.ApplicationHstsConfiguration
+import web.apis.LifecicleApi
 import web.apis.SetupApi
+import web.apis.UpdateApi
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 
 internal val settings = HoconApplicationConfig(ConfigFactory.defaultApplication(HTTP::class.java.classLoader))
@@ -27,7 +27,7 @@ object HTTP {
 
 fun Application.main() {
     install(DefaultHeaders)
-    install(Metrics) {
+    install(DropwizardMetrics) {
         val reporter = Slf4jReporter.forRegistry(registry)
                 .outputTo(log)
                 .convertRatesTo(TimeUnit.SECONDS)
@@ -46,6 +46,20 @@ fun Application.main() {
         LifecicleApi()
         SetupApi()
         UpdateApi()
+    }
+    install(CORS){
+        method(HttpMethod.Options)
+        method(HttpMethod.Get)
+        method(HttpMethod.Post)
+        method(HttpMethod.Put)
+        method(HttpMethod.Delete)
+        method(HttpMethod.Patch)
+        header(HttpHeaders.AccessControlAllowHeaders)
+        header(HttpHeaders.ContentType)
+        header(HttpHeaders.AccessControlAllowOrigin)
+        anyHost()
+        maxAge = Duration.ofDays(1)
+        allowNonSimpleContentTypes = true
     }
 
     environment.monitor.subscribe(ApplicationStopping)

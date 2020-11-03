@@ -11,18 +11,19 @@
 */
 package data.web
 
+
 /**
  * 
  * @param id 
  * @param name 
- * @param objectives 
- * @param edges 
+ * @param iteration 
+ * @param runtime_Second 
  */
-data class Graph (
+data class Run (
     val id: kotlin.String,
     val name: kotlin.String,
-    val objectives: kotlin.Array<Objective>,
-    val edges: kotlin.Array<kotlin.Array<Edge>>
+    val iteration: java.math.BigDecimal,
+    val runtime_Second: java.math.BigDecimal
 ) {
 
 }

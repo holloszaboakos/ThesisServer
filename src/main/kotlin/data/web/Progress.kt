@@ -15,14 +15,18 @@ package data.web
  * 
  * @param id 
  * @param name 
- * @param objectives 
- * @param edges 
+ * @param bestRout 
+ * @param maxCost_Euro 
+ * @param minCost_Euro 
+ * @param bestCost_Euro 
  */
-data class Graph (
+data class Progress (
     val id: kotlin.String,
     val name: kotlin.String,
-    val objectives: kotlin.Array<Objective>,
-    val edges: kotlin.Array<kotlin.Array<Edge>>
+    val bestRout: kotlin.Array<GPS>,
+    val maxCost_Euro: java.math.BigDecimal,
+    val minCost_Euro: java.math.BigDecimal,
+    val bestCost_Euro: java.math.BigDecimal
 ) {
 
 }

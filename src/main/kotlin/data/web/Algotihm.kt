@@ -11,26 +11,21 @@
 */
 package data.web
 
+
 /**
  * 
  * @param id 
  * @param name 
- * @param maxCost_Euro 
- * @param minCost_Euro 
- * @param iteration 
- * @param runtime_Second 
- * @param setup 
- * @param bestRout 
+ * @param iterLimit 
+ * @param timeLimit_Second 
+ * @param algorithm 
  */
-data class State (
+data class Algotihm (
     val id: kotlin.String,
     val name: kotlin.String,
-    val maxCost_Euro: java.math.BigDecimal,
-    val minCost_Euro: java.math.BigDecimal,
-    val iteration: java.math.BigDecimal,
-    val runtime_Second: java.math.BigDecimal,
-    val setup: Setup,
-    val bestRout: kotlin.Array<GPS>
+    val iterLimit: java.math.BigDecimal,
+    val timeLimit_Second: java.math.BigDecimal,
+    val algorithm: kotlin.String
 ) {
 
 }
