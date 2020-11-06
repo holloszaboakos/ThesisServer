@@ -20,7 +20,7 @@ package data.web
  * @param timeLimit_Second 
  * @param algorithm 
  */
-data class Algotihm (
+data class Setting (
     val id: kotlin.String,
     val name: kotlin.String,
     val iterLimit: java.math.BigDecimal,

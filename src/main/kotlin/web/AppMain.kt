@@ -12,19 +12,25 @@ import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.metrics.dropwizard.*
 import io.ktor.routing.*
+import io.ktor.util.*
 import web.apis.LifecicleApi
 import web.apis.SetupApi
 import web.apis.UpdateApi
 import java.time.Duration
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.toDuration
 
 
+@KtorExperimentalAPI
 internal val settings = HoconApplicationConfig(ConfigFactory.defaultApplication(HTTP::class.java.classLoader))
 
 object HTTP {
     val client = HttpClient(Apache)
 }
 
+@KtorExperimentalLocationsAPI
+@ExperimentalTime
 fun Application.main() {
     install(DefaultHeaders)
     install(DropwizardMetrics) {
@@ -58,7 +64,7 @@ fun Application.main() {
         header(HttpHeaders.ContentType)
         header(HttpHeaders.AccessControlAllowOrigin)
         anyHost()
-        maxAge = Duration.ofDays(1)
+        maxAgeDuration = 1.0.toDuration(TimeUnit.DAYS)
         allowNonSimpleContentTypes = true
     }
 

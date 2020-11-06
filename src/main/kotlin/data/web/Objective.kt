@@ -11,6 +11,8 @@
 */
 package data.web
 
+import data.web.GPS
+
 /**
  * 
  * @param id 

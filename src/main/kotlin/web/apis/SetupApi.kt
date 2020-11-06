@@ -19,13 +19,13 @@ import io.ktor.locations.*
 import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.*
-import io.ktor.routing.get
 import web.Paths
 
 // ktor 0.9.x is missing io.ktor.locations.DELETE, this adds it.
 // see https://github.com/ktorio/ktor/issues/288
 import web.delete
 
+@KtorExperimentalLocationsAPI
 fun Route.SetupApi() {
     val gson = Gson()
     val empty = mutableMapOf<String, Any?>()
@@ -58,7 +58,7 @@ fun Route.SetupApi() {
     }
     
 
-    route("/setup/algorithm") {
+    route("/setup/setting") {
         post {
             val exampleContentType = "application/json"
             val exampleContentString = """"""""
@@ -86,7 +86,15 @@ fun Route.SetupApi() {
     }
     
 
-    get { it: Paths.loadAlgorithm ->
+    get<Paths.listAlgorithms> {
+        call.respond(
+            HttpStatusCode.OK,
+            gson.toJson(arrayOf("genetic"))
+        )
+    }
+    
+
+    get<Paths.loadSetting> {
         val exampleContentType = "application/json"
         val exampleContentString = """{
           "timeLimit_Second" : 6.02745618307040320615897144307382404804229736328125,
@@ -104,7 +112,7 @@ fun Route.SetupApi() {
     }
     
 
-    get{ it: Paths.loadTask ->
+    get<Paths.loadTask> {
         val exampleContentType = "application/json"
         val exampleContentString = """{
           "costGraph" : {
@@ -216,17 +224,17 @@ fun Route.SetupApi() {
     }
     
 
-    delete{ it: Paths.removeObjective ->
+    delete<Paths.removeObjective> {
         call.respond(HttpStatusCode.NotImplemented)
     }
     
 
-    delete{ it: Paths.removeSalesman ->
+    delete<Paths.removeSalesman> {
         call.respond(HttpStatusCode.NotImplemented)
     }
     
 
-    route("/setup/algorithm") {
+    route("/setup/setting") {
         put {
             call.respond(HttpStatusCode.NotImplemented)
         }

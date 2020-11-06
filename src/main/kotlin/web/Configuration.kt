@@ -3,8 +3,12 @@ package web
 // Use this file to hold package-level internal functions that return receiver object passed to the `install` method.
 import io.ktor.auth.OAuthServerSettings
 import io.ktor.features.*
-import java.time.Duration
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.toDuration
 
 
 /**
@@ -15,9 +19,10 @@ import java.util.concurrent.Executors
  *
  * See http://ktor.io/features/hsts.html
  */
+@ExperimentalTime
 internal fun ApplicationHstsConfiguration(): HSTS.Configuration.() -> Unit {
     return {
-        maxAge = Duration.ofDays(365)
+        maxAgeDuration = 365.0.toDuration(TimeUnit.DAYS)
         includeSubDomains = true
         preload = false
 

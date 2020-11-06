@@ -12,84 +12,72 @@
 package web.apis
 
 import com.google.gson.Gson
+import data.web.Progress
+import data.web.Result
 import io.ktor.application.call
-import io.ktor.http.ContentType
+import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.response.respond
-import io.ktor.response.respondText
 import io.ktor.routing.*
-import io.ktor.routing.get
+import operations.PolylineEncoder
+import operations.requestRoot
 import web.Paths
+import java.math.BigDecimal
+import java.util.*
 
+// ktor 0.9.x is missing io.ktor.locations.DELETE, this adds it.
+// see https://github.com/ktorio/ktor/issues/288
+
+@KtorExperimentalLocationsAPI
 fun Route.UpdateApi() {
-    val gson = Gson()
-    val empty = mutableMapOf<String, Any?>()
 
-    get { it: Paths.getBestResult ->
-        val exampleContentType = "application/json"
-        val exampleContentString = """{
-          "bestCost_Euro" : 1.46581298050294517310021547018550336360931396484375,
-          "maxCost_Euro" : 0.80082819046101150206595775671303272247314453125,
-          "name" : "name",
-          "minCost_Euro" : 6.02745618307040320615897144307382404804229736328125,
-          "id" : "id",
-          "bestRout" : [ {
-            "lattitude" : 0.80082819046101150206595775671303272247314453125,
-            "longitude" : 6.02745618307040320615897144307382404804229736328125
-          }, {
-            "lattitude" : 0.80082819046101150206595775671303272247314453125,
-            "longitude" : 6.02745618307040320615897144307382404804229736328125
-          } ]
-        }"""
-        
-        when(exampleContentType) {
-            "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-            "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-            else -> call.respondText(exampleContentString)
-        }
+    get<Paths.getProgress> {
+        call.respond(
+            HttpStatusCode.OK,
+            Progress(
+                UUID.randomUUID().toString(),
+                "placeholder",
+                BigDecimal(0),
+                BigDecimal(0)
+            )
+        )
     }
     
 
-    get{  it: Paths.getProgress ->
-        val exampleContentType = "application/json"
-        val exampleContentString = """{
-          "bestCost_Euro" : 1.46581298050294517310021547018550336360931396484375,
-          "maxCost_Euro" : 0.80082819046101150206595775671303272247314453125,
-          "name" : "name",
-          "minCost_Euro" : 6.02745618307040320615897144307382404804229736328125,
-          "id" : "id",
-          "bestRout" : [ {
-            "lattitude" : 0.80082819046101150206595775671303272247314453125,
-            "longitude" : 6.02745618307040320615897144307382404804229736328125
-          }, {
-            "lattitude" : 0.80082819046101150206595775671303272247314453125,
-            "longitude" : 6.02745618307040320615897144307382404804229736328125
-          } ]
-        }"""
-        
-        when(exampleContentType) {
-            "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-            "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-            else -> call.respondText(exampleContentString)
-        }
+    get<Paths.getResult> {
+        call.respond(
+            HttpStatusCode.OK,
+            Result(
+                UUID.randomUUID().toString(),
+                "placeholder",
+                arrayOf(),
+                BigDecimal(0),
+                BigDecimal(0),
+                BigDecimal(0)
+            )
+        )
     }
     
 
-    get{  it: Paths.getRootBetween ->
-        val exampleContentType = "application/json"
-        val exampleContentString = """[ {
-          "lattitude" : 0.80082819046101150206595775671303272247314453125,
-          "longitude" : 6.02745618307040320615897144307382404804229736328125
-        }, {
-          "lattitude" : 0.80082819046101150206595775671303272247314453125,
-          "longitude" : 6.02745618307040320615897144307382404804229736328125
-        } ]"""
-        
-        when(exampleContentType) {
-            "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-            "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-            else -> call.respondText(exampleContentString)
-        }
+    get<Paths.getRootBetween> {
+        val response = requestRoot(
+        call.parameters["fromLat"]?.toDouble() ?: throw Error("fromLat should not be null"),
+        call.parameters["fromLong"]?.toDouble() ?: throw Error("fromLong should not be null"),
+        call.parameters["toLat"]?.toDouble() ?: throw Error("toLat should not be null"),
+        call.parameters["toLong"]?.toDouble() ?: throw Error("toLong should not be null")
+    )
+
+        val answer = PolylineEncoder.decode(
+            response.plan?.itineraries?.get(0)?.legs?.get(0)?.legGeometry?.points
+                ?: throw Error("Result should not be null")
+        ).toTypedArray()
+
+        println("calculated" +  Gson().toJson(answer))
+
+        call.respond(
+            HttpStatusCode.OK,
+            answer
+        )
     }
     
 }

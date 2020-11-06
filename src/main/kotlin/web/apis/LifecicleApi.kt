@@ -12,113 +12,92 @@
 package web.apis
 
 import com.google.gson.Gson
+import data.web.Result
 import io.ktor.application.call
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.*
+import java.math.BigDecimal
+import java.util.*
 
 // ktor 0.9.x is missing io.ktor.locations.DELETE, this adds it.
 // see https://github.com/ktorio/ktor/issues/288
 
-
 fun Route.LifecicleApi() {
-    val gson = Gson()
-    val empty = mutableMapOf<String, Any?>()
-
     route("/lifecycle/clean") {
         post {
-            call.respond(HttpStatusCode.NotImplemented)
-        }
-    }
-    
-
-    route("/lifecycle/cycle") {
-        post {
-            val exampleContentType = "application/json"
-            val exampleContentString = """{
-              "bestCost_Euro" : 1.46581298050294517310021547018550336360931396484375,
-              "maxCost_Euro" : 0.80082819046101150206595775671303272247314453125,
-              "name" : "name",
-              "minCost_Euro" : 6.02745618307040320615897144307382404804229736328125,
-              "id" : "id",
-              "bestRout" : [ {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              }, {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              } ]
-            }"""
-            
-            when(exampleContentType) {
-                "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-                "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-                else -> call.respondText(exampleContentString)
-            }
+            call.respond(HttpStatusCode.OK)
         }
     }
     
 
     route("/lifecycle/pause") {
         post {
-            call.respond(HttpStatusCode.NotImplemented)
+            call.respond(HttpStatusCode.OK)
         }
     }
     
 
     route("/lifecycle/prepare") {
         post {
-            call.respond(HttpStatusCode.NotImplemented)
+            call.respond(HttpStatusCode.OK)
         }
     }
     
 
     route("/lifecycle/resume") {
         post {
-            call.respond(HttpStatusCode.NotImplemented)
+            call.respond(HttpStatusCode.OK)
         }
     }
     
 
     route("/lifecycle/start") {
         post {
-            call.respond(HttpStatusCode.NotImplemented)
+            call.respond(HttpStatusCode.OK)
+        }
+    }
+
+
+    route("/lifecycle/stop") {
+        post {
+            call.respond(HttpStatusCode.OK)
         }
     }
     
 
     route("/lifecycle/step") {
         post {
-            val exampleContentType = "application/json"
-            val exampleContentString = """{
-              "bestCost_Euro" : 1.46581298050294517310021547018550336360931396484375,
-              "maxCost_Euro" : 0.80082819046101150206595775671303272247314453125,
-              "name" : "name",
-              "minCost_Euro" : 6.02745618307040320615897144307382404804229736328125,
-              "id" : "id",
-              "bestRout" : [ {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              }, {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              } ]
-            }"""
-            
-            when(exampleContentType) {
-                "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-                "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-                else -> call.respondText(exampleContentString)
-            }
+            call.respond(
+                HttpStatusCode.OK,
+                Result(
+                    UUID.randomUUID().toString(),
+                    "placeholder",
+                    arrayOf(),
+                    BigDecimal(0),
+                    BigDecimal(0),
+                    BigDecimal(0)
+                )
+            )
         }
     }
-    
 
-    route("/lifecycle/stop") {
+
+    route("/lifecycle/cycle") {
         post {
-            call.respond(HttpStatusCode.NotImplemented)
+            call.respond(
+                HttpStatusCode.OK,
+                Result(
+                    UUID.randomUUID().toString(),
+                    "placeholder",
+                    arrayOf(),
+                    BigDecimal(0),
+                    BigDecimal(0),
+                    BigDecimal(0)
+                )
+            )
         }
     }
     

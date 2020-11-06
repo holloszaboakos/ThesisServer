@@ -11,19 +11,22 @@
 */
 package data.web
 
-
 /**
  * 
  * @param id 
  * @param name 
- * @param iteration 
- * @param runtime_Second 
+ * @param bestRout 
+ * @param maxCost_Euro 
+ * @param minCost_Euro 
+ * @param bestCost_Euro 
  */
-data class Run (
+data class Result (
     val id: kotlin.String,
     val name: kotlin.String,
-    val iteration: java.math.BigDecimal,
-    val runtime_Second: java.math.BigDecimal
+    val bestRout: kotlin.Array<GPS>,
+    val maxCost_Euro: java.math.BigDecimal,
+    val minCost_Euro: java.math.BigDecimal,
+    val bestCost_Euro: java.math.BigDecimal
 ) {
 
 }
