@@ -38,9 +38,23 @@ object Paths {
     @Location("/setup/setting/algorithm") class listAlgorithms()
 
     /**
+     * List names of settings
+     * List names of saved settings
+     */
+    @KtorExperimentalLocationsAPI
+    @Location("/setup/setting/list") class listSettingsNames()
+
+    /**
+     * List names of tasks
+     * List names of saved tasks
+     */
+    @KtorExperimentalLocationsAPI
+    @Location("/setup/task/list") class listTaskNames()
+
+    /**
      * Load setting
      * Load setting with a name maching the parameter
-     * @param body Setting name 
+     * @param body Setting name
      */
     @KtorExperimentalLocationsAPI
     @Location("/setup/setting") class loadSetting(val body: kotlin.String)
@@ -48,7 +62,7 @@ object Paths {
     /**
      * Load task
      * Load task with a name maching the parameter
-     * @param body Task name 
+     * @param body Task name
      */
     @KtorExperimentalLocationsAPI
     @Location("/setup/task") class loadTask(val body: kotlin.String)
@@ -56,7 +70,7 @@ object Paths {
     /**
      * Delete objective
      * delete objective specified by name
-     * @param body identifier 
+     * @param body identifier
      */
     @KtorExperimentalLocationsAPI
     @Location("/setup/objective") class removeObjective(val body: kotlin.String)
@@ -64,7 +78,7 @@ object Paths {
     /**
      * Delete salesman
      * delete salesman specified by name
-     * @param body identifier 
+     * @param body identifier
      */
     @KtorExperimentalLocationsAPI
     @Location("/setup/salesman") class removeSalesman(val body: kotlin.String)
@@ -86,10 +100,10 @@ object Paths {
     /**
      * get root between locations
      * get best plan for actual transport
-     * @param fromLat lattitude of GPS coords of source location 
-     * @param fromLong longitude of GPS coords of source location 
-     * @param toLat lattitude of GPS coords of target location 
-     * @param toLong longitude of GPS coords of target location 
+     * @param fromLat lattitude of GPS coords of source location
+     * @param fromLong longitude of GPS coords of source location
+     * @param toLat lattitude of GPS coords of target location
+     * @param toLong longitude of GPS coords of target location
      */
     @KtorExperimentalLocationsAPI
     @Location("/update/root/{fromLat}/{fromLong}/{toLat}/{toLong}") class getRootBetween(val fromLat: java.math.BigDecimal, val fromLong: java.math.BigDecimal, val toLat: java.math.BigDecimal, val toLong: java.math.BigDecimal)

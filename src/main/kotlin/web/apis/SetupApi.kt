@@ -11,77 +11,68 @@
 */
 package web.apis
 
-import com.google.gson.Gson
-import io.ktor.application.call
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.locations.*
-import io.ktor.response.respond
-import io.ktor.response.respondText
-import io.ktor.routing.*
-import web.Paths
-
 // ktor 0.9.x is missing io.ktor.locations.DELETE, this adds it.
 // see https://github.com/ktorio/ktor/issues/288
+import com.google.gson.Gson
+import data.web.GPS
+import data.web.Graph
+import data.web.Setting
+import data.web.Task
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.locations.*
+import io.ktor.request.*
+import io.ktor.response.*
+import io.ktor.routing.*
+import web.Paths
 import web.delete
+import java.math.BigDecimal
+import java.util.*
 
 @KtorExperimentalLocationsAPI
 fun Route.SetupApi() {
     val gson = Gson()
-    val empty = mutableMapOf<String, Any?>()
 
     route("/setup/objective") {
         post {
-            val exampleContentType = "application/json"
-            val exampleContentString = """"""""
-            
-            when(exampleContentType) {
-                "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-                "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-                else -> call.respondText(exampleContentString)
-            }
+            //val name : Objective = call.receive()
+            call.respond(
+                HttpStatusCode.OK,
+                gson.toJson(UUID.randomUUID().toString())
+            )
         }
     }
     
 
     route("/setup/salesman") {
         post {
-            val exampleContentType = "application/json"
-            val exampleContentString = """"""""
-            
-            when(exampleContentType) {
-                "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-                "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-                else -> call.respondText(exampleContentString)
-            }
+            //val name : Salesman = call.receive()
+            call.respond(
+                HttpStatusCode.OK,
+                gson.toJson(UUID.randomUUID().toString())
+            )
         }
     }
     
 
     route("/setup/setting") {
         post {
-            val exampleContentType = "application/json"
-            val exampleContentString = """"""""
-            
-            when(exampleContentType) {
-                "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-                "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-                else -> call.respondText(exampleContentString)
-            }
+            //val name : Setting = call.receive()
+            call.respond(
+                HttpStatusCode.OK,
+                gson.toJson(UUID.randomUUID().toString())
+            )
         }
     }
     
 
     route("/setup/task") {
         post {
-            val exampleContentType = "application/json"
-            val exampleContentString = """"""""
-            
-            when(exampleContentType) {
-                "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-                "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-                else -> call.respondText(exampleContentString)
-            }
+            //val name : Task = call.receive()
+            call.respond(
+                HttpStatusCode.OK,
+                gson.toJson(UUID.randomUUID().toString())
+            )
         }
     }
     
@@ -90,160 +81,73 @@ fun Route.SetupApi() {
         call.respond(
             HttpStatusCode.OK,
             gson.toJson(arrayOf("genetic"))
+
         )
+    }
+
+
+    get<Paths.listSettingsNames> {
+        call.respond(HttpStatusCode.OK,gson.toJson(arrayOf<String>()))
+    }
+
+
+    get<Paths.listTaskNames> {
+        call.respond(HttpStatusCode.OK,gson.toJson(arrayOf<String>()))
     }
     
 
     get<Paths.loadSetting> {
-        val exampleContentType = "application/json"
-        val exampleContentString = """{
-          "timeLimit_Second" : 6.02745618307040320615897144307382404804229736328125,
-          "name" : "name",
-          "id" : "id",
-          "iterLimit" : 0.80082819046101150206595775671303272247314453125,
-          "algorithm" : "algorithm"
-        }"""
-        
-        when(exampleContentType) {
-            "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-            "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-            else -> call.respondText(exampleContentString)
-        }
+        val name : String = call.receive()
+        call.respond(HttpStatusCode.OK, gson.toJson(Setting(
+            UUID.randomUUID().toString(),
+            name,
+            BigDecimal(0),
+            BigDecimal(0),
+            "genetic"
+        )))
     }
     
 
     get<Paths.loadTask> {
-        val exampleContentType = "application/json"
-        val exampleContentString = """{
-          "costGraph" : {
-            "name" : "name",
-            "edges" : [ [ {
-              "root" : [ {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              }, {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              } ],
-              "name" : "name",
-              "id" : "id",
-              "length_Meter" : 0.80082819046101150206595775671303272247314453125
-            }, {
-              "root" : [ {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              }, {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              } ],
-              "name" : "name",
-              "id" : "id",
-              "length_Meter" : 0.80082819046101150206595775671303272247314453125
-            } ], [ {
-              "root" : [ {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              }, {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              } ],
-              "name" : "name",
-              "id" : "id",
-              "length_Meter" : 0.80082819046101150206595775671303272247314453125
-            }, {
-              "root" : [ {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              }, {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              } ],
-              "name" : "name",
-              "id" : "id",
-              "length_Meter" : 0.80082819046101150206595775671303272247314453125
-            } ] ],
-            "objectives" : [ {
-              "weight_Gramm" : 5.63737665663332876420099637471139430999755859375,
-              "volume_Stere" : 5.962133916683182377482808078639209270477294921875,
-              "name" : "name",
-              "location" : {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              },
-              "id" : "id",
-              "time_Second" : 1.46581298050294517310021547018550336360931396484375
-            }, {
-              "weight_Gramm" : 5.63737665663332876420099637471139430999755859375,
-              "volume_Stere" : 5.962133916683182377482808078639209270477294921875,
-              "name" : "name",
-              "location" : {
-                "lattitude" : 0.80082819046101150206595775671303272247314453125,
-                "longitude" : 6.02745618307040320615897144307382404804229736328125
-              },
-              "id" : "id",
-              "time_Second" : 1.46581298050294517310021547018550336360931396484375
-            } ],
-            "id" : "id"
-          },
-          "center" : {
-            "lattitude" : 0.80082819046101150206595775671303272247314453125,
-            "longitude" : 6.02745618307040320615897144307382404804229736328125
-          },
-          "name" : "name",
-          "id" : "id",
-          "salesmen" : [ {
-            "vechicleSpeed_MeterPerSecond" : 5.962133916683182377482808078639209270477294921875,
-            "fuelConsuption_LiterPerMeter" : 2.3021358869347654518833223846741020679473876953125,
-            "weightCapacity_Gramm" : 1.46581298050294517310021547018550336360931396484375,
-            "payment_EuroPerSecond" : 5.63737665663332876420099637471139430999755859375,
-            "volumeCapacity_Stere" : 6.02745618307040320615897144307382404804229736328125,
-            "name" : "name",
-            "fuelPrice_EuroPerLiter" : 7.061401241503109105224211816675961017608642578125,
-            "id" : "id",
-            "workTime_SecondPerDay" : 0.80082819046101150206595775671303272247314453125,
-            "basePrice_Euro" : 9.301444243932575517419536481611430644989013671875
-          }, {
-            "vechicleSpeed_MeterPerSecond" : 5.962133916683182377482808078639209270477294921875,
-            "fuelConsuption_LiterPerMeter" : 2.3021358869347654518833223846741020679473876953125,
-            "weightCapacity_Gramm" : 1.46581298050294517310021547018550336360931396484375,
-            "payment_EuroPerSecond" : 5.63737665663332876420099637471139430999755859375,
-            "volumeCapacity_Stere" : 6.02745618307040320615897144307382404804229736328125,
-            "name" : "name",
-            "fuelPrice_EuroPerLiter" : 7.061401241503109105224211816675961017608642578125,
-            "id" : "id",
-            "workTime_SecondPerDay" : 0.80082819046101150206595775671303272247314453125,
-            "basePrice_Euro" : 9.301444243932575517419536481611430644989013671875
-          } ]
-        }"""
-        
-        when(exampleContentType) {
-            "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-            "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-            else -> call.respondText(exampleContentString)
-        }
+        val name : String = call.receive()
+        call.respond(HttpStatusCode.OK,gson.toJson(Task(
+            UUID.randomUUID().toString(),
+            name,
+            GPS(BigDecimal(0), BigDecimal(0)),
+            arrayOf(),
+            Graph(
+                UUID.randomUUID().toString(),
+                "costGraph",
+                arrayOf(),
+                arrayOf()
+            )
+        )))
     }
     
 
     delete<Paths.removeObjective> {
-        call.respond(HttpStatusCode.NotImplemented)
+        val name : String = call.receive()
+        call.respond(HttpStatusCode.OK)
     }
     
 
     delete<Paths.removeSalesman> {
-        call.respond(HttpStatusCode.NotImplemented)
+        val name : String = call.receive()
+        call.respond(HttpStatusCode.OK)
     }
     
 
     route("/setup/setting") {
         put {
-            call.respond(HttpStatusCode.NotImplemented)
+            val name : String = call.receive()
+            call.respond(HttpStatusCode.OK)
         }
     }
     
 
     route("/setup/task") {
         put {
-            call.respond(HttpStatusCode.NotImplemented)
+            call.respond(HttpStatusCode.OK)
         }
     }
     
