@@ -113,11 +113,13 @@ fun Route.SetupApi() {
         call.respond(HttpStatusCode.OK,gson.toJson(Task(
             UUID.randomUUID().toString(),
             name,
-            GPS(BigDecimal(0), BigDecimal(0)),
             arrayOf(),
             Graph(
                 UUID.randomUUID().toString(),
                 "costGraph",
+                GPS(BigDecimal(0), BigDecimal(0)),
+                arrayOf(),
+                arrayOf(),
                 arrayOf(),
                 arrayOf()
             )
@@ -126,20 +128,20 @@ fun Route.SetupApi() {
     
 
     delete<Paths.removeObjective> {
-        val name : String = call.receive()
+        //val name : String = call.receive()
         call.respond(HttpStatusCode.OK)
     }
     
 
     delete<Paths.removeSalesman> {
-        val name : String = call.receive()
+        //val name : String = call.receive()
         call.respond(HttpStatusCode.OK)
     }
     
 
     route("/setup/setting") {
         put {
-            val name : String = call.receive()
+            //val name : String = call.receive()
             call.respond(HttpStatusCode.OK)
         }
     }

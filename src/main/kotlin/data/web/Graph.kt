@@ -11,19 +11,27 @@
 */
 package data.web
 
+
 /**
- * 
- * @param id 
- * @param name 
- * @param objectives 
- * @param edges 
+ *
+ * @param id
+ * @param name
+ * @param center
+ * @param objectives
+ * @param edgesBetween
+ * @param edgesFromCenter
+ * @param edgesToCenter
  */
 data class Graph (
-    val id: kotlin.String,
-    val name: kotlin.String,
-    val objectives: kotlin.Array<Objective>,
-    val edges: kotlin.Array<kotlin.Array<Edge>>
+    val id: String,
+    val name: String,
+    val center: GPS,
+    val objectives: Array<Objective>,
+    val edgesBetween: Array<Array<Edge>>,
+    val edgesFromCenter: Array<Edge>,
+    val edgesToCenter: Array<Edge>
 ) {
 
 }
+
 

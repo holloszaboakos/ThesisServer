@@ -22,7 +22,7 @@ data class Edge (
     val id: kotlin.String,
     val name: kotlin.String,
     val length_Meter: java.math.BigDecimal,
-    val root: kotlin.Array<GPS>
+    val rout: kotlin.Array<GPS>
 ) {
 
 }

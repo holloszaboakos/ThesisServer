@@ -97,15 +97,16 @@ object Paths {
     @KtorExperimentalLocationsAPI
     @Location("/update/result") class getResult()
 
+
     /**
-     * get root between locations
-     * get best plan for actual transport
+     * get rout between locations
+     * get rout between two locations specified by GPS coordinates
      * @param fromLat lattitude of GPS coords of source location
      * @param fromLong longitude of GPS coords of source location
      * @param toLat lattitude of GPS coords of target location
      * @param toLong longitude of GPS coords of target location
      */
     @KtorExperimentalLocationsAPI
-    @Location("/update/root/{fromLat}/{fromLong}/{toLat}/{toLong}") class getRootBetween(val fromLat: java.math.BigDecimal, val fromLong: java.math.BigDecimal, val toLat: java.math.BigDecimal, val toLong: java.math.BigDecimal)
+    @Location("/update/rout/{fromLat}/{fromLong}/{toLat}/{toLong}") class getRoutBetween(val fromLat: java.math.BigDecimal, val fromLong: java.math.BigDecimal, val toLat: java.math.BigDecimal, val toLong: java.math.BigDecimal)
 
 }

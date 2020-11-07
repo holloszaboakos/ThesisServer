@@ -26,7 +26,6 @@ import data.web.Salesman
 data class Task (
     val id: kotlin.String,
     val name: kotlin.String,
-    val center: GPS,
     val salesmen: kotlin.Array<Salesman>,
     val costGraph: Graph
 ) {
