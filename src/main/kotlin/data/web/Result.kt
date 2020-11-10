@@ -23,7 +23,7 @@ package data.web
 data class Result (
     val id: kotlin.String,
     val name: kotlin.String,
-    val bestRout: kotlin.Array<GPS>,
+    val bestRout: kotlin.Array<Array<GPS>>,
     val maxCost_Euro: java.math.BigDecimal,
     val minCost_Euro: java.math.BigDecimal,
     val bestCost_Euro: java.math.BigDecimal
