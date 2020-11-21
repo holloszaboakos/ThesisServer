@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost/thesis</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">Eredmenyek.007</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQL55Dialect</property>
+        <property name="hibernate.connection.characterEncoding">utf8</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <property name="show_sql">true</property>
+        <property name="format_sql">true</property>
+        <property name="use_sql_comments">true</property>
+
+        <mapping class="thesis.data.web.Edge"/>
+        <mapping class="thesis.data.web.EdgeArray"/>
+        <mapping class="thesis.data.web.EdgeMatrix"/>
+        <mapping class="thesis.data.web.Gps"/>
+        <mapping class="thesis.data.web.GpsArray"/>
+        <mapping class="thesis.data.web.GpsMatrix"/>
+        <mapping class="thesis.data.web.Graph"/>
+        <mapping class="thesis.data.web.Objective"/>
+        <mapping class="thesis.data.web.Progress"/>
+        <mapping class="thesis.data.web.Result"/>
+        <mapping class="thesis.data.web.Salesman"/>
+        <mapping class="thesis.data.web.Setting"/>
+        <mapping class="thesis.data.web.Task"/>
+
+        <mapping class="thesis.data.HibernateManager"/>
+
+    </session-factory>
+</hibernate-configuration>
