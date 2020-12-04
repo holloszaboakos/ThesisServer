@@ -1,10 +1,12 @@
 package thesis.core
 
+import java.math.BigDecimal
+
 data class Permutation(
     val values: Array<Int>,
     val sliceLengthes: Array<Int>,
     var alive: Boolean,
-    var cost: Int = 0,
+    var cost: BigDecimal = BigDecimal(0),
     var iteration: Int = 0,
 ) {
     operator fun get(index: Int) = values[index]

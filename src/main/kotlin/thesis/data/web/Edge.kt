@@ -24,6 +24,12 @@ import javax.persistence.*
  */
 @Entity
 @Table(name = "edge")
+@NamedQueries(
+    NamedQuery(
+        name = "listEdge",
+        query = "FROM Edge"
+    )
+)
 data class Edge(
     @Id
     @Column(name = "id", length = 255)
@@ -31,11 +37,14 @@ data class Edge(
     val name: String = "",
 
     var orderInOwner: Int = 0,
-    @ManyToOne
-    var owner: EdgeArray? = null,
 
     val length_Meter: BigDecimal = BigDecimal(0),
-    @OneToOne(cascade = [CascadeType.ALL])
-    val rout: GpsArray = GpsArray()
-)
+    @OneToMany(cascade = [CascadeType.ALL])
+    @OrderColumn(name = "orderInOwner")
+    val rout: Array<Gps> = arrayOf()
+){
+    init {
+        rout.forEachIndexed { index, gps -> gps.orderInOwner=index }
+    }
+}
 

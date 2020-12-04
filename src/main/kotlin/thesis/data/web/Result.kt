@@ -26,15 +26,31 @@ import javax.persistence.*
  */
 @Entity
 @Table(name = "result")
+@NamedQueries(
+    NamedQuery(
+        name = "listResult",
+        query = "FROM Result"
+    )
+)
 data class Result (
     @Id
     @Column(name = "id", length = 255)
     var id: String = UUID.randomUUID().toString(),
     val name: String="",
-    @OneToOne(cascade = [CascadeType.ALL])
-    val bestRout: GpsMatrix= GpsMatrix(),
+    @OneToMany(cascade = [CascadeType.ALL])
+    @OrderColumn(name = "orderInOwner")
+    val bestRout: Array<GpsArray> = arrayOf(),
     val maxCost_Euro: BigDecimal= BigDecimal(0),
     val minCost_Euro: BigDecimal= BigDecimal(0),
     val bestCost_Euro: BigDecimal= BigDecimal(0)
-)
+){
+    init {
+        bestRout.forEachIndexed { indexArray, array ->
+            array.orderInOwner = indexArray
+            array.values.forEachIndexed { indexValue, value ->
+                value.orderInOwner = indexValue
+            }
+        }
+    }
+}
 

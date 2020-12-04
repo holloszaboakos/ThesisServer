@@ -3,9 +3,15 @@ package thesis.core.genetic.lifecycle
 import thesis.core.genetic.GeneticAlgorithm
 
 enum class EPause {
-    EXAMPLE {
+    STANDARD {
         override fun invoke(alg: GeneticAlgorithm) {
-            TODO("Not yet implemented")
+            when (alg.state) {
+                GeneticAlgorithm.State.RESUMED -> {
+                    alg.state = GeneticAlgorithm.State.STARTED
+                }
+                else -> {
+                }
+            }
         }
     };
 

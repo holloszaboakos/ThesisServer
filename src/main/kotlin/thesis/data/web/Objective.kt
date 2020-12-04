@@ -26,14 +26,18 @@ import javax.persistence.*
  */
 @Entity
 @Table(name = "objective")
+@NamedQueries(
+    NamedQuery(
+        name = "listObjective",
+        query = "FROM Objective"
+    )
+)
 data class Objective (
     @Id
     @Column(name = "id", length = 255)
     var id: String = UUID.randomUUID().toString(),
     val name: String = "",
     var orderInOwner: Int =0,
-    @ManyToOne
-    var owner:Graph?=null,
     @OneToOne(cascade = [CascadeType.ALL])
     val location: Gps = Gps(),
     val time_Second: BigDecimal = BigDecimal(0),

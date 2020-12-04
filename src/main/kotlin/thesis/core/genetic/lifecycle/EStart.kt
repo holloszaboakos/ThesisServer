@@ -3,9 +3,16 @@ package thesis.core.genetic.lifecycle
 import thesis.core.genetic.GeneticAlgorithm
 
 enum class EStart {
-    EXAMPLE {
+    STANDARD {
         override fun invoke(alg: GeneticAlgorithm) {
-            TODO("Not yet implemented")
+            when (alg.state) {
+                GeneticAlgorithm.State.CREATED -> {
+                    alg.initialize()
+                    alg.orderByCost()
+                    alg.boost()
+                }
+                else -> {}
+            }
         }
     };
 

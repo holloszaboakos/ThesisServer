@@ -31,13 +31,17 @@ import javax.persistence.*
  */
 @Entity
 @Table(name = "salesman")
+@NamedQueries(
+    NamedQuery(
+        name = "listSalesman",
+        query = "FROM Salesman"
+    )
+)
 data class Salesman (
     @Id
     @Column(name = "id", length = 255)
     var id: String = UUID.randomUUID().toString(),
     val name: String="",
-    @ManyToOne
-    var owner: Task?=null,
     var orderInOwner: Int=0,
     val workTime_SecondPerDay: BigDecimal= BigDecimal(0),
     val volumeCapacity_Stere: BigDecimal= BigDecimal(0),

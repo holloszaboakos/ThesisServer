@@ -27,6 +27,12 @@ import javax.persistence.*
  */
 @Entity
 @Table(name = "graph")
+@NamedQueries(
+    NamedQuery(
+        name = "listGraph",
+        query = "FROM Graph"
+    )
+)
 data class Graph (
     @Id
     @Column(name = "id", length = 255)
@@ -34,47 +40,35 @@ data class Graph (
     val name: String="",
     @OneToOne(cascade = [CascadeType.ALL])
     val center: Gps= Gps(),
-    @OneToMany(mappedBy = "owner", cascade = [CascadeType.ALL])
+    @OneToMany(cascade = [CascadeType.ALL])
     @OrderColumn(name = "orderInOwner")
     val objectives: Array<Objective> = arrayOf(),
-    @OneToOne(cascade = [CascadeType.ALL])
-    val edgesBetween: EdgeMatrix = EdgeMatrix(),
-    @OneToOne(cascade = [CascadeType.ALL])
-    val edgesFromCenter: EdgeArray = EdgeArray(),
-    @OneToOne(cascade = [CascadeType.ALL])
-    val edgesToCenter: EdgeArray = EdgeArray()
+    @OneToMany(cascade = [CascadeType.ALL])
+    @OrderColumn(name = "orderInOwner")
+    val edgesBetween: Array<EdgeArray> = arrayOf(),
+    @OneToMany(cascade = [CascadeType.ALL])
+    @OrderColumn(name = "orderInOwner")
+    val edgesFromCenter: Array<Edge> = arrayOf(),
+    @OneToMany(cascade = [CascadeType.ALL])
+    @OrderColumn(name = "orderInOwner")
+    val edgesToCenter: Array<Edge> = arrayOf()
 ) {
     init {
         objectives.forEachIndexed { index, value ->
-            value.owner = this
             value.orderInOwner = index
         }
-    }
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
 
-        other as Graph
-
-        if (id != other.id) return false
-        if (name != other.name) return false
-        if (center != other.center) return false
-        if (!objectives.contentEquals(other.objectives)) return false
-        if (edgesBetween != other.edgesBetween) return false
-        if (edgesFromCenter != other.edgesFromCenter) return false
-        if (edgesToCenter != other.edgesToCenter) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + name.hashCode()
-        result = 31 * result + center.hashCode()
-        result = 31 * result + objectives.contentHashCode()
-        result = 31 * result + edgesBetween.hashCode()
-        result = 31 * result + edgesFromCenter.hashCode()
-        result = 31 * result + edgesToCenter.hashCode()
-        return result
+        edgesBetween.forEachIndexed { indexArray, array ->
+            array.orderInOwner = indexArray
+            array.values.forEachIndexed { indexValue, value ->
+                value.orderInOwner = indexValue
+            }
+        }
+        edgesFromCenter.forEachIndexed { index, value ->
+            value.orderInOwner = index
+        }
+        edgesToCenter.forEachIndexed { index, value ->
+            value.orderInOwner = index
+        }
     }
 }

@@ -5,7 +5,7 @@ import org.hibernate.SessionFactory
 import org.hibernate.Transaction
 import org.hibernate.cfg.Configuration
 
-object HibernateManager {
+object OHibernateManager {
     var sessionFactory: SessionFactory? = null
 
     fun openFactory() {
@@ -56,11 +56,11 @@ object HibernateManager {
         return mapped
     }
 
-    inline fun <reified Item, Owner> find(listItemKey: ListItemKey<Owner>): Item {
-        if (listItemKey.owner == null || listItemKey.orderInOwner == -1) throw Error("id should not be null")
+    inline fun <reified Item, Owner> find(IListItemKey: IListItemKey<Owner>): Item {
+        if (IListItemKey.owner == null || IListItemKey.orderInOwner == -1) throw Error("id should not be null")
         val session = openSession()
         val transaction = session.beginTransaction()
-        val mapped = session.find(Item::class.java, listItemKey)
+        val mapped = session.find(Item::class.java, IListItemKey)
         closeSession(session,transaction)
         return mapped
     }
@@ -197,13 +197,27 @@ object HibernateManager {
     }
 
     inline fun <reified T>list(tableName: String?): List<T> {
-        tableName ?: throw Error("center id should not be null")
+        tableName ?: throw Exception("table name should not be null")
         val session = openSession()
         val transaction = session.beginTransaction()
         val mapped = session
             .createNamedQuery("list$tableName", T::class.java)
             .resultList
             .map { it as T }
+        closeSession(session,transaction)
+        return mapped
+    }
+
+    inline fun <reified T>findByName(tableName: String?,name:String?): T {
+        tableName ?: throw Exception("tableName should not be null")
+        name ?: throw Exception("name should not be null")
+        val session = openSession()
+        val transaction = session.beginTransaction()
+        val mapped = session
+            .createNamedQuery("findByName$tableName", T::class.java)
+            .resultList
+            .map { it as T }
+            .first()
         closeSession(session,transaction)
         return mapped
     }

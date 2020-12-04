@@ -20,6 +20,10 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import org.hibernate.Hibernate
+import thesis.core.OAlgorithmManager
+import thesis.core.genetic.EGeneticSetup
+import thesis.data.OHibernateManager
 import thesis.data.web.*
 import thesis.web.Paths
 import thesis.web.delete
@@ -32,10 +36,12 @@ fun Route.SetupApi() {
 
     route("/setup/objective") {
         post {
-            //val name : Objective = call.receive()
+            val obj: Objective = call.receive()
+            obj.id = UUID.randomUUID().toString()
+            OHibernateManager.saveOrUpdate(obj)
             call.respond(
                 HttpStatusCode.OK,
-                gson.toJson(UUID.randomUUID().toString())
+                gson.toJson(obj.id)
             )
         }
     }
@@ -43,10 +49,12 @@ fun Route.SetupApi() {
 
     route("/setup/salesman") {
         post {
-            //val name : Salesman = call.receive()
+            val salesman: Salesman = call.receive()
+            salesman.id = UUID.randomUUID().toString()
+            OHibernateManager.saveOrUpdate(salesman)
             call.respond(
                 HttpStatusCode.OK,
-                gson.toJson(UUID.randomUUID().toString())
+                gson.toJson(salesman.id)
             )
         }
     }
@@ -54,10 +62,12 @@ fun Route.SetupApi() {
 
     route("/setup/setting") {
         post {
-            //val name : Setting = call.receive()
+            val setting: Setting = call.receive()
+            setting.id = UUID.randomUUID().toString()
+            OAlgorithmManager.settings = setting
             call.respond(
                 HttpStatusCode.OK,
-                gson.toJson(UUID.randomUUID().toString())
+                gson.toJson(setting.id)
             )
         }
     }
@@ -65,10 +75,13 @@ fun Route.SetupApi() {
 
     route("/setup/task") {
         post {
-            //val name : Task = call.receive()
+            val task: Task = call.receive()
+            if(task.id.isBlank())
+                task.id = UUID.randomUUID().toString()
+            OAlgorithmManager.task = task
             call.respond(
                 HttpStatusCode.OK,
-                gson.toJson(UUID.randomUUID().toString())
+                gson.toJson(task.id)
             )
         }
     }
@@ -77,84 +90,80 @@ fun Route.SetupApi() {
     get<Paths.listAlgorithms> {
         call.respond(
             HttpStatusCode.OK,
-            gson.toJson(arrayOf("genetic"))
+            gson.toJson(arrayOf(EGeneticSetup.values().map { it.code }))
 
         )
     }
 
 
     get<Paths.listSettingsNames> {
-        call.respond(HttpStatusCode.OK, gson.toJson(arrayOf<String>()))
+        call.respond(HttpStatusCode.OK, gson.toJson(
+            OHibernateManager.list<Setting>("Setting").map { it.name }
+        ))
     }
 
 
     get<Paths.listTaskNames> {
-        call.respond(HttpStatusCode.OK, gson.toJson(arrayOf<String>()))
+        call.respond(HttpStatusCode.OK, gson.toJson(
+            OHibernateManager.list<Task>("Task").map { it.name }
+        ))
     }
 
 
     get<Paths.loadSetting> {
         val name: String = call.receive()
-        call.respond(
-            HttpStatusCode.OK, gson.toJson(
-                Setting(
-                    UUID.randomUUID().toString(),
-                    name,
-                    BigDecimal(0),
-                    BigDecimal(0),
-                    "genetic"
-                )
-            )
-        )
+        val setting = OHibernateManager.findByName<Setting>("Setting", name)
+        OAlgorithmManager.settings = setting
+        call.respond(HttpStatusCode.OK, gson.toJson(setting))
     }
 
 
     get<Paths.loadTask> {
         val name: String = call.receive()
-        call.respond(
-            HttpStatusCode.OK, gson.toJson(
-                Task(
-                    UUID.randomUUID().toString(),
-                    name,
-                    arrayOf(),
-                    Graph(
-                        UUID.randomUUID().toString(),
-                        "costGraph",
-                        Gps(lattitude = BigDecimal(0), longitude = BigDecimal(0)),
-                        arrayOf(),
-                        EdgeMatrix(),
-                        EdgeArray(),
-                        EdgeArray()
-                    )
-                )
-            )
-        )
+        val task = OHibernateManager.findByName<Task>("Task", name)
+        OAlgorithmManager.task = task
+        call.respond(HttpStatusCode.OK, gson.toJson(task))
     }
 
 
     delete<Paths.removeObjective> {
-        //val name : String = call.receive()
+        val name: String = call.receive()
+        val objective = OHibernateManager.findByName<Objective>("Objective", name)
+        OHibernateManager.delete(objective)
         call.respond(HttpStatusCode.OK)
     }
 
 
     delete<Paths.removeSalesman> {
-        //val name : String = call.receive()
+        val name: String = call.receive()
+        val salesman = OHibernateManager.findByName<Salesman>("Salesman", name)
+        OHibernateManager.delete(salesman)
         call.respond(HttpStatusCode.OK)
     }
 
 
     route("/setup/setting") {
         put {
-            //val name : String = call.receive()
-            call.respond(HttpStatusCode.OK)
+            val setting = OAlgorithmManager.settings
+                ?.also {
+                    it.copy(name = call.receive())
+                }
+            OHibernateManager.saveOrUpdate(setting)
+            if (setting == null) call.respond(HttpStatusCode.OK)
+            else call.respond(HttpStatusCode.MethodNotAllowed)
         }
     }
 
 
     route("/setup/task") {
         put {
-            call.respond(HttpStatusCode.OK)
+            val task = OAlgorithmManager.task
+                ?.also {
+                    it.copy(name = call.receive())
+                }
+            OHibernateManager.saveOrUpdate(task)
+            if (task == null) call.respond(HttpStatusCode.OK)
+            else call.respond(HttpStatusCode.MethodNotAllowed)
         }
     }
 

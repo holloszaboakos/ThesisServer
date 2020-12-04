@@ -1,19 +1,37 @@
 package thesis
 
-import org.hibernate.Hibernate
-import thesis.data.HibernateManager
-import thesis.data.web.Edge
-import thesis.data.web.GpsArray
-import java.math.BigDecimal
+import thesis.data.OHibernateManager
+import thesis.data.web.Test
+import thesis.data.web.TestItem
 
 fun main() {
-    HibernateManager.save(
-        Edge(
-            id = "edge",
-            name = "edge",
-            length_Meter = BigDecimal(0),
-            rout = GpsArray()
+    OHibernateManager.save(
+        Test(
+            id = "test",
+            items = arrayOf(
+                TestItem(
+                    id = "testItem1",
+                    value = 1
+                ),
+                TestItem(
+                    id = "testItem2",
+                    value = 1
+                ),
+                TestItem(
+                    id = "testItem3",
+                    value = 1
+                ),
+                TestItem(
+                    id = "testItem4",
+                    value = 1
+                ),
+                TestItem(
+                    id = "testItem5",
+                    value = 1
+                )
+            )
         )
     )
-    HibernateManager.deleteById<Edge>("edge")
+    OHibernateManager.deleteById<Test>("test")
+    OHibernateManager.closeFactory()
 }

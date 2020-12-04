@@ -23,13 +23,17 @@ import javax.persistence.*
  */
 @Entity
 @Table(name = "gps")
+@NamedQueries(
+    NamedQuery(
+        name = "listGps",
+        query = "FROM Gps"
+    )
+)
 data class Gps (
     @Id
     @Column(name = "id", length = 255)
     var id: String = UUID.randomUUID().toString(),
     var orderInOwner: Int = 0,
-    @ManyToOne
-    var owner: GpsArray?=null,
     val lattitude: BigDecimal = BigDecimal(0),
     val longitude: BigDecimal = BigDecimal(0)
 ) {

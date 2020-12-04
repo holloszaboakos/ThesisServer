@@ -16,6 +16,7 @@ import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import thesis.core.OAlgorithmManager
 import thesis.data.web.*
 import thesis.operations.PolylineEncoder
 import thesis.operations.requestRoot
@@ -32,12 +33,14 @@ fun Route.UpdateApi() {
     get<Paths.getProgress> {
         call.respond(
             HttpStatusCode.OK,
-            Progress(
-                UUID.randomUUID().toString(),
-                "placeholder",
-                BigDecimal(0),
-                BigDecimal(0)
-            )
+            OAlgorithmManager.algorithm?.let {
+                Progress(
+                    UUID.randomUUID().toString(),
+                    "placeholder",
+                    it.iteration.toBigDecimal(),
+                    (it.spentTime / 1000.0).toBigDecimal()
+                )
+            } ?: throw Exception("Algorithm should not be null")
         )
     }
 
@@ -45,14 +48,7 @@ fun Route.UpdateApi() {
     get<Paths.getResult> {
         call.respond(
             HttpStatusCode.OK,
-            Result(
-                UUID.randomUUID().toString(),
-                "placeholder",
-                GpsMatrix(),
-                BigDecimal(0),
-                BigDecimal(0),
-                BigDecimal(0)
-            )
+            OAlgorithmManager.calcResult()
         )
     }
 
@@ -84,9 +80,8 @@ fun Route.UpdateApi() {
                             UUID.randomUUID().toString(),
                             "",
                             0,
-                            null,
                             BigDecimal(distance),
-                            GpsArray(gps = PolylineEncoder.decode(points).toTypedArray())
+                            rout = PolylineEncoder.decode(points).toTypedArray()
                         )
                     )
                 }

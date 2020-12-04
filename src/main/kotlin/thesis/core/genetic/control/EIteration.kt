@@ -1,11 +1,21 @@
 package thesis.core.genetic.control
 
 import thesis.core.genetic.GeneticAlgorithm
+import java.lang.System.currentTimeMillis
 
 enum class EIteration {
-    EXAMPLE {
+    STANDARD {
         override fun invoke(alg: GeneticAlgorithm) {
-            TODO("Not yet implemented")
+            alg.state = GeneticAlgorithm.State.RESUMED
+            alg.resumeTime = currentTimeMillis()
+            alg.selection()
+            alg.crossover()
+            alg.mutate()
+            alg.orderByCost()
+            alg.boost()
+            alg.iteration++
+            alg.spentTime += currentTimeMillis() - alg.resumeTime
+            alg.state = GeneticAlgorithm.State.STARTED
         }
     };
 

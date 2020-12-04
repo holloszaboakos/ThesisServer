@@ -19,6 +19,8 @@ enum class EInicializePopulation {
                         length += permutation.sliceLengthes[index]
                     }
                 }
+                permutation.iteration = -1
+                permutation.alive = true
             }
         }
     };

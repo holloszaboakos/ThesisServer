@@ -13,10 +13,7 @@ package thesis.data.web
 
 import java.math.BigDecimal
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.*
 
 
 /**
@@ -29,6 +26,12 @@ import javax.persistence.Table
  */
 @Entity
 @Table(name = "setting")
+@NamedQueries(
+    NamedQuery(
+        name = "listSetting",
+        query = "FROM Setting"
+    )
+)
 data class Setting (
     @Id
     @Column(name = "id", length = 255)

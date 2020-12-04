@@ -4,6 +4,7 @@ import thesis.core.Permutation
 import thesis.data.web.Graph
 import thesis.data.web.Objective
 import thesis.data.web.Salesman
+import java.math.BigDecimal
 
 class GeneticAlgorithm(
     var timeLimit: Long = 0L,
@@ -13,6 +14,15 @@ class GeneticAlgorithm(
     var salesmen: Array<Salesman>,
     var setup: GeneticAlgorithmSetup
 ) {
+
+    enum class State {
+        CREATED,
+        STARTED,
+        RESUMED
+    }
+
+    var state = State.CREATED
+
     var iteration = 0
     var spentTime = 0L
     var resumeTime = 0L
@@ -21,14 +31,10 @@ class GeneticAlgorithm(
             Array(objectives.size) { it },
             Array(salesmen.size) { it },
             false,
-            -1
+            BigDecimal(-1),
+            iteration = -1
         )
     }
-
-    val ratioOfKill = 0.5
-    val ratioOfRandomSelection = 0.5
-    val ratioOfMutation = 0.5
-    val limitOfAgeOfBest = (objectives.size * objectives.size)
 
     fun pause() = setup.pause(this)
     fun resume() = setup.resume(this)

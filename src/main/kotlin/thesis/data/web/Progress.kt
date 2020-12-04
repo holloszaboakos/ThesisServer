@@ -13,10 +13,7 @@ package thesis.data.web
 
 import java.math.BigDecimal
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.*
 
 
 /**
@@ -28,6 +25,12 @@ import javax.persistence.Table
  */
 @Entity
 @Table(name = "progress")
+@NamedQueries(
+    NamedQuery(
+        name = "listProgress",
+        query = "FROM Progress"
+    )
+)
 data class Progress (
     @Id
     @Column(name = "id", length = 255)

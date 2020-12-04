@@ -17,10 +17,8 @@
 
         <mapping class="thesis.data.web.Edge"/>
         <mapping class="thesis.data.web.EdgeArray"/>
-        <mapping class="thesis.data.web.EdgeMatrix"/>
         <mapping class="thesis.data.web.Gps"/>
         <mapping class="thesis.data.web.GpsArray"/>
-        <mapping class="thesis.data.web.GpsMatrix"/>
         <mapping class="thesis.data.web.Graph"/>
         <mapping class="thesis.data.web.Objective"/>
         <mapping class="thesis.data.web.Progress"/>
@@ -28,8 +26,10 @@
         <mapping class="thesis.data.web.Salesman"/>
         <mapping class="thesis.data.web.Setting"/>
         <mapping class="thesis.data.web.Task"/>
+        <mapping class="thesis.data.web.Test"/>
+        <mapping class="thesis.data.web.TestItem"/>
 
-        <mapping class="thesis.data.HibernateManager"/>
+        <mapping class="thesis.data.OHibernateManager"/>
 
     </session-factory>
 </hibernate-configuration>

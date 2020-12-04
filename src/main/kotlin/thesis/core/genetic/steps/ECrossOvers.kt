@@ -1,6 +1,7 @@
 package thesis.core.genetic.steps
 
 import thesis.core.genetic.GeneticAlgorithm
+import java.math.BigDecimal
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -33,6 +34,7 @@ enum class ECrossOvers {
                 }
                 child.alive = false
                 child.iteration = alg.iteration
+                child.cost = BigDecimal(-1)
             }
 
         }

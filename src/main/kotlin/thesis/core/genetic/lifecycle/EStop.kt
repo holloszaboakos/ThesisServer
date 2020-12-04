@@ -3,9 +3,21 @@ package thesis.core.genetic.lifecycle
 import thesis.core.genetic.GeneticAlgorithm
 
 enum class EStop {
-    EXAMPLE {
+    STANDARD {
         override fun invoke(alg: GeneticAlgorithm) {
-            TODO("Not yet implemented")
+            when (alg.state) {
+                GeneticAlgorithm.State.RESUMED -> {
+                    alg.pause()
+                    alg.stop()
+                }
+                GeneticAlgorithm.State.STARTED -> {
+                    alg.iteration = 0
+                    alg.spentTime = 0
+                    alg.population.forEach { it.iteration = 0 }
+                }
+                else -> {
+                }
+            }
         }
     };
 

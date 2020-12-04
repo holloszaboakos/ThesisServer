@@ -8,7 +8,7 @@ enum class EBoost {
             val best = alg.population[0]
             var bestCost = best.cost
             var improve = true
-            var tempGene : Int
+            var tempGene: Int
             while (improve) {
                 improve = false
                 (best.values.indices).forEach { firstIndex ->
@@ -18,11 +18,10 @@ enum class EBoost {
                             best[firstIndex] = best[secondIndex]
                             best[secondIndex] = tempGene
                             alg.cost(best)
-                            if(best.cost<bestCost){
-                                improve=true
+                            if (best.cost < bestCost) {
+                                improve = true
                                 bestCost = best.cost
-                            }
-                            else{
+                            } else {
                                 tempGene = best[firstIndex]
                                 best[firstIndex] = best[secondIndex]
                                 best[secondIndex] = tempGene
@@ -32,6 +31,11 @@ enum class EBoost {
                 }
             }
         }
+    },
+
+    NO_BOOST {
+        override fun invoke(alg: GeneticAlgorithm) {}
+
     };
 
     abstract operator fun invoke(alg: GeneticAlgorithm)

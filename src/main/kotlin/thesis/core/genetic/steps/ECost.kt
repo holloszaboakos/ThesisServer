@@ -29,7 +29,7 @@ enum class ECost {
                         cost += objective.time_Second
                     } else if (sliceGeneIndex == sliceLength - 1) {
                         val betweenEdge = (costGraph.edgesBetween
-                                [permutation[geneIndex + sliceGeneIndex - 1]]
+                                [permutation[geneIndex + sliceGeneIndex - 1]].values
                                 [permutation[geneIndex + sliceGeneIndex]]
                                 )
                         val objective = objectives[permutation[geneIndex + sliceGeneIndex]]
@@ -51,7 +51,7 @@ enum class ECost {
                                 )
                     } else {
                         val betweenEdge = (costGraph.edgesBetween
-                                [permutation[geneIndex + sliceGeneIndex - 1]]
+                                [permutation[geneIndex + sliceGeneIndex - 1]].values
                                 [permutation[geneIndex + sliceGeneIndex]]
                                 )
                         val objective = objectives[permutation[geneIndex + sliceGeneIndex]]

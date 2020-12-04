@@ -1,11 +1,22 @@
 package thesis.core.genetic.lifecycle
 
 import thesis.core.genetic.GeneticAlgorithm
+import java.lang.System.currentTimeMillis
 
 enum class EResume {
-    EXAMPLE {
+    STANDARD {
         override fun invoke(alg: GeneticAlgorithm) {
-            TODO("Not yet implemented")
+            when (alg.state) {
+                GeneticAlgorithm.State.CREATED -> {
+                    alg.start()
+                    alg.resume()
+                }
+                GeneticAlgorithm.State.STARTED -> {
+                    alg.run()
+                }
+                else -> {
+                }
+            }
         }
     };
 
