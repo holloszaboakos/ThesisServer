@@ -29,6 +29,10 @@ import javax.persistence.*
     NamedQuery(
         name = "listProgress",
         query = "FROM Progress"
+    ),
+    NamedQuery(
+        name = "findByNameProgress",
+        query = "FROM Progress where name = :name"
     )
 )
 data class Progress (

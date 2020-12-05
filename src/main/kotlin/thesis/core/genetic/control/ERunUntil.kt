@@ -5,10 +5,9 @@ import thesis.core.genetic.GeneticAlgorithm
 enum class ERunUntil {
     STANDARD {
         override fun invoke(alg: GeneticAlgorithm) {
-            alg.resumeTime = System.currentTimeMillis()
             alg.state = GeneticAlgorithm.State.RESUMED
             while (
-                alg.spentTime < alg.timeLimit
+                alg.runTime_Second < alg.timeLimit
                 && alg.iteration < alg.iterationLimit
                 && alg.state == GeneticAlgorithm.State.RESUMED
             ) {
@@ -17,10 +16,17 @@ enum class ERunUntil {
                 alg.mutate()
                 alg.orderByCost()
                 alg.boost()
+                alg.best = alg.population.first().copy(
+                    values = alg.population.first().values.clone(),
+                    sliceLengthes = alg.population.first().sliceLengthes.clone()
+                )
+                alg.worst = alg.population.last().copy(
+                    values = alg.population.last().values.clone(),
+                    sliceLengthes = alg.population.last().sliceLengthes.clone()
+                )
                 alg.iteration++
-                alg.spentTime += System.currentTimeMillis() - alg.resumeTime
             }
-            alg.state = GeneticAlgorithm.State.STARTED
+            alg.state = GeneticAlgorithm.State.INITIALIZED
         }
     };
 

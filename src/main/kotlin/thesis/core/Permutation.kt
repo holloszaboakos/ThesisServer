@@ -3,8 +3,8 @@ package thesis.core
 import java.math.BigDecimal
 
 data class Permutation(
-    val values: Array<Int>,
-    val sliceLengthes: Array<Int>,
+    val values: IntArray,
+    val sliceLengthes: IntArray,
     var alive: Boolean,
     var cost: BigDecimal = BigDecimal(0),
     var iteration: Int = 0,

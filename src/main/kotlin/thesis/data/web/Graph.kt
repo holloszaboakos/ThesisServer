@@ -31,6 +31,10 @@ import javax.persistence.*
     NamedQuery(
         name = "listGraph",
         query = "FROM Graph"
+    ),
+    NamedQuery(
+        name = "findByNameGraph",
+        query = "FROM Graph where name = :name"
     )
 )
 data class Graph (

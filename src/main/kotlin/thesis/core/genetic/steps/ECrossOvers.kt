@@ -32,7 +32,7 @@ enum class ECrossOvers {
                 primerParent.sliceLengthes.forEachIndexed { dividerIndex, divider ->
                     child.sliceLengthes[dividerIndex] = divider
                 }
-                child.alive = false
+                child.alive = true
                 child.iteration = alg.iteration
                 child.cost = BigDecimal(-1)
             }
@@ -49,16 +49,20 @@ enum class ECrossOvers {
                 val secunderParent = parent[index + 1 - 2 * (index % 2)]
                 val child = children[index]
 
+                child.values.indices.forEach { geneIndex -> child[geneIndex] = -1 }
+
                 val primerParentSlice = primerParent.values
                     .slice(
                         0..Random.nextInt(alg.objectives.indices)
                     )
                 primerParentSlice.forEachIndexed { geneIndex, gene -> child[geneIndex] = gene }
-
                 (primerParentSlice.size until alg.objectives.size)
-                    .forEach { geneIndex->
+                    .forEach { geneIndex ->
                         child[geneIndex] = secunderParent.values.first { !child.values.contains(it) }
                     }
+                child.alive = true
+                child.iteration = alg.iteration
+                child.cost = BigDecimal(-1)
             }
 
         }

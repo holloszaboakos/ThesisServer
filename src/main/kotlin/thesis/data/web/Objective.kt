@@ -30,6 +30,10 @@ import javax.persistence.*
     NamedQuery(
         name = "listObjective",
         query = "FROM Objective"
+    ),
+    NamedQuery(
+        name = "findByNameObjective",
+        query = "FROM Objective where name = :name"
     )
 )
 data class Objective (

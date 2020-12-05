@@ -5,21 +5,21 @@ import thesis.core.genetic.control.EIteration
 import thesis.core.genetic.control.ERunUntil
 import thesis.core.genetic.lifecycle.EPause
 import thesis.core.genetic.lifecycle.EResume
-import thesis.core.genetic.lifecycle.EStart
-import thesis.core.genetic.lifecycle.EStop
+import thesis.core.genetic.lifecycle.EInitialize
+import thesis.core.genetic.lifecycle.EClear
 import thesis.core.genetic.steps.*
 
 data class GeneticAlgorithmSetup (
     val pause:EPause,
     val resume:EResume,
-    val start:EStart,
-    val stop:EStop,
+    val initialize:EInitialize,
+    val clear:EClear,
 
     val run: ERunUntil,
     val cycle: ECycle,
     val iteration: EIteration,
 
-    val initialize:EInicializePopulation,
+    val initializePopulation:EInicializePopulation,
     val cost: ECost,
     val orderByCost: EOrderPopulationByCost,
     val boost: EBoost,

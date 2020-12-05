@@ -51,21 +51,22 @@ object Paths {
     @KtorExperimentalLocationsAPI
     @Location("/setup/task/list") class listTaskNames()
 
+
     /**
      * Load setting
      * Load setting with a name maching the parameter
-     * @param body Setting name
+     * @param name Setting name
      */
     @KtorExperimentalLocationsAPI
-    @Location("/setup/setting") class loadSetting(val body: kotlin.String)
+    @Location("/setup/setting") class loadSetting(val name: kotlin.String)
 
     /**
      * Load task
      * Load task with a name maching the parameter
-     * @param body Task name
+     * @param name Task name
      */
     @KtorExperimentalLocationsAPI
-    @Location("/setup/task") class loadTask(val body: kotlin.String)
+    @Location("/setup/task") class loadTask(val name: kotlin.String)
 
     /**
      * Delete objective

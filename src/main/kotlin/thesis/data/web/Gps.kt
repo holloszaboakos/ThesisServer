@@ -27,6 +27,10 @@ import javax.persistence.*
     NamedQuery(
         name = "listGps",
         query = "FROM Gps"
+    ),
+    NamedQuery(
+        name = "findByNameGps",
+        query = "FROM Gps where name = :name"
     )
 )
 data class Gps (

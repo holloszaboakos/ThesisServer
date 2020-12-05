@@ -10,7 +10,7 @@ fun requestRoot(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Respons
         "http://localhost:8000/otp/routers/default/plan"
                 + "?fromPlace=${lat1},${lon1}"
                 + "&toPlace=${lat2},${lon2}"
-                + "&time=3:50pm&date=2-25-2019&mode=CAR,WALK&maxWalkDistance=6000&arriveBy=false"
+                + "&time=3:50pm&date=2-25-2019&mode=CAR,WALK&maxWalkDistance=60000&arriveBy=false"
     ).execute().returnContent().asString()
 
     println(s)

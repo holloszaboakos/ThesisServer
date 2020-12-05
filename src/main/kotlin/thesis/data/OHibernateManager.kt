@@ -215,6 +215,7 @@ object OHibernateManager {
         val transaction = session.beginTransaction()
         val mapped = session
             .createNamedQuery("findByName$tableName", T::class.java)
+            .setParameter("name",name)
             .resultList
             .map { it as T }
             .first()

@@ -38,7 +38,7 @@ fun Route.UpdateApi() {
                     UUID.randomUUID().toString(),
                     "placeholder",
                     it.iteration.toBigDecimal(),
-                    (it.spentTime / 1000.0).toBigDecimal()
+                    BigDecimal(it.runTime_Second)
                 )
             } ?: throw Exception("Algorithm should not be null")
         )

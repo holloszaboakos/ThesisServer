@@ -11,7 +11,7 @@ enum class EMutateChildren {
                 return
             }
             alg.population
-                .filter { !it.alive }
+                .filter { it.iteration == alg.iteration }
                 .shuffled()
                 .slice(0..alg.population.size / 4)
                 .forEach { child ->
@@ -37,9 +37,9 @@ enum class EMutateChildren {
                 return
             }
             alg.population
-                .filter { !it.alive }
+                .filter { it.iteration == alg.iteration }
                 .shuffled()
-                .slice(0..alg.population.size / 4)
+                .slice(0..(alg.population.size / 4))
                 .forEach { child ->
                     val firstCutIndex = Random.nextInt(alg.objectives.indices)
                     val secondCutIndex = Random.nextInt(alg.objectives.indices)
@@ -49,9 +49,17 @@ enum class EMutateChildren {
                             else
                                 it
                         }
-                    val reversed = child.values.slice(firstCutIndex..secondCutIndex).reversed()
-                    for(geneIndex in firstCutIndex..secondCutIndex)
-                        child[geneIndex] = reversed[geneIndex]-firstCutIndex
+
+                    if(secondCutIndex>firstCutIndex) {
+                        val reversed = child.values.slice(firstCutIndex..secondCutIndex).reversed()
+                        for(geneIndex in firstCutIndex..secondCutIndex)
+                            child[geneIndex] = reversed[geneIndex-firstCutIndex]
+                    }
+                    else{
+                        val reversed = child.values.slice(secondCutIndex..firstCutIndex).reversed()
+                        for(geneIndex in secondCutIndex..firstCutIndex)
+                            child[geneIndex] = reversed[geneIndex-secondCutIndex]
+                    }
                 }
         }
     };

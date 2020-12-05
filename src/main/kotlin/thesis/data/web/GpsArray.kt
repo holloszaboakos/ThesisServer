@@ -9,6 +9,10 @@ import javax.persistence.*
     NamedQuery(
         name = "listGpsArray",
         query = "FROM GpsArray"
+    ),
+    NamedQuery(
+        name = "findByNameGpsArray",
+        query = "FROM GpsArray where name = :name"
     )
 )
 data class GpsArray(

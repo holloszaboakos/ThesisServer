@@ -28,6 +28,10 @@ import javax.persistence.*
     NamedQuery(
         name = "listEdge",
         query = "FROM Edge"
+    ),
+    NamedQuery(
+        name = "findByNameEdge",
+        query = "FROM Edge where name = :name"
     )
 )
 data class Edge(
@@ -42,9 +46,9 @@ data class Edge(
     @OneToMany(cascade = [CascadeType.ALL])
     @OrderColumn(name = "orderInOwner")
     val rout: Array<Gps> = arrayOf()
-){
+) {
     init {
-        rout.forEachIndexed { index, gps -> gps.orderInOwner=index }
+        rout.forEachIndexed { index, gps -> gps.orderInOwner = index }
     }
 }
 

@@ -63,7 +63,8 @@ fun Route.SetupApi() {
     route("/setup/setting") {
         post {
             val setting: Setting = call.receive()
-            setting.id = UUID.randomUUID().toString()
+            if (setting.id.isBlank())
+                setting.id = UUID.randomUUID().toString()
             OAlgorithmManager.settings = setting
             call.respond(
                 HttpStatusCode.OK,
@@ -76,7 +77,7 @@ fun Route.SetupApi() {
     route("/setup/task") {
         post {
             val task: Task = call.receive()
-            if(task.id.isBlank())
+            if (task.id.isBlank())
                 task.id = UUID.randomUUID().toString()
             OAlgorithmManager.task = task
             call.respond(
@@ -111,7 +112,7 @@ fun Route.SetupApi() {
 
 
     get<Paths.loadSetting> {
-        val name: String = call.receive()
+        val name: String = call.request.queryParameters["name"] ?: throw Error("Name should not be null")
         val setting = OHibernateManager.findByName<Setting>("Setting", name)
         OAlgorithmManager.settings = setting
         call.respond(HttpStatusCode.OK, gson.toJson(setting))
@@ -119,7 +120,7 @@ fun Route.SetupApi() {
 
 
     get<Paths.loadTask> {
-        val name: String = call.receive()
+        val name: String = call.request.queryParameters["name"] ?: throw Error("Name should not be null")
         val task = OHibernateManager.findByName<Task>("Task", name)
         OAlgorithmManager.task = task
         call.respond(HttpStatusCode.OK, gson.toJson(task))
@@ -144,26 +145,74 @@ fun Route.SetupApi() {
 
     route("/setup/setting") {
         put {
-            val setting = OAlgorithmManager.settings
-                ?.also {
-                    it.copy(name = call.receive())
-                }
-            OHibernateManager.saveOrUpdate(setting)
-            if (setting == null) call.respond(HttpStatusCode.OK)
-            else call.respond(HttpStatusCode.MethodNotAllowed)
+            val setting = OAlgorithmManager.settings?.copy(name = call.receive())
+            if (setting != null) {
+                OHibernateManager.saveOrUpdate(setting)
+                call.respond(HttpStatusCode.OK)
+            } else call.respond(HttpStatusCode.MethodNotAllowed)
         }
     }
 
 
     route("/setup/task") {
         put {
-            val task = OAlgorithmManager.task
-                ?.also {
-                    it.copy(name = call.receive())
+            val task = OAlgorithmManager.task?.copy(name = call.receive())
+            if (task != null) {
+                task.salesmen.forEachIndexed { index, salesman ->
+                    if (salesman.id.isBlank())
+                        salesman.id = UUID.randomUUID().toString()
+                    salesman.orderInOwner = index
                 }
-            OHibernateManager.saveOrUpdate(task)
-            if (task == null) call.respond(HttpStatusCode.OK)
-            else call.respond(HttpStatusCode.MethodNotAllowed)
+                if (task.costGraph.id.isBlank())
+                    task.costGraph.id = UUID.randomUUID().toString()
+                if (task.costGraph.center.id.isBlank())
+                    task.costGraph.center.id = UUID.randomUUID().toString()
+                task.costGraph.objectives.forEachIndexed { index, objective ->
+                    if (objective.id.isBlank())
+                        objective.id = UUID.randomUUID().toString()
+                    objective.orderInOwner = index
+                    if (objective.location.id.isBlank())
+                        objective.location.id= UUID.randomUUID().toString()
+
+                }
+                task.costGraph.edgesBetween.forEachIndexed { index, edgeArray ->
+                    if (edgeArray.id.isBlank())
+                        edgeArray.id = UUID.randomUUID().toString()
+                    edgeArray.orderInOwner = index
+                    edgeArray.values.forEachIndexed { edgeIndex, edge ->
+                        if (edge.id.isBlank())
+                            edge.id = UUID.randomUUID().toString()
+                        edge.orderInOwner = edgeIndex
+                        edge.rout.forEachIndexed { indexEdge, gps ->
+                            if (gps.id.isBlank())
+                                gps.id = UUID.randomUUID().toString()
+                            gps.orderInOwner = indexEdge
+                        }
+                    }
+                }
+                task.costGraph.edgesFromCenter.forEachIndexed { index, edge ->
+                    if (edge.id.isBlank())
+                        edge.id = UUID.randomUUID().toString()
+                    edge.orderInOwner = index
+                    edge.rout.forEachIndexed { indexEdge, gps ->
+                        if (gps.id.isBlank())
+                            gps.id = UUID.randomUUID().toString()
+                        gps.orderInOwner = indexEdge
+                    }
+                }
+                task.costGraph.edgesToCenter.forEachIndexed { index, edge ->
+                    if (edge.id.isBlank())
+                        edge.id = UUID.randomUUID().toString()
+                    edge.orderInOwner = index
+                    edge.rout.forEachIndexed { indexEdge, gps ->
+                        if (gps.id.isBlank())
+                            gps.id = UUID.randomUUID().toString()
+                        gps.orderInOwner = indexEdge
+                    }
+                }
+                OHibernateManager.saveOrUpdate(task)
+                call.respond(HttpStatusCode.OK)
+            } else call.respond(HttpStatusCode.MethodNotAllowed)
         }
     }
 

@@ -11,21 +11,20 @@ enum class EBoost {
             var tempGene: Int
             while (improve) {
                 improve = false
-                (best.values.indices).forEach { firstIndex ->
-                    (best.values.indices).forEach { secondIndex ->
-                        if (firstIndex != secondIndex) {
+                (0 until best.values.size - 1).forEach { firstIndex ->
+                    (firstIndex until best.values.size).forEach { secondIndex ->
+                        tempGene = best[firstIndex]
+                        best[firstIndex] = best[secondIndex]
+                        best[secondIndex] = tempGene
+                        alg.cost(best)
+                        if (best.cost < bestCost) {
+                            improve = true
+                            bestCost = best.cost
+                        } else {
                             tempGene = best[firstIndex]
                             best[firstIndex] = best[secondIndex]
                             best[secondIndex] = tempGene
-                            alg.cost(best)
-                            if (best.cost < bestCost) {
-                                improve = true
-                                bestCost = best.cost
-                            } else {
-                                tempGene = best[firstIndex]
-                                best[firstIndex] = best[secondIndex]
-                                best[secondIndex] = tempGene
-                            }
+                            best.cost = bestCost
                         }
                     }
                 }

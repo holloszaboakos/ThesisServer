@@ -30,6 +30,10 @@ import javax.persistence.*
     NamedQuery(
         name = "listSetting",
         query = "FROM Setting"
+    ),
+    NamedQuery(
+        name = "findByNameSetting",
+        query = "FROM Setting where name = :name"
     )
 )
 data class Setting (

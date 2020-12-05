@@ -12,12 +12,13 @@ object OAlgorithmManager {
     var algorithm: GeneticAlgorithm? = null
     var task: Task? = null
     var settings: Setting? = null
-    var minCost: BigDecimal = BigDecimal(Long.MAX_VALUE)
+    private var minCost: BigDecimal = BigDecimal(Long.MAX_VALUE)
+    private var maxCost: BigDecimal = BigDecimal(Long.MIN_VALUE)
 
     fun prepare(): Boolean =
         task?.let { task ->
             task.costGraph.edgesBetween.size == task.costGraph.objectives.size
-                    && task.costGraph.edgesBetween.all { it.values.size == task.costGraph.objectives.size }
+                    && task.costGraph.edgesBetween.all { it.values.size == task.costGraph.objectives.size - 1 }
                     && task.costGraph.edgesFromCenter.size == task.costGraph.objectives.size
                     && task.costGraph.edgesToCenter.size == task.costGraph.objectives.size
         } == true
@@ -38,7 +39,7 @@ object OAlgorithmManager {
                 )
             }
         }
-        algorithm?.start()
+        algorithm?.initialize()
     }
 
     fun resume() {
@@ -50,37 +51,50 @@ object OAlgorithmManager {
     }
 
     fun stop() {
-        algorithm?.stop()
+        algorithm?.clear()
     }
 
     fun clean() {
         algorithm = null
         task = null
         settings = null
+        minCost = BigDecimal(Long.MAX_VALUE)
+        maxCost = BigDecimal(Long.MIN_VALUE)
     }
 
     fun calcResult(): Result {
-        var result: Result? = null
-        algorithm?.apply {
-
+        task?.run {
             if (minCost == BigDecimal(Long.MAX_VALUE)) {
                 var minLength_Meter = BigDecimal(0)
-                costGraph.edgesBetween.forEach { edgeArray ->
-                    minLength_Meter += edgeArray.values.minOf { it.length_Meter }
+                costGraph.edgesBetween.forEachIndexed { index, edgeArray ->
+                    minLength_Meter += minOf(
+                        edgeArray.values.minOf { it.length_Meter },
+                        costGraph.edgesToCenter[index].length_Meter
+                    )
                 }
                 minCost = salesmen.minOf {
-                    var cost = it.basePrice_Euro
-                    costGraph.objectives.forEach { objective ->
-                        cost += objective.time_Second * it.payment_EuroPerSecond
-                    }
-                    cost += minLength_Meter * it.fuelConsuption_LiterPerMeter * it.fuelPrice_EuroPerLiter
-                    cost += minLength_Meter / it.vechicleSpeed_MeterPerSecond * it.payment_EuroPerSecond
-                    cost
+                    it.basePrice_Euro +
+                            costGraph.objectives.sumOf { objective -> objective.time_Second * it.payment_EuroPerSecond } +
+                            minLength_Meter * it.fuelConsuption_LiterPerMeter * it.fuelPrice_EuroPerLiter +
+                            minLength_Meter / it.vechicleSpeed_MeterPerSecond * it.payment_EuroPerSecond
                 }
             }
 
+            if (maxCost == BigDecimal(Long.MIN_VALUE)) {
+                val maxLength_Meter =
+                    costGraph.edgesFromCenter.sumOf { it.length_Meter } + costGraph.edgesToCenter.sumOf { it.length_Meter }
+                maxCost = salesmen.minOf { salesman ->
+                    salesman.basePrice_Euro +
+                            costGraph.objectives.sumOf { objective -> objective.time_Second * salesman.payment_EuroPerSecond } +
+                            maxLength_Meter * salesman.fuelConsuption_LiterPerMeter * salesman.fuelPrice_EuroPerLiter +
+                            maxLength_Meter / salesman.vechicleSpeed_MeterPerSecond * salesman.payment_EuroPerSecond
+                }
+            }
+        }
+        return algorithm?.run {
+
             val bestRout: Array<GpsArray> =
-                population.first().run {
+                best?.run {
                     var geneIndex = 0
                     sliceLengthes.map { sliceLength ->
                         val gpsList = (geneIndex until (geneIndex + sliceLength))
@@ -88,50 +102,30 @@ object OAlgorithmManager {
                         geneIndex += sliceLength
                         GpsArray(values = gpsList.toTypedArray())
                     }
-                }.toTypedArray()
+                }?.toTypedArray() ?: arrayOf()
+            worst?.let { worst->
+                if (worst.cost < maxCost) {
+                    maxCost = worst.cost
+                }
+            }
 
-            result = Result(
+            Result(
                 name = "",
                 bestRout = bestRout,
-                maxCost_Euro = population.last().cost,
+                maxCost_Euro = maxCost,
                 minCost_Euro = minCost,
-                bestCost_Euro = population.first().cost
+                bestCost_Euro = best?.cost ?: maxCost
             )
-        } ?: task?.apply {
-
-            if (minCost == BigDecimal(Long.MAX_VALUE)) {
-                var minLength_Meter = BigDecimal(0)
-                costGraph.edgesBetween.forEach { edgeArray ->
-                    minLength_Meter += edgeArray.values.minOf { it.length_Meter }
-                }
-                minCost = salesmen.minOf {
-                    var cost = it.basePrice_Euro
-                    costGraph.objectives.forEach { objective ->
-                        cost += objective.time_Second * it.payment_EuroPerSecond
-                    }
-                    cost += minLength_Meter * it.fuelConsuption_LiterPerMeter * it.fuelPrice_EuroPerLiter
-                    cost += minLength_Meter / it.vechicleSpeed_MeterPerSecond * it.payment_EuroPerSecond
-                    cost
-                }
-            }
-
-            val maxLength = costGraph.edgesFromCenter.sumOf { it.length_Meter } + costGraph.edgesToCenter.sumOf { it.length_Meter }
-            val maxCost = salesmen.maxOf { salesman ->
-                maxLength / salesman.vechicleSpeed_MeterPerSecond * salesman.payment_EuroPerSecond +
-                        costGraph.objectives.sumOf { it.time_Second } * salesman.payment_EuroPerSecond +
-                        salesman.basePrice_Euro +
-                        maxLength * salesman.fuelConsuption_LiterPerMeter + salesman.fuelPrice_EuroPerLiter
-            }
-
-            result = Result(
+        } ?: task?.run {
+            Result(
                 name = "",
                 bestRout = arrayOf(),
                 maxCost_Euro = maxCost,
                 minCost_Euro = minCost,
                 bestCost_Euro = maxCost
             )
-        }
-        return result ?: throw Exception("Funcion Should Not be called if algorithm is null")
+        } ?: throw Exception("Funcion Should Not be called if algorithm and task are null")
+
     }
 
     fun step(): Result {

@@ -9,6 +9,10 @@ import javax.persistence.*
     NamedQuery(
         name = "listEdgeArray",
         query = "FROM EdgeArray"
+    ),
+    NamedQuery(
+        name = "findByNameEdgeArray",
+        query = "FROM EdgeArray where name = :name"
     )
 )
 data class EdgeArray(

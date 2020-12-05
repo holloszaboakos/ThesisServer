@@ -5,8 +5,8 @@ import thesis.core.genetic.control.EIteration
 import thesis.core.genetic.control.ERunUntil
 import thesis.core.genetic.lifecycle.EPause
 import thesis.core.genetic.lifecycle.EResume
-import thesis.core.genetic.lifecycle.EStart
-import thesis.core.genetic.lifecycle.EStop
+import thesis.core.genetic.lifecycle.EInitialize
+import thesis.core.genetic.lifecycle.EClear
 import thesis.core.genetic.steps.*
 
 enum class EGeneticSetup(val code: String, val setup: GeneticAlgorithmSetup) {
@@ -14,8 +14,8 @@ enum class EGeneticSetup(val code: String, val setup: GeneticAlgorithmSetup) {
         "geneticWithOpt2", GeneticAlgorithmSetup(
             EPause.STANDARD,
             EResume.STANDARD,
-            EStart.STANDARD,
-            EStop.STANDARD,
+            EInitialize.STANDARD,
+            EClear.STANDARD,
             ERunUntil.STANDARD,
             ECycle.STANDARD,
             EIteration.STANDARD,

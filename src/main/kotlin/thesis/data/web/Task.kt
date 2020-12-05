@@ -28,6 +28,10 @@ import javax.persistence.*
     NamedQuery(
         name = "listTask",
         query = "FROM Task"
+    ),
+    NamedQuery(
+        name = "findByNameTask",
+        query = "FROM Task where name = :name"
     )
 )
 data class Task(

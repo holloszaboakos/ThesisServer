@@ -9,6 +9,10 @@ import javax.persistence.*
     NamedQuery(
         name = "listTest",
         query = "FROM Test"
+    ),
+    NamedQuery(
+        name = "findByNameTest",
+        query = "FROM Test where name = :name"
     )
 )
 data class Test(
