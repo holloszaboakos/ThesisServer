@@ -69,7 +69,17 @@ class GeneticAlgorithm(
                 (System.currentTimeMillis() - timeOf.resume + timeOf.running) / 1000.0
 
     var iteration = 0
-    val population: Array<Permutation> = Array(2 * (objectives.size - 1) * objectives.size) {
+    val population: Array<Permutation> = if (objectives.size != 1)
+        Array((objectives.size - objectives.size % 2) * (objectives.size + objectives.size % 2)) {
+            Permutation(
+                IntArray(objectives.size) { it },
+                IntArray(salesmen.size) { it },
+                false,
+                BigDecimal(-1),
+                iteration = -1
+            )
+        }
+    else arrayOf(
         Permutation(
             IntArray(objectives.size) { it },
             IntArray(salesmen.size) { it },
@@ -77,9 +87,9 @@ class GeneticAlgorithm(
             BigDecimal(-1),
             iteration = -1
         )
-    }
-    var best : Permutation? = null
-    var worst : Permutation? = null
+    )
+    var best: Permutation? = null
+    var worst: Permutation? = null
 
     fun pause() = setup.pause(this)
     fun resume() = setup.resume(this)
