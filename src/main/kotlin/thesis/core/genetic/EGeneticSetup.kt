@@ -8,10 +8,12 @@ import thesis.core.genetic.lifecycle.EResume
 import thesis.core.genetic.lifecycle.EInitialize
 import thesis.core.genetic.lifecycle.EClear
 import thesis.core.genetic.steps.*
+import thesis.core.permutation.EPermutationFactory
 
 enum class EGeneticSetup(val code: String, val setup: GeneticAlgorithmSetup) {
     OPT2_HIBDRID(
         "geneticWithOpt2", GeneticAlgorithmSetup(
+            EPermutationFactory.TWO_PART_REPRESENTATION,
             EPause.STANDARD,
             EResume.STANDARD,
             EInitialize.STANDARD,
@@ -25,6 +27,7 @@ enum class EGeneticSetup(val code: String, val setup: GeneticAlgorithmSetup) {
             EBoost.OPT2,
             ESelectSurvivers.RANDOM,
             ECrossOvers.HALF,
+            ECrossOverOperator.STATISTICAL_PROBABILITY,
             EMutateChildren.REVERSE,
         )
     )

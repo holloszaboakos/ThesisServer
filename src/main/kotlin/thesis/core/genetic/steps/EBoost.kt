@@ -11,8 +11,8 @@ enum class EBoost {
             var tempGene: Int
             while (improve) {
                 improve = false
-                (0 until best.values.size - 1).forEach { firstIndex ->
-                    (firstIndex until best.values.size).forEach { secondIndex ->
+                (0 until best.size - 1).forEach { firstIndex ->
+                    (firstIndex until best.size).forEach { secondIndex ->
                         tempGene = best[firstIndex]
                         best[firstIndex] = best[secondIndex]
                         best[secondIndex] = tempGene

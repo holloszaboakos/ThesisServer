@@ -94,16 +94,11 @@ object OAlgorithmManager {
         return algorithm?.run {
 
             val bestRout: Array<GpsArray> =
-                best?.run {
-                    var geneIndex = 0
-                    sliceLengthes.map { sliceLength ->
-                        val gpsList = (geneIndex until (geneIndex + sliceLength))
-                            .map { index -> objectives[values[index]].location }
-                        geneIndex += sliceLength
-                        GpsArray(values = gpsList.toTypedArray())
-                    }
+                best?.mapSlice { slice ->
+                    val gpsList = slice.map { value -> objectives[value].location }
+                    GpsArray(values = gpsList.toTypedArray())
                 }?.toTypedArray() ?: arrayOf()
-            worst?.let { worst->
+            worst?.let { worst ->
                 if (worst.cost < maxCost) {
                     maxCost = worst.cost
                 }

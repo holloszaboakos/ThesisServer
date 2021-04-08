@@ -75,4 +75,32 @@ data class Graph (
             value.orderInOwner = index
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Graph
+
+        if (id != other.id) return false
+        if (name != other.name) return false
+        if (center != other.center) return false
+        if (!objectives.contentEquals(other.objectives)) return false
+        if (!edgesBetween.contentEquals(other.edgesBetween)) return false
+        if (!edgesFromCenter.contentEquals(other.edgesFromCenter)) return false
+        if (!edgesToCenter.contentEquals(other.edgesToCenter)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + center.hashCode()
+        result = 31 * result + objectives.contentHashCode()
+        result = 31 * result + edgesBetween.contentHashCode()
+        result = 31 * result + edgesFromCenter.contentHashCode()
+        result = 31 * result + edgesToCenter.contentHashCode()
+        return result
+    }
 }

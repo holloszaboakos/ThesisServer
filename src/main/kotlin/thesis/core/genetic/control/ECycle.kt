@@ -1,6 +1,15 @@
 package thesis.core.genetic.control
 
+import thesis.core.genetic.EGeneticSetup
 import thesis.core.genetic.GeneticAlgorithm
+import thesis.core.genetic.GeneticAlgorithmSetup
+import thesis.core.genetic.lifecycle.EClear
+import thesis.core.genetic.lifecycle.EInitialize
+import thesis.core.genetic.lifecycle.EPause
+import thesis.core.genetic.lifecycle.EResume
+import thesis.core.permutation.EPermutationFactory
+import thesis.core.permutation.TwoPartRepresentation
+import thesis.data.web.Graph
 
 enum class ECycle {
     STANDARD {
@@ -17,14 +26,8 @@ enum class ECycle {
                 alg.mutate()
                 alg.orderByCost()
                 alg.boost()
-                alg.best = alg.population.first().copy(
-                    values = alg.population.first().values.clone(),
-                    sliceLengthes = alg.population.first().sliceLengthes.clone()
-                )
-                alg.worst = alg.population.last().copy(
-                    values = alg.population.last().values.clone(),
-                    sliceLengthes = alg.population.last().sliceLengthes.clone()
-                )
+                alg.best = alg.population.first().copy()
+                alg.worst = alg.population.last().copy()
                 alg.iteration++
             }
             alg.state = GeneticAlgorithm.State.INITIALIZED

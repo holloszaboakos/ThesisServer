@@ -51,12 +51,12 @@ enum class EMutateChildren {
                         }
 
                     if(secondCutIndex>firstCutIndex) {
-                        val reversed = child.values.slice(firstCutIndex..secondCutIndex).reversed()
+                        val reversed = child.slice(firstCutIndex..secondCutIndex).reversed()
                         for(geneIndex in firstCutIndex..secondCutIndex)
                             child[geneIndex] = reversed[geneIndex-firstCutIndex]
                     }
                     else{
-                        val reversed = child.values.slice(secondCutIndex..firstCutIndex).reversed()
+                        val reversed = child.slice(secondCutIndex..firstCutIndex).reversed()
                         for(geneIndex in secondCutIndex..firstCutIndex)
                             child[geneIndex] = reversed[geneIndex-secondCutIndex]
                     }

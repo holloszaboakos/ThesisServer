@@ -1,11 +1,11 @@
 package thesis.core.genetic
 
-import thesis.core.Permutation
+import thesis.core.permutation.IPermutation
+import thesis.core.permutation.TwoPartRepresentation
 import thesis.data.web.Graph
 import thesis.data.web.Objective
 import thesis.data.web.Salesman
 import java.math.BigDecimal
-import java.util.*
 import kotlin.properties.Delegates
 
 class GeneticAlgorithm(
@@ -69,27 +69,24 @@ class GeneticAlgorithm(
                 (System.currentTimeMillis() - timeOf.resume + timeOf.running) / 1000.0
 
     var iteration = 0
-    val population: Array<Permutation> = if (objectives.size != 1)
+    val population: Array<IPermutation> = if (objectives.size != 1)
         Array((objectives.size - objectives.size % 2) * (objectives.size + objectives.size % 2)) {
-            Permutation(
-                IntArray(objectives.size) { it },
-                IntArray(salesmen.size) { it },
-                false,
-                BigDecimal(-1),
-                iteration = -1
+            setup.permutationFactory(
+                Array(salesmen.size){index->
+                    if(index==0)
+                        IntArray(objectives.size) { it }
+                    else
+                        intArrayOf()
+                }
             )
         }
     else arrayOf(
-        Permutation(
-            IntArray(objectives.size) { it },
-            IntArray(salesmen.size) { it },
-            false,
-            BigDecimal(-1),
-            iteration = -1
+        setup.permutationFactory(
+            arrayOf(IntArray(objectives.size) { it })
         )
     )
-    var best: Permutation? = null
-    var worst: Permutation? = null
+    var best: IPermutation? = null
+    var worst: IPermutation? = null
 
     fun pause() = setup.pause(this)
     fun resume() = setup.resume(this)
@@ -101,10 +98,13 @@ class GeneticAlgorithm(
     fun iterate() = setup.iteration(this)
 
     fun initializePopulation() = setup.initializePopulation(this)
-    fun cost(permutation: Permutation) = setup.cost(this, permutation)
+    fun cost(permutation: IPermutation) = setup.cost(this, permutation)
     fun orderByCost() = setup.orderByCost(this)
     fun boost() = setup.boost(this)
     fun selection() = setup.selection(this)
     fun crossover() = setup.crossover(this)
+    fun crossoverOperator(
+        parents: Pair<IPermutation, IPermutation>,
+        child: IPermutation) = setup.crossoverOperator(parents,child,this)
     fun mutate() = setup.mutate(this)
 }

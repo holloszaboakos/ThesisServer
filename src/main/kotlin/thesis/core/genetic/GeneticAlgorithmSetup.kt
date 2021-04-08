@@ -8,8 +8,11 @@ import thesis.core.genetic.lifecycle.EResume
 import thesis.core.genetic.lifecycle.EInitialize
 import thesis.core.genetic.lifecycle.EClear
 import thesis.core.genetic.steps.*
+import thesis.core.permutation.EPermutationFactory
 
 data class GeneticAlgorithmSetup (
+    val permutationFactory:EPermutationFactory,
+
     val pause:EPause,
     val resume:EResume,
     val initialize:EInitialize,
@@ -25,5 +28,6 @@ data class GeneticAlgorithmSetup (
     val boost: EBoost,
     val selection: ESelectSurvivers,
     val crossover:ECrossOvers,
+    val crossoverOperator:ECrossOverOperator,
     val mutate:EMutateChildren
 )

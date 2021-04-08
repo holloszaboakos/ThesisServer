@@ -1,12 +1,13 @@
 package thesis.core.genetic.steps
 
-import thesis.core.Permutation
+import thesis.core.permutation.TwoPartRepresentation
 import thesis.core.genetic.GeneticAlgorithm
+import thesis.core.permutation.IPermutation
 import java.math.BigDecimal
 
 enum class ECost {
     NO_CAPACITY {
-        override fun invoke(alg: GeneticAlgorithm, permutation: Permutation) {
+        override fun invoke(alg: GeneticAlgorithm, permutation: IPermutation) {
             val objectives = alg.objectives
             val salesmen = alg.salesmen
             val costGraph = alg.costGraph
@@ -14,25 +15,25 @@ enum class ECost {
 
             var sumCost = BigDecimal(0)
             var geneIndex = 0
-            permutation.sliceLengthes.forEachIndexed { sliceIndex, sliceLength ->
+            permutation.forEachSliceIndexed { sliceIndex, slice ->
                 val salesman = salesmen[sliceIndex]
                 var cost = salesman.basePrice_Euro
-                (geneIndex until (geneIndex + sliceLength)).forEach { sliceGeneIndex ->
-                    when (sliceGeneIndex) {
+                slice.forEachIndexed { index, value ->
+                    when (index) {
                         0 -> {
-                            val fromCenterEdge = costGraph.edgesFromCenter[permutation[sliceGeneIndex]]
-                            val objective = objectives[permutation[sliceGeneIndex]]
+                            val fromCenterEdge = costGraph.edgesFromCenter[value]
+                            val objective = objectives[value]
                             cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * fromCenterEdge.length_Meter +
                                     salesman.payment_EuroPerSecond * fromCenterEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond +
                                     salesman.payment_EuroPerSecond * objective.time_Second
                         }
-                        geneIndex + sliceLength - 1 -> {
-                            val betweenEdge = if (permutation[sliceGeneIndex - 1] > permutation[sliceGeneIndex])
-                                (costGraph.edgesBetween[permutation[sliceGeneIndex - 1]].values[permutation[sliceGeneIndex]])
+                        geneIndex + slice.size - 1 -> {
+                            val betweenEdge = if (permutation[index - 1] > value)
+                                (costGraph.edgesBetween[permutation[index - 1]].values[value])
                             else
-                                (costGraph.edgesBetween[permutation[sliceGeneIndex - 1]].values[permutation[sliceGeneIndex] - 1])
-                            val objective = objectives[permutation[sliceGeneIndex]]
-                            val toCenterEdge = costGraph.edgesToCenter[permutation[sliceGeneIndex]]
+                                (costGraph.edgesBetween[permutation[index - 1]].values[value - 1])
+                            val objective = objectives[value]
+                            val toCenterEdge = costGraph.edgesToCenter[value]
                             cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * betweenEdge.length_Meter +
                                     salesman.payment_EuroPerSecond * betweenEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond +
                                     salesman.payment_EuroPerSecond * objective.time_Second +
@@ -41,11 +42,11 @@ enum class ECost {
 
                         }
                         else -> {
-                            val betweenEdge = if (permutation[sliceGeneIndex - 1] > permutation[sliceGeneIndex])
-                                (costGraph.edgesBetween[permutation[sliceGeneIndex - 1]].values[permutation[sliceGeneIndex]])
+                            val betweenEdge = if (permutation[index - 1] > value)
+                                (costGraph.edgesBetween[permutation[index - 1]].values[value])
                             else
-                                (costGraph.edgesBetween[permutation[sliceGeneIndex - 1]].values[permutation[sliceGeneIndex] - 1])
-                            val objective = objectives[permutation[sliceGeneIndex]]
+                                (costGraph.edgesBetween[permutation[index - 1]].values[value - 1])
+                            val objective = objectives[value]
                             cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter* betweenEdge.length_Meter +
                                     salesman.payment_EuroPerSecond * betweenEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond +
                                     salesman.payment_EuroPerSecond * objective.time_Second
@@ -53,12 +54,12 @@ enum class ECost {
                     }
 
                 }
-                geneIndex += sliceLength
+                geneIndex += slice.size
                 sumCost += cost
             }
             permutation.cost = sumCost
         }
     };
 
-    abstract operator fun invoke(alg: GeneticAlgorithm, permutation: Permutation)
+    abstract operator fun invoke(alg: GeneticAlgorithm, permutation: IPermutation)
 }

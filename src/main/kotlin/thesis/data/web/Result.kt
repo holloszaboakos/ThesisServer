@@ -56,5 +56,31 @@ data class Result (
             }
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Result
+
+        if (id != other.id) return false
+        if (name != other.name) return false
+        if (!bestRout.contentEquals(other.bestRout)) return false
+        if (maxCost_Euro != other.maxCost_Euro) return false
+        if (minCost_Euro != other.minCost_Euro) return false
+        if (bestCost_Euro != other.bestCost_Euro) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + bestRout.contentHashCode()
+        result = 31 * result + maxCost_Euro.hashCode()
+        result = 31 * result + minCost_Euro.hashCode()
+        result = 31 * result + bestCost_Euro.hashCode()
+        return result
+    }
 }
 

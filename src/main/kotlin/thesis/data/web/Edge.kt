@@ -50,5 +50,29 @@ data class Edge(
     init {
         rout.forEachIndexed { index, gps -> gps.orderInOwner = index }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Edge
+
+        if (id != other.id) return false
+        if (name != other.name) return false
+        if (orderInOwner != other.orderInOwner) return false
+        if (length_Meter != other.length_Meter) return false
+        if (!rout.contentEquals(other.rout)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + orderInOwner
+        result = 31 * result + length_Meter.hashCode()
+        result = 31 * result + rout.contentHashCode()
+        return result
+    }
 }
 
