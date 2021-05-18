@@ -97,14 +97,14 @@ class GeneticAlgorithm(
     fun cycle() = setup.cycle(this)
     fun iterate() = setup.iteration(this)
 
-    fun initializePopulation() = setup.initializePopulation(this)
+    suspend fun initializePopulation() = setup.initializePopulation(this)
     fun cost(permutation: IPermutation) = setup.cost(this, permutation)
-    fun orderByCost() = setup.orderByCost(this)
+    suspend fun orderByCost() = setup.orderByCost(this)
     fun boost() = setup.boost(this)
     fun selection() = setup.selection(this)
-    fun crossover() = setup.crossover(this)
+    suspend fun crossover() = setup.crossover(this)
     fun crossoverOperator(
         parents: Pair<IPermutation, IPermutation>,
         child: IPermutation) = setup.crossoverOperator(parents,child,this)
-    fun mutate() = setup.mutate(this)
+    suspend fun mutate() = setup.mutate(this)
 }

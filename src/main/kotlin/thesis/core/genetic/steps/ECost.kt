@@ -1,6 +1,5 @@
 package thesis.core.genetic.steps
 
-import thesis.core.permutation.TwoPartRepresentation
 import thesis.core.genetic.GeneticAlgorithm
 import thesis.core.permutation.IPermutation
 import java.math.BigDecimal

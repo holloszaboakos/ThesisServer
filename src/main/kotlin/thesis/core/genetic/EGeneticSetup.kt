@@ -26,7 +26,7 @@ enum class EGeneticSetup(val code: String, val setup: GeneticAlgorithmSetup) {
             EOrderPopulationByCost.RECALC_ALL,
             EBoost.OPT2,
             ESelectSurvivers.RANDOM,
-            ECrossOvers.HALF,
+            ECrossOvers.ORDERED,
             ECrossOverOperator.STATISTICAL_PROBABILITY,
             EMutateChildren.REVERSE,
         )

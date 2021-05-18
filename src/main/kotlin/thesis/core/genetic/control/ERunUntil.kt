@@ -1,8 +1,7 @@
 package thesis.core.genetic.control
 
+import kotlinx.coroutines.runBlocking
 import thesis.core.genetic.GeneticAlgorithm
-import thesis.core.permutation.EPermutationFactory
-import thesis.core.permutation.TwoPartRepresentation
 
 enum class ERunUntil {
     STANDARD {
@@ -12,7 +11,7 @@ enum class ERunUntil {
                 alg.runTime_Second < alg.timeLimit
                 && alg.iteration < alg.iterationLimit
                 && alg.state == GeneticAlgorithm.State.RESUMED
-            ) {
+            ) runBlocking {
                 alg.selection()
                 alg.crossover()
                 alg.mutate()

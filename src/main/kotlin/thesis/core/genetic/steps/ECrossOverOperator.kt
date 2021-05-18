@@ -67,7 +67,9 @@ enum class ECrossOverOperator {
                 }
             //fill missing places of child
             (0 until child.size).forEach { valueIndex ->
-
+                if(child[valueIndex] == -1){
+                    child[valueIndex] = seconderParent.first { !child.contains(it) }
+                }
             }
             child.setEach { _, value ->
                 if (value == -1) {
@@ -84,8 +86,6 @@ enum class ECrossOverOperator {
             child: IPermutation,
             alg: GeneticAlgorithm
         ) {
-            val parentsL = parents.toList()
-
             val primerParent = parents.first
             val seconderParent = parents.second
             val selected = BooleanArray(child.size) { Random.nextBoolean() }
@@ -115,7 +115,6 @@ enum class ECrossOverOperator {
             child: IPermutation,
             alg: GeneticAlgorithm
         ) {
-            val parentsL = parents.toList()
             val primerParent = parents.first
             val seconderParent = parents.second
             val selected1 = BooleanArray(child.size) { Random.nextBoolean() }
@@ -146,8 +145,6 @@ enum class ECrossOverOperator {
             child: IPermutation,
             alg: GeneticAlgorithm
         ) {
-            val parentsL = parents.toList()
-
             val primerParent = parents.first
             val seconderParent = parents.second
 
@@ -395,7 +392,7 @@ enum class ECrossOverOperator {
             )
             val parentsNL = listOf(parentsNeighbouring[0], parentsNeighbouring[1])
             var size = Random.nextInt(child.size) + 1
-            child.setEach { index, value ->
+            child.setEach { index, _ ->
                 when {
                     index == 0 -> Random.nextInt(child.size)
                     index < size -> parentsNL[0][child[index - 1]]

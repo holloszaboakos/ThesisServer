@@ -1,5 +1,6 @@
 package thesis.core.genetic.control
 
+import kotlinx.coroutines.runBlocking
 import thesis.core.genetic.GeneticAlgorithm
 import thesis.core.permutation.EPermutationFactory
 import thesis.core.permutation.TwoPartRepresentation
@@ -7,7 +8,7 @@ import java.lang.System.currentTimeMillis
 
 enum class EIteration {
     STANDARD {
-        override fun invoke(alg: GeneticAlgorithm) {
+        override fun invoke(alg: GeneticAlgorithm) = runBlocking{
             alg.state = GeneticAlgorithm.State.RESUMED
             alg.selection()
             alg.crossover()

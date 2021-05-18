@@ -1,5 +1,6 @@
 package thesis.core.genetic.control
 
+import kotlinx.coroutines.runBlocking
 import thesis.core.genetic.EGeneticSetup
 import thesis.core.genetic.GeneticAlgorithm
 import thesis.core.genetic.GeneticAlgorithmSetup
@@ -20,7 +21,7 @@ enum class ECycle {
                 alg.runTime_Second < alg.timeLimit
                 && alg.iteration < alg.iterationLimit
                 && alg.iteration - oldIterationCount < alg.objectives.size
-            ) {
+            )  runBlocking {
                 alg.selection()
                 alg.crossover()
                 alg.mutate()
