@@ -15,21 +15,21 @@
         <property name="format_sql">true</property>
         <property name="use_sql_comments">true</property>
 
-        <mapping class="thesis.data.web.Edge"/>
-        <mapping class="thesis.data.web.EdgeArray"/>
-        <mapping class="thesis.data.web.Gps"/>
-        <mapping class="thesis.data.web.GpsArray"/>
-        <mapping class="thesis.data.web.Graph"/>
-        <mapping class="thesis.data.web.Objective"/>
-        <mapping class="thesis.data.web.Progress"/>
-        <mapping class="thesis.data.web.Result"/>
-        <mapping class="thesis.data.web.Salesman"/>
-        <mapping class="thesis.data.web.Setting"/>
-        <mapping class="thesis.data.web.Task"/>
-        <mapping class="thesis.data.web.Test"/>
-        <mapping class="thesis.data.web.TestItem"/>
+        <mapping class="thesis.model.mtsp.DEdge"/>
+        <mapping class="thesis.model.mtsp.DEdgeArray"/>
+        <mapping class="thesis.model.mtsp.DGps"/>
+        <mapping class="thesis.model.mtsp.DGpsArray"/>
+        <mapping class="thesis.model.mtsp.DGraph"/>
+        <mapping class="thesis.model.mtsp.DObjective"/>
+        <mapping class="thesis.model.mtsp.DProgress"/>
+        <mapping class="thesis.model.mtsp.DResult"/>
+        <mapping class="thesis.model.mtsp.DSalesman"/>
+        <mapping class="thesis.model.mtsp.DSetting"/>
+        <mapping class="thesis.model.mtsp.DTask"/>
+        <mapping class="thesis.model.mtsp.DTest"/>
+        <mapping class="thesis.model.mtsp.DTestItem"/>
 
-        <mapping class="thesis.data.OHibernateManager"/>
+        <mapping class="thesis.model.OHibernateManager"/>
 
     </session-factory>
 </hibernate-configuration>

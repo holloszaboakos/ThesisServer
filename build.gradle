@@ -51,3 +51,8 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation name: 'otp-1.4.0-shaded'
 }
+compileKotlin {
+    kotlinOptions {
+        languageVersion = "1.5"
+    }
+}
