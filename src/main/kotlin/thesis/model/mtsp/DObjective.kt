@@ -22,7 +22,7 @@ import javax.persistence.*
  * @param location 
  * @param time_Second 
  * @param volume_Stere 
- * @param weight_Gramm 
+ * @param weight_Gramm
  */
 @Entity
 @Table(name = "objective")
@@ -47,7 +47,5 @@ data class DObjective (
     val time_Second: BigDecimal = BigDecimal(0),
     val volume_Stere: BigDecimal = BigDecimal(0),
     val weight_Gramm: BigDecimal = BigDecimal(0)
-) {
-
-}
+)
 
