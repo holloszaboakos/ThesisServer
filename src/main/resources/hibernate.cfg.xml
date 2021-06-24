@@ -5,7 +5,7 @@
 <hibernate-configuration>
     <session-factory>
         <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-        <property name="hibernate.connection.url">jdbc:mysql://localhost/thesis</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost/hu.bme.thesis</property>
         <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password">Eredmenyek.007</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQL55Dialect</property>
@@ -15,21 +15,21 @@
         <property name="format_sql">true</property>
         <property name="use_sql_comments">true</property>
 
-        <mapping class="thesis.model.mtsp.DEdge"/>
-        <mapping class="thesis.model.mtsp.DEdgeArray"/>
-        <mapping class="thesis.model.mtsp.DGps"/>
-        <mapping class="thesis.model.mtsp.DGpsArray"/>
-        <mapping class="thesis.model.mtsp.DGraph"/>
-        <mapping class="thesis.model.mtsp.DObjective"/>
-        <mapping class="thesis.model.mtsp.DProgress"/>
-        <mapping class="thesis.model.mtsp.DResult"/>
-        <mapping class="thesis.model.mtsp.DSalesman"/>
-        <mapping class="thesis.model.mtsp.DSetting"/>
-        <mapping class="thesis.model.mtsp.DTask"/>
-        <mapping class="thesis.model.mtsp.DTest"/>
-        <mapping class="thesis.model.mtsp.DTestItem"/>
+        <mapping class="hu.bme.thesis.model.mtsp.DEdge"/>
+        <mapping class="hu.bme.thesis.model.mtsp.DEdgeArray"/>
+        <mapping class="hu.bme.thesis.model.mtsp.DGps"/>
+        <mapping class="hu.bme.thesis.model.mtsp.DGpsArray"/>
+        <mapping class="hu.bme.thesis.model.mtsp.DGraph"/>
+        <mapping class="hu.bme.thesis.model.mtsp.DObjective"/>
+        <mapping class="hu.bme.thesis.model.mtsp.DProgress"/>
+        <mapping class="hu.bme.thesis.model.mtsp.DResult"/>
+        <mapping class="hu.bme.thesis.model.mtsp.DSalesman"/>
+        <mapping class="hu.bme.thesis.model.mtsp.DSetting"/>
+        <mapping class="hu.bme.thesis.model.mtsp.DTask"/>
+        <mapping class="hu.bme.thesis.model.mtsp.DTest"/>
+        <mapping class="hu.bme.thesis.model.mtsp.DTestItem"/>
 
-        <mapping class="thesis.model.OHibernateManager"/>
+        <mapping class="hu.bme.thesis.model.OHibernateManager"/>
 
     </session-factory>
 </hibernate-configuration>
