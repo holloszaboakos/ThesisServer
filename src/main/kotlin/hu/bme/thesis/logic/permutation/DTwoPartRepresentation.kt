@@ -37,7 +37,7 @@ data class DTwoPartRepresentation(
     override fun forEachIndexed(operation: (Int, Int) -> Unit) = values.forEachIndexed(operation)
 
     override fun setEach(operation: (Int, Int) -> Int) {
-        values.forEachIndexed { index: Int, value: Int -> values[index] = value }
+        values.forEachIndexed { index: Int, value: Int -> values[index] = operation(index,value) }
     }
 
     override fun <T> mapSlice(mapper: (List<Int>) -> T): List<T> {

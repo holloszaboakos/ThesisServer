@@ -9,10 +9,10 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 @ExperimentalTime
-fun main(args:Array<String>){
-    val  argMap = mutableMapOf<String,String>()
-    for(index in 0 until  args.size / 2){
-        argMap[args[index*2]] = args[index*2+1]
+fun main(args: Array<String>) {
+    val argMap = mutableMapOf<String, String>()
+    for (index in 0 until args.size / 2) {
+        argMap[args[index * 2]] = args[index * 2 + 1]
     }
     val inputFilePath = argMap["-inputFilePath"] ?: throw Error("No inputFilePath given")
     val outputFolderPath = argMap["-outputFolderPath"] ?: throw Error("No outputFolderPath given")
@@ -25,12 +25,13 @@ fun main(args:Array<String>){
     OAlgorithmManager.prepare()
     OAlgorithmManager.start()
     val outputFile = File("$outputFolderPath\\statistics.txt")
-    for (index in 0 until setup.task.costGraph.objectives.size){
+    for (index in 0 until (setup.task.costGraph.objectives.size * setup.task.costGraph.objectives.size)) {
         val duration = measureTime {
             OAlgorithmManager.cycle()
         }
         val cost = OAlgorithmManager.algorithm?.best?.cost ?: -1
-        outputFile.appendText("cycle:$index timeElapsed: ${duration.inMilliseconds}, bestCost $cost")
+        println("\ncycle:$index timeElapsed: ${duration.inMilliseconds}, bestCost $cost")
+        outputFile.appendText("\ncycle:$index timeElapsed: ${duration.inMilliseconds}, bestCost $cost")
 
     }
 
