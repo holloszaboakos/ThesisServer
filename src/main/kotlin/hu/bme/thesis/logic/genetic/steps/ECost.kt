@@ -2,6 +2,7 @@ package hu.bme.thesis.logic.genetic.steps
 
 import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
 import hu.bme.thesis.logic.permutation.IPermutation
+import hu.bme.thesis.model.mtsp.DEdge
 
 enum class ECost {
     NO_CAPACITY {
@@ -26,26 +27,33 @@ enum class ECost {
                                     salesman.payment_EuroPerSecond * objective.time_Second
                         }
                         geneIndex + slice.size - 1 -> {
-                            val betweenEdge = if (permutation[index - 1] > value)
-                                (costGraph.edgesBetween[permutation[index - 1]].values[value])
+                            val betweenEdge = if (slice[index - 1] > value)
+                                (costGraph.edgesBetween[slice[index - 1]].values[value])
                             else
-                                (costGraph.edgesBetween[permutation[index - 1]].values[value - 1])
+                                (costGraph.edgesBetween[slice[index - 1]].values[value - 1])
                             val objective = objectives[value]
                             val toCenterEdge = costGraph.edgesToCenter[value]
                             cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * betweenEdge.length_Meter +
                                     salesman.payment_EuroPerSecond * betweenEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond +
                                     salesman.payment_EuroPerSecond * objective.time_Second +
                                     salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * toCenterEdge.length_Meter +
-                                    salesman.payment_EuroPerSecond * toCenterEdge.length_Meter/ salesman.vechicleSpeed_MeterPerSecond
+                                    salesman.payment_EuroPerSecond * toCenterEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond
 
                         }
                         else -> {
-                            val betweenEdge = if (permutation[index - 1] > value)
-                                (costGraph.edgesBetween[permutation[index - 1]].values[value])
+                            val betweenEdge = if (slice[index - 1] > value)
+                                costGraph.edgesBetween[slice[index - 1]].values[value]
                             else
-                                (costGraph.edgesBetween[permutation[index - 1]].values[value - 1])
+                                try {
+                                    costGraph.edgesBetween[slice[index - 1]].values[value - 1]
+                                }
+                                catch (e:ArrayIndexOutOfBoundsException){
+                                    permutation
+                                    throw e
+                                }
+
                             val objective = objectives[value]
-                            cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter* betweenEdge.length_Meter +
+                            cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * betweenEdge.length_Meter +
                                     salesman.payment_EuroPerSecond * betweenEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond +
                                     salesman.payment_EuroPerSecond * objective.time_Second
                         }

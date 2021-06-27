@@ -4,7 +4,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import hu.bme.thesis.model.mtsp.*
-import hu.bme.thesis.utility.PolylineEncoder
 import hu.bme.thesis.utility.requestRoot
 import java.io.File
 import java.math.BigDecimal
@@ -58,21 +57,23 @@ fun main() {
             time_Second = (Random.nextLong(60, 600)),
         )
     }.toTypedArray()
-    val fromCenter = gps.mapIndexedNotNull { index, it ->
+    val fromCenter = gps.mapIndexed { index, it ->
         println("fromCenter $index out of ${gps.size} ")
-        planRout(center, it)
+        planRout(center, it) ?: DEdge(length_Meter = Long.MAX_VALUE)
     }.toTypedArray()
-    val toCenter = gps.mapIndexedNotNull { index, it ->
+    val toCenter = gps.mapIndexed { index, it ->
         println("toCenter $index out of ${gps.size} ")
-        planRout(it, center) }.toTypedArray()
+        planRout(it, center) ?: DEdge(length_Meter = Long.MAX_VALUE)
+    }.toTypedArray()
     val between = gps.mapIndexed { index, value ->
         DEdgeArray(
             orderInOwner = index,
             values = gps
                 .filter { it != value }
-                .mapIndexedNotNull { indexInner, it ->
+                .mapIndexed { indexInner, it ->
                     println("between from $index to $indexInner out of ${gps.size} ")
-                    planRout(value, it) }
+                    planRout(value, it) ?: DEdge(length_Meter = Long.MAX_VALUE)
+                }
                 .toTypedArray()
         )
     }.toTypedArray()
@@ -108,7 +109,7 @@ fun main() {
         setting = DSetting(
             name = "hungarian example setup",
             timeLimit_Second = BigDecimal(60 * 60 * 8),
-            iterLimit = BigDecimal(Long.MAX_VALUE),
+            iterLimit = BigDecimal(Int.MAX_VALUE),
             algorithm = "statisticalRaceBased",
         ),
     )

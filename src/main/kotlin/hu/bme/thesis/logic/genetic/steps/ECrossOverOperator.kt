@@ -8,7 +8,7 @@ import kotlin.random.Random
 enum class ECrossOverOperator {
     PARTIALLY_MATCHED {
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
         ) {
@@ -40,12 +40,14 @@ enum class ECrossOverOperator {
                 } else
                     value
             }
-
+            child.iteration = alg.iteration
+            
+                
         }
     },
     ORDER {
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
         ) {
@@ -67,7 +69,7 @@ enum class ECrossOverOperator {
                 }
             //fill missing places of child
             (0 until child.size).forEach { valueIndex ->
-                if(child[valueIndex] == -1){
+                if (child[valueIndex] == -1) {
                     child[valueIndex] = seconderParent.first { !child.contains(it) }
                 }
             }
@@ -77,12 +79,15 @@ enum class ECrossOverOperator {
                 } else
                     value
             }
+            child.iteration = alg.iteration
+            
+                
         }
 
     },
     ORDER_BASED {
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
         ) {
@@ -106,12 +111,15 @@ enum class ECrossOverOperator {
                 } else
                     value
             }
+            child.iteration = alg.iteration
+            
+                
 
         }
     },
     POSITION_BASED {
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
         ) {
@@ -136,12 +144,15 @@ enum class ECrossOverOperator {
                 } else
                     value
             }
+            child.iteration = alg.iteration
+            
+                
         }
 
     },
     CYCLE_BASED {
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
         ) {
@@ -155,7 +166,7 @@ enum class ECrossOverOperator {
             child[0] = primerParent[0]
             //fill missing places of child
             var actualIndex = seconderParent.indexOf(child[0])
-            while (actualIndex != 0) {
+            while (actualIndex != primerParent[0]) {
                 child[actualIndex] = primerParent[actualIndex]
                 actualIndex = seconderParent.indexOf(actualIndex)
             }
@@ -168,11 +179,14 @@ enum class ECrossOverOperator {
                     value
 
             }
+            child.iteration = alg.iteration
+            
+                
         }
     },
     HEURISTIC {
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
         ) {
@@ -182,17 +196,29 @@ enum class ECrossOverOperator {
             for (geneIndex in 1 until child.size) {
                 val previous = child[geneIndex - 1]
                 val neighbours = listOf(
-                    parentsL[0][(parentsL[0].indexOf(previous) - 1) % child.size],
+                    parentsL[0][(parentsL[0].indexOf(previous) + child.size - 1) % child.size],
                     parentsL[0][(parentsL[0].indexOf(previous) + 1) % child.size],
-                    parentsL[1][(parentsL[0].indexOf(previous) - 1) % child.size],
+                    parentsL[1][(parentsL[0].indexOf(previous) + child.size - 1) % child.size],
                     parentsL[1][(parentsL[0].indexOf(previous) + 1) % child.size]
                 ).filter { !child.contains(it) }
                 if (neighbours.isEmpty()) {
-                    child[geneIndex] = parentsL[0].map { it }.filter { !child.contains(it) }.random()
+                    try {
+                        child[geneIndex] = parentsL[0].map { it }.filter { !child.contains(it) }.random()
+                    } catch (e: NoSuchElementException) {
+                        println("LOL")
+                    }
                     continue
                 }
                 val weights = Array(neighbours.size) {
-                    1.0f / alg.costGraph.edgesBetween[previous].values[neighbours[it]].length_Meter.toLong()
+                    try {
+                        1.0f / alg.costGraph.edgesBetween[previous].values[
+                                if (neighbours[it] > previous)
+                                    neighbours[it] - 1
+                                else neighbours[it]
+                        ].length_Meter
+                    } catch (e: ArrayIndexOutOfBoundsException) {
+                        throw e
+                    }
                 }
                 val sum = weights.sum()
                 val choice = Random.nextFloat() * sum
@@ -203,11 +229,14 @@ enum class ECrossOverOperator {
                         child[geneIndex] = neighbours[weightIndex]
                 }
             }
+            child.iteration = alg.iteration
+            
+                
         }
     },
     GENETIC_EDGE_RECOMBINATION {
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
         ) {
@@ -222,23 +251,34 @@ enum class ECrossOverOperator {
                 }
                 values
             }
+            child.setEach { _, _ -> -1 }
             for (geneIndex in 0 until child.size) {
-                val minimalLineLength = table.map { it.size }.toSet().minOf { it }
-                val chosenLine = table.filter { it.size == minimalLineLength }.random()
-                child[geneIndex] = table.indexOf(chosenLine)
-                table[child[geneIndex]].clear()
-                table.forEach {
-                    it.remove(child[geneIndex])
+
+                val minimalLineLength = if (table.map { it.size }.any { it != 0 }) {
+                    table.map { it.size }.filter { it != 0 }.toSet().minOf { it }
+                } else
+                    0
+                if (minimalLineLength != 0) {
+                    val chosenLine = table.filter { it.size == minimalLineLength }.random()
+                    child[geneIndex] = table.indexOf(chosenLine)
+                    table[child[geneIndex]].clear()
+                    table.forEach {
+                        it.remove(child[geneIndex])
+                    }
+                } else {
+                    child[geneIndex] = (0 until child.size).first { !child.contains(it) }
                 }
             }
+            child.iteration = alg.iteration
+            
         }
     },
     SORTED_MATCH {
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
-        ){
+        ) {
             val parentsInverse = listOf(
                 Array(parents.first.size) {
                     parents.first.indexOf(it)
@@ -274,12 +314,17 @@ enum class ECrossOverOperator {
             }
             if (foundSlices.isNotEmpty()) {
                 val cheaperIndex = LongArray(2) { sliceIndex ->
-                    (1 until foundSlices[sliceIndex].size).map { geneIndex ->
+                    (1 until foundSlices[sliceIndex].size).sumOf { geneIndex ->
                         alg.costGraph
-                            .edgesBetween[foundSlices[sliceIndex][geneIndex] - 1]
-                            .values[foundSlices[sliceIndex][geneIndex]]
-                            .length_Meter.toLong()
-                    }.sum()
+                            .edgesBetween[foundSlices[sliceIndex][geneIndex - 1]]
+                            .values[
+                                if (foundSlices[sliceIndex][geneIndex] > foundSlices[sliceIndex][geneIndex - 1])
+                                    foundSlices[sliceIndex][geneIndex] - 1
+                                else
+                                    foundSlices[sliceIndex][geneIndex]
+                        ]
+                            .length_Meter
+                    }
                 }.let { costs -> costs.indexOf(costs.minOf { it }) }
                 val indices = Array(2) { index ->
                     parentsInverse[index][foundSlices[index].first()]..
@@ -295,27 +340,38 @@ enum class ECrossOverOperator {
                     child[geneIndex] = parents.toList()[0][geneIndex]
                 }
             }
+            child.iteration = alg.iteration
+            
+                
         }
     },
     MAXIMAL_PRESERVATION {
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
         ) {
             val size = child.size / 4 + Random.nextInt(child.size / 4)
             val start = Random.nextInt(child.size - size)
             child.setEach { index, _ ->
-                if (index < size)
-                    parents.first[index + start]
+                if (index in start until (start + size))
+                    parents.first[index]
                 else
-                    parents.second.first { !child.contains(it) }
+                    -1
             }
+            child.setEach { _, value ->
+                if (value == -1)
+                    parents.first.first { !child.contains(it) }
+                else value
+            }
+            child.iteration = alg.iteration
+            
+                
         }
     },
     VOTING_RECOMBINATION {
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
         ) {
@@ -331,11 +387,14 @@ enum class ECrossOverOperator {
                     randomPermutation.first { !child.contains(it) }
                 else value
             }
+            child.iteration = alg.iteration
+            
+                
         }
     },
     ALTERNATING_POSITION {
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
         ) {
@@ -347,11 +406,14 @@ enum class ECrossOverOperator {
                         child[child.indexOf(-1)] = parent[geneIndex]
                 }
             }
+            child.iteration = alg.iteration
+            
+                
         }
     },
     ALTERNATING_EDGE {
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
         ) {
@@ -363,22 +425,25 @@ enum class ECrossOverOperator {
                     parents.second[(parents.second.indexOf(index) + 1) % parents.second.size]
                 }
             )
-
-            val parentsNL = listOf(parentsNeighbouring[0], parentsNeighbouring[1])
             child.setEach { _, _ -> -1 }
-            child[0] = parents.first[0]
-            (0 until child.size).forEach { geneIndex ->
-                parentsNL.forEach { parentN ->
-                    if (!child.contains(parentN[child.map { it }.last { it != -1 }]))
-                        child[child.map { it }.indexOfFirst { it == -1 }] =
-                            parentsNL[geneIndex % 2][child.map { it }.last { it != -1 }]
-                }
+            child[0] = (0 until parents.first.size).random()
+            (1 until child.size).forEach { nextGeneIndex ->
+                val parent = parentsNeighbouring[nextGeneIndex % 2]
+                child[nextGeneIndex] =
+                    if (!child.contains(parent[child[nextGeneIndex - 1]]))
+                        parent[child[nextGeneIndex - 1]]
+                    else
+                        (0 until child.size).filter { !child.contains(it) }.random()
             }
+            child.iteration = alg.iteration
+            
+                
+
         }
     },
     SUB_TOUR_CHUNKS {
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
         ) {
@@ -390,35 +455,35 @@ enum class ECrossOverOperator {
                     parents.second[(parents.second.indexOf(index) + 1) % parents.second.size]
                 }
             )
-            val parentsNL = listOf(parentsNeighbouring[0], parentsNeighbouring[1])
-            var size = Random.nextInt(child.size) + 1
-            child.setEach { index, _ ->
-                when {
-                    index == 0 -> Random.nextInt(child.size)
-                    index < size -> parentsNL[0][child[index - 1]]
-                    else -> -1
-                }
-            }
-            var geneIndex = child.first { it == -1 }
-            var parentIndex = 1
-            var sliceSize = 0
-            while (geneIndex < child.size) {
-                if (sliceSize == 0) {
-                    size = Random.nextInt(child.size - geneIndex)
-                    parentIndex = (parentIndex + 1) % 2
-                    if (!child.contains(parentsNL[parentIndex][geneIndex - 1]))
-                        child[geneIndex] = parentsNL[parentIndex][geneIndex - 1]
+            var size = Random.nextInt(child.size / 2) + 1
+            var parentIndex = 0
+
+            child.setEach { _, _ -> -1 }
+
+            child.setEach { nextGeneIndex, _ ->
+                if (nextGeneIndex == 0) {
+                    parents.first[0]
+                } else {
+                    val parent = parentsNeighbouring[parentIndex]
+                    size--
+                    if (size == 0) {
+                        size = Random.nextInt(nextGeneIndex, child.size)
+                        parentIndex = (parentIndex + 1) % 2
+                    }
+                    if (!child.contains(parent[child[nextGeneIndex - 1]]))
+                        parent[child[nextGeneIndex - 1]]
                     else
-                        child[geneIndex] = (0 until child.size).filter { !child.contains(it) }.random()
+                        (0 until child.size).filter { !child.contains(it) }.random()
                 }
-                sliceSize = (sliceSize + 1) % size
-                geneIndex++
             }
+            child.iteration = alg.iteration
+            
+                
         }
     },
     DISTANCE_PRESERVING {
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
         ) {
@@ -434,9 +499,13 @@ enum class ECrossOverOperator {
                 else
                     value
             }
+            child.iteration = alg.iteration
+            
+                
         }
     },
-    TWO_PART_CHROMOSOME {
+
+    /*TWO_PART_CHROMOSOME {
         override fun <P : IPermutation> invoke(
             parents: Pair<P,P>,
             child: P,
@@ -444,11 +513,11 @@ enum class ECrossOverOperator {
         ){
             TODO("Not yet implemented")
         }
-    },
+    },*/
     STATISTICAL_PROBABILITY {
         val operators = mutableMapOf<ECrossOverOperator, Float>()
         override fun <P : IPermutation> invoke(
-            parents: Pair<P,P>,
+            parents: Pair<P, P>,
             child: P,
             alg: DGeneticAlgorithm<P>
         ) {
@@ -472,11 +541,13 @@ enum class ECrossOverOperator {
                         operators[type] = (operators.getOrDefault(type, 0.5f) * size + 1) / size
                 }
             }
+            child.iteration = alg.iteration
+            
         }
     };
 
     abstract operator fun <P : IPermutation> invoke(
-        parents: Pair<P,P>,
+        parents: Pair<P, P>,
         child: P,
         alg: DGeneticAlgorithm<P>
     )
