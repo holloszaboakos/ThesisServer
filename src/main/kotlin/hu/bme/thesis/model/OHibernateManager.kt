@@ -4,33 +4,36 @@ import org.hibernate.Session
 import org.hibernate.SessionFactory
 import org.hibernate.Transaction
 import org.hibernate.cfg.Configuration
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 object OHibernateManager {
     var sessionFactory: SessionFactory? = null
+    var lock = ReentrantLock()
 
-    fun openFactory() {
+    fun openFactory() = lock.withLock {
         if (sessionFactory == null || sessionFactory?.isClosed == true)
             sessionFactory = Configuration().configure().buildSessionFactory()
     }
 
-    fun closeFactory() {
+    fun closeFactory() = lock.withLock {
         sessionFactory?.close()
         sessionFactory = null
     }
 
-    fun openSession(): Session {
+    fun openSession(): Session = lock.withLock {
         openFactory()
         return sessionFactory?.openSession() ?: throw Error("Factory is closed")
     }
 
-    fun closeSession(session: Session, transaction: Transaction) {
+    fun closeSession(session: Session, transaction: Transaction) = lock.withLock {
         transaction.commit()
         session.clear()
         session.joinTransaction()
         session.close()
     }
 
-    inline fun <reified T> find(id: String?): T {
+    inline fun <reified T> find(id: String?): T = lock.withLock {
         id ?: throw Error("id should not be null")
         val session = openSession()
         val transaction = session.beginTransaction()
@@ -39,7 +42,7 @@ object OHibernateManager {
         return mapped
     }
 
-    inline fun <reified T : Any> find(idList: List<String>?): List<T> {
+    inline fun <reified T : Any> find(idList: List<String>?): List<T> = lock.withLock {
         idList ?: throw Error("id should not be null")
         var session = openSession()
         var transaction = session.beginTransaction()
@@ -56,7 +59,7 @@ object OHibernateManager {
         return mapped
     }
 
-    inline fun <reified Item, Owner> find(IListItemKey: IListItemKey<Owner>): Item {
+    inline fun <reified Item, Owner> find(IListItemKey: IListItemKey<Owner>): Item = lock.withLock {
         if (IListItemKey.owner == null || IListItemKey.orderInOwner == -1) throw Error("id should not be null")
         val session = openSession()
         val transaction = session.beginTransaction()
@@ -65,14 +68,14 @@ object OHibernateManager {
         return mapped
     }
 
-    inline fun <reified T> create(value: T) {
+    inline fun <reified T> create(value: T) = lock.withLock {
         val session = openSession()
         val transaction = session.beginTransaction()
         session.persist(value)
         closeSession(session,transaction)
     }
 
-    inline fun <reified T> createAll(value: List<T>) {
+    inline fun <reified T> createAll(value: List<T>) = lock.withLock {
         var session = openSession()
         var transaction = session.beginTransaction()
         value.forEachIndexed {index, it ->
@@ -86,14 +89,14 @@ object OHibernateManager {
         closeSession(session,transaction)
     }
 
-    fun <T> save(value: T) {
+    fun <T> save(value: T) = lock.withLock {
         val session = openSession()
         val transaction = session.beginTransaction()
         session.save(value)
         closeSession(session,transaction)
     }
 
-    fun <T> saveAll(value: List<T>) {
+    fun <T> saveAll(value: List<T>) = lock.withLock {
         var session = openSession()
         var transaction = session.beginTransaction()
         value.forEachIndexed {index, it ->
@@ -108,14 +111,14 @@ object OHibernateManager {
     }
 
 
-    inline fun <reified T> update(value: T) {
+    inline fun <reified T> update(value: T) = lock.withLock {
         val session = openSession()
         val transaction = session.beginTransaction()
         session.update(value)
         closeSession(session,transaction)
     }
 
-    inline fun <reified T> updateAll(value: List<T>) {
+    inline fun <reified T> updateAll(value: List<T>) = lock.withLock {
         var session = openSession()
         var transaction = session.beginTransaction()
         value.forEachIndexed {index, it ->
@@ -129,14 +132,14 @@ object OHibernateManager {
     }
 
 
-    inline fun <reified T> saveOrUpdate(value: T) {
+    inline fun <reified T> saveOrUpdate(value: T) = lock.withLock {
         val session = openSession()
         val transaction = session.beginTransaction()
         session.saveOrUpdate(value)
         closeSession(session,transaction)
     }
 
-    inline fun <reified T> saveOrUpdateAll(value: List<T>) {
+    inline fun <reified T> saveOrUpdateAll(value: List<T>) = lock.withLock {
         var session = openSession()
         var transaction = session.beginTransaction()
         value.forEachIndexed {index, it ->
@@ -151,14 +154,14 @@ object OHibernateManager {
     }
 
 
-    inline fun <reified T> delete(value: T) {
+    inline fun <reified T> delete(value: T) = lock.withLock {
         val session = openSession()
         val transaction = session.beginTransaction()
         session.delete(value)
         closeSession(session,transaction)
     }
 
-    inline fun <reified T> deleteAll(value: List<T>) {
+    inline fun <reified T> deleteAll(value: List<T>) = lock.withLock {
         var session = openSession()
         var transaction = session.beginTransaction()
         value.forEachIndexed {index, it ->
@@ -172,7 +175,7 @@ object OHibernateManager {
         closeSession(session,transaction)
     }
 
-    inline fun <reified T> deleteById(id: String?) {
+    inline fun <reified T> deleteById(id: String?) = lock.withLock {
         val session = openSession()
         val transaction = session.beginTransaction()
         val value = session.load(T::class.java, id)
@@ -180,7 +183,7 @@ object OHibernateManager {
         closeSession(session,transaction)
     }
 
-    inline fun <reified T> deleteAllById(ids: List<String>?) {
+    inline fun <reified T> deleteAllById(ids: List<String>?) = lock.withLock {
         ids ?: throw Error("ids should not be null")
         var session = openSession()
         var transaction = session.beginTransaction()
@@ -196,7 +199,7 @@ object OHibernateManager {
         closeSession(session,transaction)
     }
 
-    inline fun <reified T>list(tableName: String?): List<T> {
+    inline fun <reified T>list(tableName: String?): List<T> = lock.withLock {
         tableName ?: throw Exception("table name should not be null")
         val session = openSession()
         val transaction = session.beginTransaction()
@@ -208,7 +211,7 @@ object OHibernateManager {
         return mapped
     }
 
-    inline fun <reified T>findByName(tableName: String?,name:String?): T {
+    inline fun <reified T>findByName(tableName: String?,name:String?): T = lock.withLock{
         tableName ?: throw Exception("tableName should not be null")
         name ?: throw Exception("name should not be null")
         val session = openSession()
