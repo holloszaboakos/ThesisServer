@@ -1,24 +1,42 @@
 package hu.bme.thesis.logic.genetic.steps
 
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
-import hu.bme.thesis.logic.permutation.IPermutation
-import java.math.BigDecimal
+import hu.bme.thesis.logic.specimen.IRepresentation
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 enum class EOrderPopulationByCost {
     RECALC_ALL {
-        override suspend fun <P : IPermutation> invoke(alg: DGeneticAlgorithm<P>) = coroutineScope{
-            val jobs = alg.population.filter { it.cost == (-1.0) }.map {
-              launch {
-                  alg.cost(it)
-              }
+        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>) = runBlocking {
+            alg.run {
+                val jobCount = 100
+                val jobs: Array<Job?> = Array(jobCount) { null }
+                population.asSequence()
+                    .filter { !it.costCalculated }
+                    .forEachIndexed { index, p ->
+                        jobs[index % jobCount]?.join()
+                        jobs[index % jobCount] =
+                            launch {
+                                alg.cost(p)
+                            }
+                    }
+                jobs.forEach { it?.join() }
+                population = ArrayList(
+                    population.asSequence()
+                        .sortedBy { it.cost }
+                        .mapIndexed { index, it ->
+                            it.orderInPopulation = index
+                            if (it.cost == 0.0)
+                                println("Impossible!")
+                            it.inUse = false
+                            it
+                        }.toList()
+                )
             }
-            jobs.forEach { it.join() }
-            alg.population = alg.population.sortedBy { it.cost }
-            alg.population.forEach { it.alive = false }
         }
     };
 
-    abstract suspend operator fun <P : IPermutation> invoke(alg: DGeneticAlgorithm<P>)
+    abstract operator fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>)
 }

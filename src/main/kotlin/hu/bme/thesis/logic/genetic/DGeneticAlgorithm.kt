@@ -1,14 +1,14 @@
 package hu.bme.thesis.logic.genetic
 
-import hu.bme.thesis.logic.permutation.EPermutationFactory
-import hu.bme.thesis.logic.permutation.IPermutation
+import hu.bme.thesis.logic.specimen.IRepresentation
+import hu.bme.thesis.logic.specimen.factory.SPermutationFactory
 import hu.bme.thesis.model.mtsp.DGraph
 import hu.bme.thesis.model.mtsp.DObjective
 import hu.bme.thesis.model.mtsp.DSalesman
 import kotlin.properties.Delegates
 
-data class DGeneticAlgorithm <P:IPermutation>(
-    var permutationFactory:EPermutationFactory,
+data class DGeneticAlgorithm<P : IRepresentation>(
+    var permutationFactory: SPermutationFactory<P>,
     var timeLimit: Long = 0L,
     var iterationLimit: Int = 0,
     var costGraph: DGraph,
@@ -28,9 +28,9 @@ data class DGeneticAlgorithm <P:IPermutation>(
         var running = 0L
         var resume = 0L
     }
-    
+
     var thread: Thread? = null
-    
+
     var state: State by Delegates.observable(State.CREATED)
     { _, oldValue, newValue ->
         when (newValue) {
@@ -71,28 +71,28 @@ data class DGeneticAlgorithm <P:IPermutation>(
                 (System.currentTimeMillis() - timeOf.resume + timeOf.running) / 1000.0
 
     var iteration = 0
-    var population: List<P> = if (objectives.size != 1)
-        List((objectives.size - objectives.size % 2) * (objectives.size + objectives.size % 2)) {
+    var population: ArrayList<P> = if (objectives.size != 1)
+        ArrayList(List(4 * (objectives.size + salesmen.size)){
             permutationFactory.produce(
-                Array(salesmen.size){index->
-                    if(index==0)
+                Array(salesmen.size) { index ->
+                    if (index == 0)
                         IntArray(objectives.size) { it }
                     else
                         intArrayOf()
                 }
-            ) as P
-        }
-    else listOf(
+            )
+        })
+    else arrayListOf(
         permutationFactory.produce(
             arrayOf(IntArray(objectives.size) { it })
-        ) as P
+        )
     )
     var best: P? = null
     var worst: P? = null
 
     fun pause() = setup.pause(this)
     fun resume() = setup.resume(this)
-    fun initialize() = setup.initialize.invoke(this)
+    fun initialize() = setup.initialize(this)
     fun clear() = setup.clear(this)
 
     fun run() = setup.run(this)
@@ -103,10 +103,12 @@ data class DGeneticAlgorithm <P:IPermutation>(
     fun cost(permutation: P) = setup.cost(this, permutation)
     suspend fun orderByCost() = setup.orderByCost(this)
     fun boost() = setup.boost(this)
-    fun selection() = setup.selection(this)
+    val selection by lazy { setup.selection(this) }
     suspend fun crossover() = setup.crossover(this)
     fun crossoverOperator(
         parents: Pair<P, P>,
-        child: P) = setup.crossoverOperator(parents,child,this)
+        child: P
+    ) = setup.crossoverOperator(parents, child, this)
+
     suspend fun mutate() = setup.mutate(this)
 }

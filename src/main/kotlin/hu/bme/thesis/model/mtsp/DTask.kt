@@ -18,7 +18,6 @@ import javax.persistence.*
  *
  * @param id
  * @param name
- * @param center
  * @param salesmen
  * @param costGraph
  */
