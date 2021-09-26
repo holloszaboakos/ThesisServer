@@ -23,7 +23,7 @@ data class GeneticAlgorithmSetup (
     val cost: ECost,
     val orderByCost: EOrderPopulationByCost,
     val boost: EBoost,
-    val selection: ESelectSurvivers,
+    val selection: ESelectSurvivors,
     val crossover:ECrossOvers,
     val crossoverOperator:ECrossOverOperator,
     val mutate:EMutateChildren

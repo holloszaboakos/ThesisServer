@@ -1,28 +1,35 @@
 package hu.bme.thesis.logic.genetic.steps
 
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
-import hu.bme.thesis.logic.permutation.IPermutation
+import hu.bme.thesis.logic.specimen.IRepresentation
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 enum class ECrossOvers {
     ORDERED {
-        override suspend fun <P : IPermutation> invoke(alg: DGeneticAlgorithm<P>) = coroutineScope {
-            val children = alg.population.filter { !it.alive }
-            val parent = alg.population.filter { it.alive }.shuffled()
+        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>) = runBlocking {
+            val children = alg.population.filter { !it.inUse }
+            val parent = alg.population.filter { it.inUse }//.shuffled()
+            val jobCount = 100
+            val jobs: Array<Job?> = Array(jobCount) { null }
             parent.forEachIndexed { index, primerParent ->
-                launch {
-                    val seconderParent =
-                        if (index % 2 == 0)
-                            parent[index + 1]
-                        else
-                            parent[index - 1]
-                    alg.crossoverOperator(Pair(primerParent, seconderParent), children[index])
-                }
+                jobs[index % jobCount]?.join()
+                jobs[index % jobCount] =
+                    launch {
+                        val seconderParent =
+                            if (index % 2 == 0)
+                                parent[index + 1]
+                            else
+                                parent[index - 1]
+                        alg.crossoverOperator(Pair(primerParent, seconderParent), children[index])
+                    }
             }
+            jobs.forEach { it?.join() }
 
         }
     };
 
-    abstract suspend operator fun <P : IPermutation> invoke(alg: DGeneticAlgorithm<P>)
+    abstract operator fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>)
 }

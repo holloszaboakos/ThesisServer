@@ -19,13 +19,13 @@ enum class EGeneticSetup(val code: String, val setup: GeneticAlgorithmSetup) {
             ERunUntil.STANDARD,
             ECycle.STANDARD,
             EIteration.STANDARD,
-            EInicializePopulation.RANDOM,
+            EInicializePopulation.MODULO_STEPPER,
             ECost.NO_CAPACITY,
             EOrderPopulationByCost.RECALC_ALL,
-            EBoost.OPT2,
-            ESelectSurvivers.RANDOM,
+            EBoost.OPT2_STEP,
+            ESelectSurvivors.RANDOM,
             ECrossOvers.ORDERED,
-            ECrossOverOperator.STATISTICAL_PROBABILITY,
+            ECrossOverOperator.STATISTICAL_RACE,
             EMutateChildren.REVERSE,
         )
     )

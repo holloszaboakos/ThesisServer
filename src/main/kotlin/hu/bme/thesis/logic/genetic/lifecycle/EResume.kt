@@ -1,11 +1,12 @@
 package hu.bme.thesis.logic.genetic.lifecycle
 
 import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
+import hu.bme.thesis.logic.specimen.IRepresentation
 import kotlin.concurrent.thread
 
 enum class EResume {
     STANDARD {
-        override fun invoke(alg: DGeneticAlgorithm<*>) {
+        override fun <P : IRepresentation>invoke(alg: DGeneticAlgorithm<P>) {
             when (alg.state) {
                 DGeneticAlgorithm.State.CREATED -> {
                     alg.initialize()
@@ -23,5 +24,5 @@ enum class EResume {
         }
     };
 
-    abstract operator fun invoke(alg: DGeneticAlgorithm<*>)
+    abstract operator  fun <P : IRepresentation>invoke(alg: DGeneticAlgorithm<P>)
 }

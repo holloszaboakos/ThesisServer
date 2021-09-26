@@ -2,11 +2,21 @@ package hu.bme.thesis
 
 import com.google.gson.Gson
 import hu.bme.thesis.logic.OAlgorithmManager
-import hu.bme.thesis.model.mtsp.DSetup
+import hu.bme.thesis.logic.genetic.steps.ECrossOverOperator
+import hu.bme.thesis.model.mtsp.*
+import kotlinx.coroutines.runBlocking
 import java.io.File
-import java.lang.Error
+import kotlin.Error
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
+
+//record 44355.0
+//objective 1000, boost: otp_step, mutation:reset, population: 4 * customer : 193575
+//objective 1000, boost: otp_step, mutation:reset, population: 4 * customer : 184957
+//objective 1000, boost: none, operator:heuristic , mutation:reverse, population: 4 * customer : 162960.0 in 1700 iter
+//objective 1000,  boost: none, operator:heuristic , mutation:reverse, population: 4 * ( customer + transport unit)
+//step:10280 timeElapsed: 6635.5869, bestCost 152902.0, worstCost 2.9090193731010694E17
 
 @ExperimentalTime
 fun main(args: Array<String>) {
@@ -14,25 +24,72 @@ fun main(args: Array<String>) {
     for (index in 0 until args.size / 2) {
         argMap[args[index * 2]] = args[index * 2 + 1]
     }
-    val inputFilePath = argMap["-inputFilePath"] ?: throw Error("No inputFilePath given")
-    val outputFolderPath = argMap["-outputFolderPath"] ?: throw Error("No outputFolderPath given")
+    val setupFilePath = argMap["-setupFilePath"] ?: throw Error("No inputFilePath given")
+    val betweenFilePath = argMap["-betweenFilePath"] ?: throw Error("No inputFilePath given")
+    val fromCenterFilePath = argMap["-fromCenterFilePath"] ?: throw Error("No inputFilePath given")
+    val toCenterFilePath = argMap["-toCenterFilePath"] ?: throw Error("No inputFilePath given")
+    val salesmanFilePath = argMap["-salesmanFilePath"] ?: throw Error("No inputFilePath given")
+    val objectivesFilePath = argMap["-objectivesFilePath"] ?: throw Error("No inputFilePath given")
+    val outputFolderPath = argMap["-outputFolderPath"] ?: throw Error("No inputFilePath given")
 
-    val inputFile = File(inputFilePath)
+    val setupFile = File(setupFilePath)
+    val betweenFile = File(betweenFilePath)
+    val fromCenterFile = File(fromCenterFilePath)
+    val toCenterFile = File(toCenterFilePath)
+    val salesmanFile = File(salesmanFilePath)
+    val objectivesFile = File(objectivesFilePath)
+
     val gson = Gson()
-    val setup: DSetup = gson.fromJson(inputFile.readText(), DSetup::class.java)
+    var incompleteSetup: DSetup? = gson.fromJson(setupFile.readText(), DSetup::class.java)
+    var edgesBetween: Array<DEdgeArray>? = gson.fromJson(betweenFile.readText(), Array<DEdgeArray>::class.java)
+    var edgesFromCenter: Array<DEdge>? = gson.fromJson(fromCenterFile.readText(), Array<DEdge>::class.java)
+    var edgesToCenter: Array<DEdge>? = gson.fromJson(toCenterFile.readText(), Array<DEdge>::class.java)
+    var salesmen: Array<DSalesman>? = gson.fromJson(salesmanFile.readText(), Array<DSalesman>::class.java)
+    var objectives: Array<DObjective>? = gson.fromJson(objectivesFile.readText(), Array<DObjective>::class.java)
+
+    val setup = incompleteSetup?.let { ics ->
+        ics.copy(
+            task = ics.task.copy(
+                salesmen = salesmen ?: throw Error("WTF"),
+                costGraph = ics.task.costGraph.copy(
+                    objectives = objectives ?: throw Error("WTF"),
+                    edgesBetween = edgesBetween ?: throw Error("WTF"),
+                    edgesFromCenter = edgesFromCenter ?: throw Error("WTF"),
+                    edgesToCenter = edgesToCenter ?: throw Error("WTF")
+                )
+            )
+        )
+    } ?: throw Error("WTF")
+
+    incompleteSetup = null
+    edgesBetween = null
+    edgesFromCenter = null
+    edgesToCenter = null
+    salesmen = null
+    objectives = null
+
     OAlgorithmManager.task = setup.task
     OAlgorithmManager.settings = setup.setting
+
     OAlgorithmManager.prepare()
     OAlgorithmManager.start()
     val outputFile = File("$outputFolderPath\\statistics.txt")
-    for (index in 0 until (setup.task.costGraph.objectives.size * setup.task.costGraph.objectives.size)) {
+    for (index in 0 until setup.task.costGraph.objectives.size * setup.task.costGraph.objectives.size * setup.task.costGraph.objectives.size) {
         val duration = measureTime {
-            OAlgorithmManager.cycle()
+            runBlocking {
+                OAlgorithmManager.iterate()
+            }
         }
-        val cost = OAlgorithmManager.algorithm?.best?.cost ?: -1
-        println("\ncycle:$index timeElapsed: ${duration.inMilliseconds}, bestCost $cost")
-        outputFile.appendText("\ncycle:$index timeElapsed: ${duration.inMilliseconds}, bestCost $cost")
-
+        val bestCost = OAlgorithmManager.algorithm?.best?.cost ?: -1
+        val worstCost = OAlgorithmManager.algorithm?.worst?.cost ?: -1
+        println("step:$index timeElapsed: ${duration.toDouble(DurationUnit.MILLISECONDS)}, bestCost $bestCost, worstCost $worstCost")
+        outputFile.appendText("\nstep:$index timeElapsed: ${duration.toDouble(DurationUnit.MILLISECONDS)}, bestCost $bestCost, worstCost $worstCost")
+        ECrossOverOperator.STATISTICAL_RACE.operators.entries
+            .sortedBy { it.value.successRatio }
+            .forEach { (operator, statistics) ->
+                println("name: ${operator.name}, value: $statistics")
+                outputFile.appendText("\nname: ${operator.name}, value: $statistics")
+            }
+        println()
     }
-
 }
