@@ -43,7 +43,6 @@ object OAlgorithmManager {
                         (settings.timeLimit_Second * BigDecimal(1000)).toLong(),
                         settings.iterLimit.toInt(),
                         task.costGraph,
-                        task.costGraph.objectives,
                         task.salesmen,
                         EGeneticSetup.values()
                             .find { it.code.compareTo(settings.algorithm) == 0 }?.setup
@@ -117,7 +116,7 @@ object OAlgorithmManager {
 
                 val bestRout: Array<DGpsArray> =
                     best?.mapSlice { slice ->
-                        val gpsList = slice.map { value -> objectives[value.toInt()].location }.toList()
+                        val gpsList = slice.map { value -> costGraph.objectives[value.toInt()].location }.toList()
                         DGpsArray(values = gpsList.toTypedArray())
                     }?.toList()?.toTypedArray() ?: arrayOf()
                 worst?.let { worst ->

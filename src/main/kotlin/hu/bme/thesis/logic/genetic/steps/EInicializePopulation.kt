@@ -1,19 +1,17 @@
 package hu.bme.thesis.logic.genetic.steps
 
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
 import hu.bme.thesis.logic.specimen.DOnePartRepresentation
 import hu.bme.thesis.logic.specimen.DTwoPartRepresentation
-import hu.bme.thesis.logic.specimen.IRepresentation
-import hu.bme.thesis.utility.biggestCommonDivider
+import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 import kotlin.random.nextInt
 
 enum class EInicializePopulation {
     MODULO_STEPPER {
-        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>) = runBlocking {
+        override fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) = runBlocking {
             alg.run {
                 val sizeOfPermutation = costGraph.objectives.size + salesmen.size - 1
                 val basePermutation = IntArray(sizeOfPermutation) { it }
@@ -61,7 +59,7 @@ enum class EInicializePopulation {
         }
     },
     RANDOM {
-        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>) = runBlocking {
+        override fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) = runBlocking {
             alg.population.forEach { permutation ->
                 launch {
                     permutation.shuffle()
@@ -70,11 +68,11 @@ enum class EInicializePopulation {
                         is DTwoPartRepresentation ->
                             permutation.forEachSliceIndexed { index, _ ->
                                 if (index == permutation.sliceLengths.size - 1) {
-                                    permutation.sliceLengths[index] = alg.objectives.size - length
+                                    permutation.sliceLengths[index] = alg.costGraph.objectives.size - length
 
                                 } else {
                                     permutation.sliceLengths[index] =
-                                        Random.nextInt(0..(alg.objectives.size - length))
+                                        Random.nextInt(0..(alg.costGraph.objectives.size - length))
                                     length += permutation.sliceLengths[index]
                                 }
                             }
@@ -90,5 +88,5 @@ enum class EInicializePopulation {
         }
     };
 
-    abstract operator fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>)
+    abstract operator fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>)
 }

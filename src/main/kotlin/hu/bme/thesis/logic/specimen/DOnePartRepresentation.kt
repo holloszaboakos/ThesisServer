@@ -5,32 +5,40 @@ import kotlin.concurrent.read
 import kotlin.concurrent.write
 
 data class DOnePartRepresentation(
-    private val permutationSize: Int,
+    override val objectiveCount: Int,
     private val permutation: IntArray,
     override var inUse: Boolean = true,
     override var costCalculated: Boolean = true,
     override var cost: Double = -1.0,
     override var iteration: Int = 0,
     override var orderInPopulation: Int = 0
-) : IRepresentation {
+) : ISpecimenRepresentation {
 
     private val lock = ReentrantReadWriteLock()
 
     constructor(data: Array<IntArray>) : this(
         data.sumOf { it.size },
         data.let {
-            val permutationSize = data.sumOf { it.size }
-            val sum = mutableListOf<Int>()
+            val objectiveCount = data.sumOf { it.size }
+            val salesmanCount = data.size
+            val permutation = IntArray(objectiveCount + salesmanCount - 1) { -1 }
+            var counter = 0
             data.forEachIndexed { index, array ->
-                sum.addAll(array.asSequence())
-                sum.add((permutationSize + index))
+                array.forEach {
+                    permutation[counter] = it
+                    counter++
+                }
+                if (counter < permutation.size) {
+                    permutation[counter] = objectiveCount + index
+                    counter++
+                }
             }
-            sum.toIntArray()
+            permutation
         }
     )
 
     constructor(other: DOnePartRepresentation) : this(
-        other.permutationSize,
+        other.objectiveCount,
         other.permutation,
         other.inUse,
         other.costCalculated,
@@ -38,8 +46,8 @@ data class DOnePartRepresentation(
         other.iteration
     )
 
-    override val size: Int
-        get() = permutation.size
+    override val salesmanCount: Int = permutation.size - objectiveCount + 1
+    override val permutationSize: Int = permutation.size
 
     override operator fun get(index: Int) = lock.read {
         permutation[index]
@@ -70,53 +78,24 @@ data class DOnePartRepresentation(
             var count = 0
             while (count < permutation.size) {
                 yield(sequence {
-                    permutation.slice(count until permutation.size)
-                        .forEach {
-                            count++
-                            if (it < permutationSize)
-                                yield(it)
-                            else
-                                return@forEach
-                        }
+                    permutation.slice(count until permutation.size).forEach {
+                        count++
+                        if (it < objectiveCount)
+                            yield(it)
+                        else
+                            return@forEach
+                    }
                 })
             }
         }.map { mapper(it) }
     }
 
     override fun forEachSlice(operation: (slice: Sequence<Int>) -> Unit) = lock.read {
-        sequence {
-            var count = 0
-            while (count < permutation.size) {
-                yield(sequence {
-                    permutation.slice(count until permutation.size)
-                        .forEach {
-                            count++
-                            if (it < permutationSize)
-                                yield(it)
-                            else
-                                return@forEach
-                        }
-                })
-            }
-        }.forEach { operation(it) }
+        mapSlice { it }.forEach { operation(it) }
     }
 
     override fun forEachSliceIndexed(operation: (index: Int, slice: Sequence<Int>) -> Unit) = lock.read {
-        sequence {
-            var count = 0
-            while (count < permutation.size) {
-                yield(sequence {
-                    permutation.slice(count until permutation.size)
-                        .forEach {
-                            count++
-                            if (it < permutationSize)
-                                yield(it)
-                            else
-                                return@forEach
-                        }
-                })
-            }
-        }.forEachIndexed { index, sequence -> operation(index,sequence) }
+        mapSlice { it }.forEachIndexed { index, sequence -> operation(index, sequence) }
     }
 
     override fun slice(indices: IntRange): Sequence<Int> = lock.read {
@@ -130,12 +109,17 @@ data class DOnePartRepresentation(
 
     override fun setData(data: Sequence<Sequence<Int>>) {
         data.let {
-            val sum = mutableListOf<Int>()
+            var counter = 0
             data.forEachIndexed { index, array ->
-                sum.addAll(array.asSequence())
-                sum.add((permutationSize + index))
+                array.forEach {
+                    permutation[counter] = it
+                    counter++
+                }
+                if (counter < permutation.size) {
+                    permutation[counter] = objectiveCount + index
+                    counter++
+                }
             }
-            sum.toIntArray()
         }
     }
 
@@ -145,31 +129,17 @@ data class DOnePartRepresentation(
         }
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as DOnePartRepresentation
-
-        if (permutationSize != other.permutationSize) return false
-        if (!permutation.contentEquals(other.permutation)) return false
-        if (inUse != other.inUse) return false
-        if (costCalculated != other.costCalculated) return false
-        if (cost != other.cost) return false
-        if (iteration != other.iteration) return false
-        if (lock != other.lock) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = permutationSize
-        result = 31 * result + permutation.contentHashCode()
-        result = 31 * result + inUse.hashCode()
-        result = 31 * result + costCalculated.hashCode()
-        result = 31 * result + cost.hashCode()
-        result = 31 * result + iteration.hashCode()
-        result = 31 * result + lock.hashCode()
-        return result
+    override fun checkFormat(): Boolean {
+        val contains = BooleanArray(permutationSize) { false }
+        var result = true
+        permutation.forEach {
+            if (it !in permutation.indices || contains[it])
+                result = false
+            else
+                contains[it] = true
+        }
+        return if (permutation.filter { it >= objectiveCount }.size != salesmanCount - 1)
+            false
+        else result
     }
 }

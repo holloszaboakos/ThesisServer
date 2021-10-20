@@ -2,21 +2,21 @@ package hu.bme.thesis.logic.genetic.control
 
 import kotlinx.coroutines.runBlocking
 import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
-import hu.bme.thesis.logic.specimen.IRepresentation
+import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 enum class ECycle {
     STANDARD {
         @OptIn(ExperimentalTime::class)
-        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>) {
+        override fun <S : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) {
             alg.run {
                 val oldIterationCount = iteration
                 state = DGeneticAlgorithm.State.RESUMED
                 while (
                     runTime_Second < timeLimit
                     && iteration < iterationLimit
-                    && iteration - oldIterationCount < objectives.size
+                    && iteration - oldIterationCount < costGraph.objectives.size
                 ) runBlocking {
                     val time = measureTime {
                         selection()
@@ -35,5 +35,5 @@ enum class ECycle {
         }
     };
 
-    abstract operator fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>)
+    abstract operator fun <S : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>)
 }
