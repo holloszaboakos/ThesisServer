@@ -8,7 +8,7 @@ data class DTwoPartRepresentation(
     override var cost: Double = -1.0,
     override var iteration: Int = 0,
     override var orderInPopulation: Int = -1,
-) : IRepresentation {
+) : ISpecimenRepresentation {
 
     constructor(data: Array<IntArray>) : this(
         data.let {
@@ -28,8 +28,9 @@ data class DTwoPartRepresentation(
         other.iteration
     )
 
-    override val size: Int
-        get() = permutation.size
+    override val objectiveCount: Int = permutation.size
+    override val salesmanCount: Int = sliceLengths.sum()
+    override val permutationSize: Int = permutation.size
 
     override operator fun get(index: Int) = permutation[index]
     override operator fun set(index: Int, value: Int){
@@ -79,9 +80,7 @@ data class DTwoPartRepresentation(
     }
 
     override fun slice(indices: IntRange): Sequence<Int> =
-        sequence {
-            yieldAll(permutation.slice(indices))
-        }
+        permutation.slice(indices).asSequence()
 
 
     override fun shuffle(){ permutation.shuffle() }
@@ -100,29 +99,17 @@ data class DTwoPartRepresentation(
             return mapSlice { list -> list.toList().toIntArray() }.toList().toTypedArray()
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as DTwoPartRepresentation
-
-        if (!permutation.contentEquals(other.permutation)) return false
-        if (!sliceLengths.contentEquals(other.sliceLengths)) return false
-        if (inUse != other.inUse) return false
-        if (costCalculated != other.costCalculated) return false
-        if (cost != other.cost) return false
-        if (iteration != other.iteration) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = permutation.contentHashCode()
-        result = 31 * result + sliceLengths.contentHashCode()
-        result = 31 * result + inUse.hashCode()
-        result = 31 * result + costCalculated.hashCode()
-        result = 31 * result + cost.hashCode()
-        result = 31 * result + iteration.hashCode()
-        return result
+    override fun checkFormat():Boolean{
+        val contains = BooleanArray(permutation.size){false}
+        var result = true
+        permutation.forEach {
+            if (it !in permutation.indices || contains[it])
+                result = false
+            else
+                contains[it] = true
+        }
+        return if (sliceLengths.sum() != salesmanCount)
+            false
+        else result
     }
 }

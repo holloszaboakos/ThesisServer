@@ -22,7 +22,7 @@ enum class EGeneticSetup(val code: String, val setup: GeneticAlgorithmSetup) {
             EInicializePopulation.MODULO_STEPPER,
             ECost.NO_CAPACITY,
             EOrderPopulationByCost.RECALC_ALL,
-            EBoost.OPT2_STEP,
+            EBoost.NO_BOOST,
             ESelectSurvivors.RANDOM,
             ECrossOvers.ORDERED,
             ECrossOverOperator.STATISTICAL_RACE,

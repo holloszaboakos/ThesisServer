@@ -1,7 +1,7 @@
 package hu.bme.thesis.logic.genetic.steps
 
 import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
-import hu.bme.thesis.logic.specimen.IRepresentation
+import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import hu.bme.thesis.utility.slice
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -11,33 +11,33 @@ import kotlin.random.nextInt
 enum class EMutateChildren {
 
     RESET {
-        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>) = runBlocking {
-            val basePermutation = List(alg.best?.size ?: 0) { it }.shuffled().toIntArray()
-            if (alg.objectives.size > 1)
+        override fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) = runBlocking {
+            val basePermutation = List(alg.best?.permutationSize ?: 0) { it }.shuffled().toIntArray()
+            if (alg.costGraph.objectives.size > 1)
                 alg.population.asSequence()
                     .filter { it.iteration == alg.iteration }
                     .shuffled()
-                    .slice(0..( alg.population.size / 16))
+                    .slice(0 until ( alg.population.size / 16))
                     .forEachIndexed { instanceIndex, child ->
-                        if (instanceIndex < child.size) {
-                            val step = instanceIndex % (child.size - 1) + 1
+                        if (instanceIndex < child.permutationSize) {
+                            val step = instanceIndex % (child.permutationSize - 1) + 1
                             if (step == 1) {
                                 basePermutation.shuffle()
                             }
-                            val newContains = BooleanArray(child.size){false}
-                            val newPermutation = IntArray(child.size) { -1 }
+                            val newContains = BooleanArray(child.permutationSize){false}
+                            val newPermutation = IntArray(child.permutationSize) { -1 }
                             var baseIndex = step
-                            for (newIndex in 0 until child.size) {
+                            for (newIndex in 0 until child.permutationSize) {
                                 if (newContains[basePermutation[baseIndex]])
-                                    baseIndex = (baseIndex + 1) % child.size
+                                    baseIndex = (baseIndex + 1) % child.permutationSize
                                 newPermutation[newIndex] = basePermutation[baseIndex]
                                 newContains[basePermutation[baseIndex]] = true
-                                baseIndex = (baseIndex + step) % child.size
+                                baseIndex = (baseIndex + step) % child.permutationSize
                             }
 
                             val breakPoints = newPermutation
                                 .mapIndexed { index, value ->
-                                    if (value < child.size)
+                                    if (value < child.permutationSize)
                                         -1
                                     else
                                         index
@@ -46,35 +46,34 @@ enum class EMutateChildren {
                                 .toMutableList()
 
                             breakPoints.add(0, -1)
-                            breakPoints.add(child.size)
+                            breakPoints.add(child.permutationSize)
                             var it = -1
                             child.setData(sequence {
                                 it++
                                 newPermutation.slice((breakPoints[it] + 1) until breakPoints[it + 1])
 
                             })
-                            child.iteration = 0
-                            child.costCalculated = false
-                            child.inUse = true
-                            child.cost = 0.0
+
+                            if (!child.checkFormat())
+                                throw Error("Invalid specimen!")
                         }
                     }
         }
     },
     SWAP {
-        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>) = runBlocking {
-            if (alg.objectives.size > 1)
+        override fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) = runBlocking {
+            if (alg.costGraph.objectives.size > 1)
                 alg.population.asSequence()
                     .filter { it.iteration == alg.iteration }
                     .shuffled()
-                    .slice(0..alg.population.size / 4)
+                    .slice(0 until alg.population.size / 4)
                     .forEach { child ->
                         launch {
-                            val firstCutIndex = Random.nextInt(alg.objectives.indices)
-                            val secondCutIndex = Random.nextInt(alg.objectives.indices)
+                            val firstCutIndex = Random.nextInt(alg.costGraph.objectives.indices)
+                            val secondCutIndex = Random.nextInt(alg.costGraph.objectives.indices)
                                 .let {
                                     if (it == firstCutIndex)
-                                        (it + 1) % alg.objectives.size
+                                        (it + 1) % alg.costGraph.objectives.size
                                     else
                                         it
                                 }
@@ -83,24 +82,27 @@ enum class EMutateChildren {
                             child[firstCutIndex] = child[secondCutIndex]
                             child[secondCutIndex] = tmp
                         }
+                        if (!child.checkFormat())
+                            throw Error("Invalid specimen!")
                     }
+
         }
     },
 
     REVERSE {
-        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>) = runBlocking {
-            if (alg.objectives.size > 1)
+        override fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) = runBlocking {
+            if (alg.costGraph.objectives.size > 1)
                 alg.population.asSequence()
                     .filter { it.iteration == alg.iteration }
                     .shuffled()
-                    .slice(0..(alg.population.size / 4))
+                    .slice(0 until (alg.population.size / 4))
                     .forEach { child ->
                         launch {
-                            val firstCutIndex = Random.nextInt(alg.objectives.indices)
-                            val secondCutIndex = Random.nextInt(alg.objectives.indices)
+                            val firstCutIndex = Random.nextInt(alg.costGraph.objectives.indices)
+                            val secondCutIndex = Random.nextInt(alg.costGraph.objectives.indices)
                                 .let {
                                     if (it == firstCutIndex)
-                                        (it + 1) % alg.objectives.size
+                                        (it + 1) % alg.costGraph.objectives.size
                                     else
                                         it
                                 }
@@ -114,11 +116,13 @@ enum class EMutateChildren {
                                 for (geneIndex in secondCutIndex..firstCutIndex)
                                     child[geneIndex] = reversed[geneIndex - secondCutIndex]
                             }
+                            if (!child.checkFormat())
+                                throw Error("Invalid specimen!")
                         }
                     }
         }
     },REVERSE_OR_RESET{
-        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>) = runBlocking {
+        override fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) = runBlocking {
             if(alg.iteration % 100 == 0)
                 RESET(alg)
             else
@@ -126,5 +130,5 @@ enum class EMutateChildren {
         }
     };
 
-    abstract operator fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>)
+    abstract operator fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>)
 }

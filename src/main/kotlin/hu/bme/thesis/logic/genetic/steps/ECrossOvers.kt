@@ -1,15 +1,14 @@
 package hu.bme.thesis.logic.genetic.steps
 
-import kotlinx.coroutines.coroutineScope
 import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
-import hu.bme.thesis.logic.specimen.IRepresentation
+import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 enum class ECrossOvers {
     ORDERED {
-        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>) = runBlocking {
+        override fun <S : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) = runBlocking {
             val children = alg.population.filter { !it.inUse }
             val parent = alg.population.filter { it.inUse }//.shuffled()
             val jobCount = 100
@@ -31,5 +30,5 @@ enum class ECrossOvers {
         }
     };
 
-    abstract operator fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>)
+    abstract operator fun <S : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>)
 }

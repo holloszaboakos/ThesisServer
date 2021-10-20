@@ -1,11 +1,11 @@
 package hu.bme.thesis.logic.genetic.lifecycle
 
 import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
-import hu.bme.thesis.logic.specimen.IRepresentation
+import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 
 enum class EPause {
     STANDARD {
-        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>) {
+        override fun <S : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) {
             when (alg.state) {
                 DGeneticAlgorithm.State.RESUMED -> {
                     alg.state = DGeneticAlgorithm.State.INITIALIZED
@@ -18,5 +18,5 @@ enum class EPause {
         }
     };
 
-    abstract operator fun <P : IRepresentation>invoke(alg: DGeneticAlgorithm<P>)
+    abstract operator fun <S : ISpecimenRepresentation>invoke(alg: DGeneticAlgorithm<S>)
 }

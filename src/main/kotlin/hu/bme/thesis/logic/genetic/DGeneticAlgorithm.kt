@@ -1,18 +1,17 @@
 package hu.bme.thesis.logic.genetic
 
-import hu.bme.thesis.logic.specimen.IRepresentation
-import hu.bme.thesis.logic.specimen.factory.SPermutationFactory
+import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
+import hu.bme.thesis.logic.specimen.factory.SSpecimenRepresentationFactory
 import hu.bme.thesis.model.mtsp.DGraph
 import hu.bme.thesis.model.mtsp.DObjective
 import hu.bme.thesis.model.mtsp.DSalesman
 import kotlin.properties.Delegates
 
-data class DGeneticAlgorithm<P : IRepresentation>(
-    var permutationFactory: SPermutationFactory<P>,
+data class DGeneticAlgorithm<S : ISpecimenRepresentation>(
+    var permutationFactory: SSpecimenRepresentationFactory<S>,
     var timeLimit: Long = 0L,
     var iterationLimit: Int = 0,
     var costGraph: DGraph,
-    var objectives: Array<DObjective>,
     var salesmen: Array<DSalesman>,
     var setup: GeneticAlgorithmSetup
 ) {
@@ -71,12 +70,12 @@ data class DGeneticAlgorithm<P : IRepresentation>(
                 (System.currentTimeMillis() - timeOf.resume + timeOf.running) / 1000.0
 
     var iteration = 0
-    var population: ArrayList<P> = if (objectives.size != 1)
-        ArrayList(List(4 * (objectives.size + salesmen.size)){
+    var population: ArrayList<S> = if (costGraph.objectives.size != 1)
+        ArrayList(List(4 * (costGraph.objectives.size + salesmen.size)){
             permutationFactory.produce(
                 Array(salesmen.size) { index ->
                     if (index == 0)
-                        IntArray(objectives.size) { it }
+                        IntArray(costGraph.objectives.size) { it }
                     else
                         intArrayOf()
                 }
@@ -84,11 +83,11 @@ data class DGeneticAlgorithm<P : IRepresentation>(
         })
     else arrayListOf(
         permutationFactory.produce(
-            arrayOf(IntArray(objectives.size) { it })
+            arrayOf(IntArray(costGraph.objectives.size) { it })
         )
     )
-    var best: P? = null
-    var worst: P? = null
+    var best: S? = null
+    var worst: S? = null
 
     fun pause() = setup.pause(this)
     fun resume() = setup.resume(this)
@@ -100,14 +99,14 @@ data class DGeneticAlgorithm<P : IRepresentation>(
     fun iterate() = setup.iteration(this)
 
     suspend fun initializePopulation() = setup.initializePopulation(this)
-    fun cost(permutation: P) = setup.cost(this, permutation)
+    fun cost(specimen: S) = setup.cost.invoke(this, specimen)
     suspend fun orderByCost() = setup.orderByCost(this)
     fun boost() = setup.boost(this)
     val selection by lazy { setup.selection(this) }
     suspend fun crossover() = setup.crossover(this)
     fun crossoverOperator(
-        parents: Pair<P, P>,
-        child: P
+        parents: Pair<S, S>,
+        child: S
     ) = setup.crossoverOperator(parents, child, this)
 
     suspend fun mutate() = setup.mutate(this)

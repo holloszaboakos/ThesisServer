@@ -2,11 +2,11 @@ package hu.bme.thesis.logic.genetic.control
 
 import kotlinx.coroutines.runBlocking
 import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
-import hu.bme.thesis.logic.specimen.IRepresentation
+import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 
 enum class EIteration {
     STANDARD {
-        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>) = runBlocking {
+        override fun <S : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) = runBlocking {
             alg.run {
                 state = DGeneticAlgorithm.State.RESUMED
                 selection()
@@ -22,5 +22,5 @@ enum class EIteration {
         }
     };
 
-    abstract operator fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>)
+    abstract operator fun <S : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>)
 }

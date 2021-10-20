@@ -1,12 +1,14 @@
 package hu.bme.thesis.logic.specimen
 
-interface IRepresentation {
+interface ISpecimenRepresentation {
      var inUse: Boolean
      var costCalculated: Boolean
      var cost: Double
      var iteration: Int
      var orderInPopulation: Int
-     val size: Int
+     val objectiveCount: Int
+     val salesmanCount: Int
+     val permutationSize: Int
 
      operator fun get(index: Int): Int
      operator fun set(index: Int, value: Int)
@@ -29,5 +31,7 @@ interface IRepresentation {
 
      fun setData(data: Sequence<Sequence<Int>>)
      fun getData():Array<IntArray>
+
+     fun checkFormat():Boolean
 
 }

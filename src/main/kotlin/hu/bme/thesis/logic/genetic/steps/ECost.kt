@@ -1,17 +1,16 @@
 package hu.bme.thesis.logic.genetic.steps
 
 import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
-import hu.bme.thesis.logic.specimen.IRepresentation
+import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import hu.bme.thesis.model.mtsp.DEdge
-import kotlinx.coroutines.runBlocking
 
 enum class ECost {
     NO_CAPACITY {
-        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>, permutation: IRepresentation){
+        override fun <S : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>, specimen: ISpecimenRepresentation){
                 alg.run {
                     var sumCost = 0.0
                     var geneIndex = 0
-                    permutation.forEachSliceIndexed { sliceIndex, sliceSequence ->
+                    specimen.forEachSliceIndexed { sliceIndex, sliceSequence ->
                         val slice = sliceSequence.toList()
                         val salesman = salesmen[sliceIndex]
                         var cost = salesman.basePrice_Euro
@@ -19,7 +18,7 @@ enum class ECost {
                             when (index) {
                                 0 -> {
                                     val fromCenterEdge = costGraph.edgesFromCenter[value]
-                                    val objective = objectives[value]
+                                    val objective = costGraph.objectives[value]
                                     cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * fromCenterEdge.length_Meter +
                                             salesman.payment_EuroPerSecond * fromCenterEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond +
                                             salesman.payment_EuroPerSecond * objective.time_Second
@@ -29,7 +28,7 @@ enum class ECost {
                                         (costGraph.edgesBetween[slice[index - 1]].values[value])
                                     else
                                         (costGraph.edgesBetween[slice[index - 1]].values[value - 1])
-                                    val objective = objectives[value]
+                                    val objective = costGraph.objectives[value]
                                     val toCenterEdge = costGraph.edgesToCenter[value]
                                     cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * betweenEdge.length_Meter +
                                             salesman.payment_EuroPerSecond * betweenEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond +
@@ -51,7 +50,7 @@ enum class ECost {
                                             DEdge()
                                         }
 
-                                    val objective = objectives[value]
+                                    val objective = costGraph.objectives[value]
                                     cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * betweenEdge.length_Meter +
                                             salesman.payment_EuroPerSecond * betweenEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond +
                                             salesman.payment_EuroPerSecond * objective.time_Second
@@ -62,8 +61,8 @@ enum class ECost {
                         geneIndex += slice.size
                         sumCost += cost.toLong()
                     }
-                    permutation.cost = sumCost
-                    permutation.costCalculated = true
+                    specimen.cost = sumCost
+                    specimen.costCalculated = true
                     if (sumCost == 0.0) {
                         println("Impossible!")
                     }
@@ -71,5 +70,5 @@ enum class ECost {
             }
     };
 
-    abstract operator fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>, permutation: IRepresentation)
+    abstract operator fun <S : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>, specimen: ISpecimenRepresentation)
 }

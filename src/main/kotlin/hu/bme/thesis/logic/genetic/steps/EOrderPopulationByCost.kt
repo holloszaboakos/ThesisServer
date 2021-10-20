@@ -1,42 +1,38 @@
 package hu.bme.thesis.logic.genetic.steps
 
-import kotlinx.coroutines.coroutineScope
 import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
-import hu.bme.thesis.logic.specimen.IRepresentation
+import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 enum class EOrderPopulationByCost {
     RECALC_ALL {
-        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>) = runBlocking {
+        override fun <S : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>): Unit = runBlocking {
             alg.run {
                 val jobCount = 100
                 val jobs: Array<Job?> = Array(jobCount) { null }
                 population.asSequence()
                     .filter { !it.costCalculated }
-                    .forEachIndexed { index, p ->
+                    .forEachIndexed { index, specimen ->
                         jobs[index % jobCount]?.join()
                         jobs[index % jobCount] =
                             launch {
-                                alg.cost(p)
+                                alg.cost(specimen)
                             }
                     }
                 jobs.forEach { it?.join() }
-                population = ArrayList(
-                    population.asSequence()
-                        .sortedBy { it.cost }
-                        .mapIndexed { index, it ->
-                            it.orderInPopulation = index
-                            if (it.cost == 0.0)
-                                println("Impossible!")
-                            it.inUse = false
-                            it
-                        }.toList()
-                )
+                population.sortBy { it.cost }
+                population.asSequence()
+                    .forEachIndexed { index, it ->
+                        it.orderInPopulation = index
+                        if (it.cost == 0.0)
+                            println("Impossible!")
+                        it.inUse = false
+                    }
             }
         }
     };
 
-    abstract operator fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>)
+    abstract operator fun <S : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>)
 }

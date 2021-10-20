@@ -1,12 +1,12 @@
 package hu.bme.thesis.logic.genetic.steps
 
 import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
-import hu.bme.thesis.logic.specimen.IRepresentation
+import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import hu.bme.thesis.utility.slice
 
 enum class ESelectSurvivors {
     RANDOM {
-        override fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>): () -> Unit {
+        override fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>): () -> Unit {
             return  {
                 alg.run {
                     population.asSequence()
@@ -23,5 +23,5 @@ enum class ESelectSurvivors {
     }
     ;
 
-    abstract operator fun <P : IRepresentation> invoke(alg: DGeneticAlgorithm<P>): () -> Unit
+    abstract operator fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>): () -> Unit
 }
