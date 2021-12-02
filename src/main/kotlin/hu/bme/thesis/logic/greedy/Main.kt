@@ -1,8 +1,17 @@
 package hu.bme.thesis.logic.greedy
 
 import com.google.gson.Gson
+import hu.bme.thesis.logic.common.lifecycle.EClear
+import hu.bme.thesis.logic.common.lifecycle.EInitialize
+import hu.bme.thesis.logic.common.lifecycle.EPause
+import hu.bme.thesis.logic.common.lifecycle.EResume
+import hu.bme.thesis.logic.common.steps.ECost
+import hu.bme.thesis.logic.common.steps.ECostOfEdge
+import hu.bme.thesis.logic.common.steps.ECostOfObjective
 import hu.bme.thesis.logic.specimen.factory.OOnePartRepresentationFactory
+import hu.bme.thesis.model.inner.setup.DNearestNeighbourSetup
 import hu.bme.thesis.model.mtsp.*
+import kotlinx.coroutines.runBlocking
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -61,9 +70,18 @@ fun main(args: Array<String>) {
     val greedy = NearestNeighbourTSP2MTSP(
         OOnePartRepresentationFactory,
         setup.task.costGraph,
-        setup.task.salesmen
+        setup.task.salesmen,
+        DNearestNeighbourSetup(
+            EPause.DEFAULT,
+            EResume.DEFAULT,
+            EInitialize.DEFAULT,
+            EClear.DEFAULT,
+            ECost.NO_CAPACITY,
+            ECostOfEdge.DEFAULT,
+            ECostOfObjective.DEFAULT
+        )
     )
 
-    val result = greedy.run()
+    val result = runBlocking { greedy.run() }
     println("cost of greedy: ${result.cost}")
 }

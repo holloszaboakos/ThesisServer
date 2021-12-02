@@ -1,8 +1,10 @@
-package hu.bme.thesis.logic.genetic.steps
+package hu.bme.thesis.logic.evolutionary.genetic
 
-import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
+import hu.bme.thesis.logic.evolutionary.GeneticAlgorithm
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import hu.bme.thesis.utility.slice
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
@@ -11,7 +13,7 @@ import kotlin.random.nextInt
 enum class EMutateChildren {
 
     RESET {
-        override fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) = runBlocking {
+        override fun <S  : ISpecimenRepresentation> invoke(alg: GeneticAlgorithm<S>) = runBlocking {
             val basePermutation = List(alg.best?.permutationSize ?: 0) { it }.shuffled().toIntArray()
             if (alg.costGraph.objectives.size > 1)
                 alg.population.asSequence()
@@ -48,7 +50,7 @@ enum class EMutateChildren {
                             breakPoints.add(0, -1)
                             breakPoints.add(child.permutationSize)
                             var it = -1
-                            child.setData(sequence {
+                            child.setData(flow {
                                 it++
                                 newPermutation.slice((breakPoints[it] + 1) until breakPoints[it + 1])
 
@@ -61,7 +63,7 @@ enum class EMutateChildren {
         }
     },
     SWAP {
-        override fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) = runBlocking {
+        override fun <S  : ISpecimenRepresentation> invoke(alg: GeneticAlgorithm<S>) = runBlocking {
             if (alg.costGraph.objectives.size > 1)
                 alg.population.asSequence()
                     .filter { it.iteration == alg.iteration }
@@ -90,7 +92,7 @@ enum class EMutateChildren {
     },
 
     REVERSE {
-        override fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) = runBlocking {
+        override fun <S  : ISpecimenRepresentation> invoke(alg: GeneticAlgorithm<S>) = runBlocking {
             if (alg.costGraph.objectives.size > 1)
                 alg.population.asSequence()
                     .filter { it.iteration == alg.iteration }
@@ -122,7 +124,7 @@ enum class EMutateChildren {
                     }
         }
     },REVERSE_OR_RESET{
-        override fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) = runBlocking {
+        override fun <S  : ISpecimenRepresentation> invoke(alg: GeneticAlgorithm<S>) = runBlocking {
             if(alg.iteration % 100 == 0)
                 RESET(alg)
             else
@@ -130,5 +132,5 @@ enum class EMutateChildren {
         }
     };
 
-    abstract operator fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>)
+    abstract operator fun <S  : ISpecimenRepresentation> invoke(alg: GeneticAlgorithm<S>)
 }

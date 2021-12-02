@@ -17,6 +17,7 @@ import hu.bme.thesis.network.apis.LifecicleApi
 import hu.bme.thesis.network.apis.SetupApi
 import hu.bme.thesis.network.apis.UpdateApi
 import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 
@@ -63,7 +64,7 @@ fun Application.main() {
         header(HttpHeaders.ContentType)
         header(HttpHeaders.AccessControlAllowOrigin)
         anyHost()
-        maxAgeDuration = 1.0.toDuration(TimeUnit.DAYS)
+        maxAgeDuration = 1.0.toDuration(DurationUnit.DAYS)
         allowNonSimpleContentTypes = true
     }
 

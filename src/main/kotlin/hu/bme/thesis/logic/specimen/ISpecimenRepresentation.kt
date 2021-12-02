@@ -1,5 +1,7 @@
 package hu.bme.thesis.logic.specimen
 
+import kotlinx.coroutines.flow.Flow
+
 interface ISpecimenRepresentation {
      var inUse: Boolean
      var costCalculated: Boolean
@@ -16,21 +18,21 @@ interface ISpecimenRepresentation {
      fun indexOf(value: Int): Int
      fun contains(value: Int): Boolean
 
-     fun <T>map(mapper: (value:Int) -> T): Sequence<T>
+     fun <T>map(mapper: (value:Int) -> T): Flow<T>
      fun forEach(operation: (value:Int) -> Unit)
      fun forEachIndexed(operation: (index:Int, value:Int) -> Unit)
      fun setEach(operation: (index:Int, value:Int) -> Int)
 
-     fun <T> mapSlice(mapper: (slice: Sequence<Int>) -> T): Sequence<T>
-     fun forEachSlice(operation: (slice: Sequence<Int>) -> Unit)
-     fun forEachSliceIndexed(operation: (index: Int, slice: Sequence<Int>) -> Unit)
-     fun slice(indices:IntRange): Sequence<Int>
+     fun <T> mapSlice(mapper: (slice: Flow<Int>) -> T): Flow<T>
+     fun forEachSlice(operation: (slice: Flow<Int>) -> Unit)
+     fun forEachSliceIndexed(operation: (index: Int, slice: Flow<Int>) -> Unit)
+     fun slice(indices:IntRange): Flow<Int>
 
      fun shuffle()
      fun first(selector: (value:Int) -> Boolean) : Int
 
-     fun setData(data: Sequence<Sequence<Int>>)
-     fun getData():Array<IntArray>
+     suspend fun setData(data: Flow<Flow<Int>>)
+     fun getData():Flow<Flow<Int>>
 
      fun checkFormat():Boolean
 

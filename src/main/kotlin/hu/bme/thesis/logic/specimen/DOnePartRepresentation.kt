@@ -1,5 +1,10 @@
 package hu.bme.thesis.logic.specimen
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
@@ -8,7 +13,7 @@ data class DOnePartRepresentation(
     override val objectiveCount: Int,
     private val permutation: IntArray,
     override var inUse: Boolean = true,
-    override var costCalculated: Boolean = true,
+    override var costCalculated: Boolean = false,
     override var cost: Double = -1.0,
     override var iteration: Int = 0,
     override var orderInPopulation: Int = 0
@@ -61,7 +66,7 @@ data class DOnePartRepresentation(
 
     override fun contains(value: Int): Boolean = permutation.contains(value)
 
-    override fun <T> map(mapper: (Int) -> T): Sequence<T> = permutation.map(mapper).asSequence()
+    override fun <T> map(mapper: (Int) -> T): Flow<T> = permutation.map(mapper).asFlow()
 
     override fun forEach(operation: (Int) -> Unit) =
         lock.read { permutation.forEach(operation) }
@@ -73,59 +78,55 @@ data class DOnePartRepresentation(
         permutation.forEachIndexed { index: Int, value: Int -> permutation[index] = operation(index, value) }
     }
 
-    override fun <T> mapSlice(mapper: (slice: Sequence<Int>) -> T): Sequence<T> = lock.read {
-        sequence {
-            var count = 0
-            while (count < permutation.size) {
-                yield(sequence {
-                    permutation.slice(count until permutation.size).forEach {
-                        count++
-                        if (it < objectiveCount)
-                            yield(it)
-                        else
-                            return@forEach
-                    }
-                })
-            }
-        }.map { mapper(it) }
+    override fun <T> mapSlice(mapper: (slice: Flow<Int>) -> T): Flow<T> = lock.read {
+        val result = mutableListOf<MutableList<Int>>(mutableListOf())
+        permutation.forEach { value->
+            if(value<objectiveCount)
+                result.last().add(value)
+            else
+                result.add(mutableListOf())
+        }
+        result.asFlow().map { mapper(it.asFlow()) }
     }
 
-    override fun forEachSlice(operation: (slice: Sequence<Int>) -> Unit) = lock.read {
-        mapSlice { it }.forEach { operation(it) }
+    override fun forEachSlice(operation: (slice: Flow<Int>) -> Unit) = lock.read {
+        runBlocking { mapSlice { it }.toList() }
+            .forEach { slice -> operation(slice) }
     }
 
-    override fun forEachSliceIndexed(operation: (index: Int, slice: Sequence<Int>) -> Unit) = lock.read {
-        mapSlice { it }.forEachIndexed { index, sequence -> operation(index, sequence) }
+    override fun forEachSliceIndexed(operation: (index: Int, slice: Flow<Int>) -> Unit): Unit = lock.read {
+        val collected = runBlocking { mapSlice { it }.toList() }
+        collected.forEachIndexed { index, flow ->
+            operation(index, flow)
+        }
     }
 
-    override fun slice(indices: IntRange): Sequence<Int> = lock.read {
-        sequence {
-            yieldAll(permutation.slice(indices))
+    override fun slice(indices: IntRange): Flow<Int> = lock.read {
+        flow {
+            emitAll(permutation.slice(indices).asFlow())
         }
     }
 
     override fun shuffle() = lock.write { permutation.shuffle() }
     override fun first(selector: (Int) -> Boolean): Int = lock.read { permutation.first(selector) }
 
-    override fun setData(data: Sequence<Sequence<Int>>) {
-        data.let {
-            var counter = 0
-            data.forEachIndexed { index, array ->
-                array.forEach {
-                    permutation[counter] = it
-                    counter++
-                }
-                if (counter < permutation.size) {
-                    permutation[counter] = objectiveCount + index
-                    counter++
-                }
+    override suspend fun setData(data: Flow<Flow<Int>>) {
+        var counter = 0
+        data.collectIndexed { index, array ->
+            array.collect {
+                permutation[counter] = it
+                counter++
+            }
+            if (counter < permutation.size) {
+                permutation[counter] = objectiveCount + index
+                counter++
             }
         }
     }
 
-    override fun getData(): Array<IntArray> {
+    override fun getData(): Flow<Flow<Int>> {
         lock.read {
-            return mapSlice { list -> list.toList().toIntArray() }.toList().toTypedArray()
+            return mapSlice { list -> list }
         }
     }
 

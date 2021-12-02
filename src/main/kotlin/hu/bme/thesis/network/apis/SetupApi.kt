@@ -21,7 +21,7 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import hu.bme.thesis.logic.OAlgorithmManager
-import hu.bme.thesis.logic.genetic.EGeneticSetup
+import hu.bme.thesis.logic.evolutionary.setup.EGeneticSetup
 import hu.bme.thesis.model.OHibernateManager
 import hu.bme.thesis.model.mtsp.*
 import hu.bme.thesis.network.Paths
