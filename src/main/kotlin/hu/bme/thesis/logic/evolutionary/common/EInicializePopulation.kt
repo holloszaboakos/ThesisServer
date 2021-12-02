@@ -1,17 +1,18 @@
-package hu.bme.thesis.logic.genetic.steps
+package hu.bme.thesis.logic.evolutionary.common
 
+import hu.bme.thesis.logic.evolutionary.SEvolutionaryAlgorithm
 import kotlinx.coroutines.launch
-import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
 import hu.bme.thesis.logic.specimen.DOnePartRepresentation
 import hu.bme.thesis.logic.specimen.DTwoPartRepresentation
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 import kotlin.random.nextInt
 
 enum class EInicializePopulation {
     MODULO_STEPPER {
-        override fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) = runBlocking {
+        override fun <S : ISpecimenRepresentation> invoke(alg: SEvolutionaryAlgorithm<S>) {
             alg.run {
                 val sizeOfPermutation = costGraph.objectives.size + salesmen.size - 1
                 val basePermutation = IntArray(sizeOfPermutation) { it }
@@ -21,7 +22,7 @@ enum class EInicializePopulation {
                         basePermutation.shuffle()
                     }
 
-                    val newContains = BooleanArray(sizeOfPermutation){false}
+                    val newContains = BooleanArray(sizeOfPermutation) { false }
                     val newPermutation = IntArray(sizeOfPermutation) { -1 }
                     var baseIndex = step
                     for (newIndex in 0 until sizeOfPermutation) {
@@ -45,48 +46,48 @@ enum class EInicializePopulation {
                     breakPoints.add(0, -1)
                     breakPoints.add(sizeOfPermutation)
                     var it = -1
-                    instance.setData(sequence {
-                        it++
-                        newPermutation.slice((breakPoints[it] + 1) until breakPoints[it + 1])
+                    runBlocking {
+                        instance.setData(flow {
+                            it++
+                            newPermutation.slice((breakPoints[it] + 1) until breakPoints[it + 1])
 
-                    })
+                        })
+                    }
                     instance.iteration = 0
                     instance.costCalculated = false
                     instance.inUse = true
-                    instance.cost=-1.0
+                    instance.cost = -1.0
                 }
             }
         }
     },
     RANDOM {
-        override fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) = runBlocking {
+        override fun <S : ISpecimenRepresentation> invoke(alg: SEvolutionaryAlgorithm<S>) {
             alg.population.forEach { permutation ->
-                launch {
-                    permutation.shuffle()
-                    var length = 0
-                    when (permutation) {
-                        is DTwoPartRepresentation ->
-                            permutation.forEachSliceIndexed { index, _ ->
-                                if (index == permutation.sliceLengths.size - 1) {
-                                    permutation.sliceLengths[index] = alg.costGraph.objectives.size - length
+                permutation.shuffle()
+                var length = 0
+                when (permutation) {
+                    is DTwoPartRepresentation ->
+                        permutation.forEachSliceIndexed { index, _ ->
+                            if (index == permutation.sliceLengths.size - 1) {
+                                permutation.sliceLengths[index] = alg.costGraph.objectives.size - length
 
-                                } else {
-                                    permutation.sliceLengths[index] =
-                                        Random.nextInt(0..(alg.costGraph.objectives.size - length))
-                                    length += permutation.sliceLengths[index]
-                                }
+                            } else {
+                                permutation.sliceLengths[index] =
+                                    Random.nextInt(0..(alg.costGraph.objectives.size - length))
+                                length += permutation.sliceLengths[index]
                             }
-                        is DOnePartRepresentation -> {
-
                         }
+                    is DOnePartRepresentation -> {
+
                     }
-                    permutation.iteration = 0
-                    permutation.costCalculated = false
-                    permutation.inUse = true
                 }
+                permutation.iteration = 0
+                permutation.costCalculated = false
+                permutation.inUse = true
             }
         }
     };
 
-    abstract operator fun <S  : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>)
+    abstract operator fun <S : ISpecimenRepresentation> invoke(alg: SEvolutionaryAlgorithm<S>)
 }

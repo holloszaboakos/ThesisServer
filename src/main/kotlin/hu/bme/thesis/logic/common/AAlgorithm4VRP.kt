@@ -1,21 +1,22 @@
-package hu.bme.thesis.logic.genetic
+package hu.bme.thesis.logic.common
 
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import hu.bme.thesis.logic.specimen.factory.SSpecimenRepresentationFactory
+import hu.bme.thesis.model.inner.setup.AAlgorithm4VRPSetup
+import hu.bme.thesis.model.mtsp.DEdge
 import hu.bme.thesis.model.mtsp.DGraph
 import hu.bme.thesis.model.mtsp.DObjective
 import hu.bme.thesis.model.mtsp.DSalesman
 import kotlin.properties.Delegates
 
-data class DGeneticAlgorithm<S : ISpecimenRepresentation>(
-    var permutationFactory: SSpecimenRepresentationFactory<S>,
-    var timeLimit: Long = 0L,
-    var iterationLimit: Int = 0,
-    var costGraph: DGraph,
-    var salesmen: Array<DSalesman>,
-    var setup: GeneticAlgorithmSetup
+abstract class AAlgorithm4VRP<S : ISpecimenRepresentation>(
+    open val permutationFactory: SSpecimenRepresentationFactory<S>,
+    open val costGraph: DGraph,
+    open val salesmen: Array<DSalesman>,
+    open val setup: AAlgorithm4VRPSetup,
+    open val timeLimit: Long,
+    open val iterationLimit: Int,
 ) {
-
     enum class State {
         CREATED,
         INITIALIZED,
@@ -70,44 +71,16 @@ data class DGeneticAlgorithm<S : ISpecimenRepresentation>(
                 (System.currentTimeMillis() - timeOf.resume + timeOf.running) / 1000.0
 
     var iteration = 0
-    var population: ArrayList<S> = if (costGraph.objectives.size != 1)
-        ArrayList(List(4 * (costGraph.objectives.size + salesmen.size)){
-            permutationFactory.produce(
-                Array(salesmen.size) { index ->
-                    if (index == 0)
-                        IntArray(costGraph.objectives.size) { it }
-                    else
-                        intArrayOf()
-                }
-            )
-        })
-    else arrayListOf(
-        permutationFactory.produce(
-            arrayOf(IntArray(costGraph.objectives.size) { it })
-        )
-    )
-    var best: S? = null
-    var worst: S? = null
+
 
     fun pause() = setup.pause(this)
-    fun resume() = setup.resume(this)
+    suspend fun resume() = setup.resume(this)
     fun initialize() = setup.initialize(this)
     fun clear() = setup.clear(this)
 
-    fun run() = setup.run(this)
-    fun cycle() = setup.cycle(this)
-    fun iterate() = setup.iteration(this)
+    fun cost(specimen: S) = setup.cost(this, specimen)
+    fun costOfEdge(edge: DEdge, salesman: DSalesman) = setup.costOfEdge(edge, salesman)
+    fun costOfObjective(objective: DObjective, salesman: DSalesman) = setup.costOfObjective(objective, salesman)
 
-    suspend fun initializePopulation() = setup.initializePopulation(this)
-    fun cost(specimen: S) = setup.cost.invoke(this, specimen)
-    suspend fun orderByCost() = setup.orderByCost(this)
-    fun boost() = setup.boost(this)
-    val selection by lazy { setup.selection(this) }
-    suspend fun crossover() = setup.crossover(this)
-    fun crossoverOperator(
-        parents: Pair<S, S>,
-        child: S
-    ) = setup.crossoverOperator(parents, child, this)
-
-    suspend fun mutate() = setup.mutate(this)
+    abstract suspend fun run():S
 }

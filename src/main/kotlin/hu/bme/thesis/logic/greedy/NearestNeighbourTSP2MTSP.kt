@@ -2,15 +2,20 @@ package hu.bme.thesis.logic.greedy
 
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import hu.bme.thesis.logic.specimen.factory.SSpecimenRepresentationFactory
+import hu.bme.thesis.model.inner.setup.DNearestNeighbourSetup
 import hu.bme.thesis.model.mtsp.DGraph
 import hu.bme.thesis.model.mtsp.DSalesman
+import kotlinx.coroutines.flow.toList
 
 class NearestNeighbourTSP2MTSP<S : ISpecimenRepresentation>(
-    permutationFactory: SSpecimenRepresentationFactory<S>,
-    costGraph: DGraph,
-    salesmen: Array<DSalesman>
-) : SNearestNeighbour<S>(permutationFactory, costGraph, salesmen) {
-    override fun run(): S {
+    override var permutationFactory: SSpecimenRepresentationFactory<S>,
+    override var costGraph: DGraph,
+    override var salesmen: Array<DSalesman>,
+    override var setup: DNearestNeighbourSetup,
+    override var timeLimit: Long = 0L,
+    override var iterationLimit: Int = 0,
+) : SNearestNeighbour<S>(permutationFactory, costGraph, salesmen, setup, timeLimit, iterationLimit) {
+    override suspend fun run(): S {
         var bestSpecimen : S? = null
         for(permutationIndex in costGraph.objectives.indices){
             val contains = BooleanArray(costGraph.objectives.size) { false }
@@ -35,13 +40,13 @@ class NearestNeighbourTSP2MTSP<S : ISpecimenRepresentation>(
             }
 
             val resultSpecimen = permutationFactory.produce(arrayOf(resultPermutation))
-            calcCost(resultSpecimen)
+            cost(resultSpecimen)
             if(bestSpecimen == null || bestSpecimen.cost > resultSpecimen.cost)
                 bestSpecimen = resultSpecimen
         }
 
         bestSpecimen?.let {
-            val data = it.getData()[0]
+            val data = it.getData().toList()[0]
             val newData = mutableListOf<IntArray>()
 
 

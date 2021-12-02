@@ -3,6 +3,8 @@ package hu.bme.thesis.logic.linkernighan
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import hu.bme.thesis.logic.specimen.factory.SSpecimenRepresentationFactory
 import hu.bme.thesis.model.mtsp.*
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import java.util.*
 import java.util.ArrayList
 import kotlin.math.pow
@@ -33,55 +35,57 @@ class LinKernighanTSP<S : ISpecimenRepresentation>(
     fun calcCost(specimen: S) {
         var sumCost = 0.0
         var geneIndex = 0
-        specimen.forEachSliceIndexed { sliceIndex, sliceSequence ->
-            val slice = sliceSequence.toList()
-            val salesman = salesmen[sliceIndex]
-            var cost = salesman.basePrice_Euro
-            slice.map { it }.forEachIndexed { index, value ->
-                when (index) {
-                    0 -> {
-                        val fromCenterEdge = costGraph.edgesFromCenter[value]
-                        val objective = costGraph.objectives[value]
-                        cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * fromCenterEdge.length_Meter +
-                                salesman.payment_EuroPerSecond * fromCenterEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond +
-                                salesman.payment_EuroPerSecond * objective.time_Second
-                    }
-                    geneIndex + slice.size - 1 -> {
-                        val betweenEdge = if (slice[index - 1] > value)
-                            (costGraph.edgesBetween[slice[index - 1]].values[value])
-                        else
-                            (costGraph.edgesBetween[slice[index - 1]].values[value - 1])
-                        val objective = costGraph.objectives[value]
-                        val toCenterEdge = costGraph.edgesToCenter[value]
-                        cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * betweenEdge.length_Meter +
-                                salesman.payment_EuroPerSecond * betweenEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond +
-                                salesman.payment_EuroPerSecond * objective.time_Second +
-                                salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * toCenterEdge.length_Meter +
-                                salesman.payment_EuroPerSecond * toCenterEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond
+        runBlocking {
+            specimen.forEachSliceIndexed { sliceIndex, sliceSequence ->
+                val slice = runBlocking { sliceSequence.toList() }
+                val salesman = salesmen[sliceIndex]
+                var cost = salesman.basePrice_Euro
+                slice.map { it }.forEachIndexed { index, value ->
+                    when (index) {
+                        0 -> {
+                            val fromCenterEdge = costGraph.edgesFromCenter[value]
+                            val objective = costGraph.objectives[value]
+                            cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * fromCenterEdge.length_Meter +
+                                    salesman.payment_EuroPerSecond * fromCenterEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond +
+                                    salesman.payment_EuroPerSecond * objective.time_Second
+                        }
+                        geneIndex + slice.size - 1 -> {
+                            val betweenEdge = if (slice[index - 1] > value)
+                                (costGraph.edgesBetween[slice[index - 1]].values[value])
+                            else
+                                (costGraph.edgesBetween[slice[index - 1]].values[value - 1])
+                            val objective = costGraph.objectives[value]
+                            val toCenterEdge = costGraph.edgesToCenter[value]
+                            cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * betweenEdge.length_Meter +
+                                    salesman.payment_EuroPerSecond * betweenEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond +
+                                    salesman.payment_EuroPerSecond * objective.time_Second +
+                                    salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * toCenterEdge.length_Meter +
+                                    salesman.payment_EuroPerSecond * toCenterEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond
 
-                    }
-                    else -> {
-                        val betweenEdge = if (slice[index - 1] > value)
-                            costGraph.edgesBetween[slice[index - 1]].values[value]
-                        else
-                            try {
-                                costGraph.edgesBetween[slice[index - 1]].values[value - 1]
+                        }
+                        else -> {
+                            val betweenEdge = if (slice[index - 1] > value)
+                                costGraph.edgesBetween[slice[index - 1]].values[value]
+                            else
+                                try {
+                                    costGraph.edgesBetween[slice[index - 1]].values[value - 1]
 
-                            } catch (e: ArrayIndexOutOfBoundsException) {
-                                println("fuck!")
-                                DEdge()
-                            }
+                                } catch (e: ArrayIndexOutOfBoundsException) {
+                                    println("fuck!")
+                                    DEdge()
+                                }
 
-                        val objective = costGraph.objectives[value]
-                        cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * betweenEdge.length_Meter +
-                                salesman.payment_EuroPerSecond * betweenEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond +
-                                salesman.payment_EuroPerSecond * objective.time_Second
+                            val objective = costGraph.objectives[value]
+                            cost += salesman.fuelPrice_EuroPerLiter * salesman.fuelConsuption_LiterPerMeter * betweenEdge.length_Meter +
+                                    salesman.payment_EuroPerSecond * betweenEdge.length_Meter / salesman.vechicleSpeed_MeterPerSecond +
+                                    salesman.payment_EuroPerSecond * objective.time_Second
+                        }
                     }
+
                 }
-
+                geneIndex += slice.size
+                sumCost += cost.toLong()
             }
-            geneIndex += slice.size
-            sumCost += cost.toLong()
         }
         specimen.cost = sumCost
         specimen.costCalculated = true
@@ -97,15 +101,17 @@ class LinKernighanTSP<S : ISpecimenRepresentation>(
      */
     val result: S
         get() {
-            val specimen = permutationFactory.produce(arrayOf(tour))
-            calcCost(specimen)
-            return specimen
+            return runBlocking {
+                val specimen = permutationFactory.produce(arrayOf(tour))
+                calcCost(specimen)
+                specimen
+            }
         }
 
     // The current tour solution
-    var tour: IntArray = IntArray(size){it}
+    var tour: IntArray = IntArray(size) { it }
 
-    init{
+    init {
         tour.shuffle()
     }
 }

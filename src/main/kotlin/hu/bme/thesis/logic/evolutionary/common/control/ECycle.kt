@@ -1,39 +1,33 @@
-package hu.bme.thesis.logic.genetic.control
+package hu.bme.thesis.logic.evolutionary.common.control
 
+import hu.bme.thesis.logic.common.AAlgorithm4VRP
+import hu.bme.thesis.logic.evolutionary.SEvolutionaryAlgorithm
 import kotlinx.coroutines.runBlocking
-import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 enum class ECycle {
-    STANDARD {
+    DEFAULT {
         @OptIn(ExperimentalTime::class)
-        override fun <S : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>) {
+        override fun <S : ISpecimenRepresentation> invoke(alg: SEvolutionaryAlgorithm<S>) {
             alg.run {
                 val oldIterationCount = iteration
-                state = DGeneticAlgorithm.State.RESUMED
+                state = AAlgorithm4VRP.State.RESUMED
                 while (
                     runTime_Second < timeLimit
                     && iteration < iterationLimit
                     && iteration - oldIterationCount < costGraph.objectives.size
                 ) runBlocking {
                     val time = measureTime {
-                        selection()
-                        crossover()
-                        mutate()
-                        orderByCost()
-                        boost()
-                        best = permutationFactory.copy(population.first())
-                        worst = permutationFactory.copy(population.last())
-                        iteration++
+                        iterate(false)
                     }
                     println("$iteration. iteration: bestCost: ${best?.cost} worstCost: ${worst?.cost} runtime: ${time.inWholeSeconds}s")
                 }
-                state = DGeneticAlgorithm.State.INITIALIZED
+                state = AAlgorithm4VRP.State.INITIALIZED
             }
         }
     };
 
-    abstract operator fun <S : ISpecimenRepresentation> invoke(alg: DGeneticAlgorithm<S>)
+    abstract operator fun <S : ISpecimenRepresentation> invoke(alg: SEvolutionaryAlgorithm<S>)
 }

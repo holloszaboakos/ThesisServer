@@ -1,11 +1,33 @@
 package hu.bme.thesis.logic
 
-import hu.bme.thesis.logic.genetic.EGeneticSetup
-import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
+import hu.bme.thesis.logic.common.lifecycle.EClear
+import hu.bme.thesis.logic.common.lifecycle.EInitialize
+import hu.bme.thesis.logic.common.lifecycle.EPause
+import hu.bme.thesis.logic.common.lifecycle.EResume
+import hu.bme.thesis.logic.common.steps.ECost
+import hu.bme.thesis.logic.common.steps.ECostOfEdge
+import hu.bme.thesis.logic.common.steps.ECostOfObjective
+import hu.bme.thesis.logic.evolutionary.BacterialAlgorithm
+import hu.bme.thesis.logic.evolutionary.GeneticAlgorithm
+import hu.bme.thesis.logic.evolutionary.SEvolutionaryAlgorithm
+import hu.bme.thesis.logic.evolutionary.bacterial.*
+import hu.bme.thesis.logic.evolutionary.common.EInicializePopulation
+import hu.bme.thesis.logic.evolutionary.common.EOrderPopulationByCost
+import hu.bme.thesis.logic.evolutionary.common.control.ECycle
+import hu.bme.thesis.logic.evolutionary.common.control.EIteration
+import hu.bme.thesis.logic.evolutionary.common.control.ERunUntil
+import hu.bme.thesis.logic.evolutionary.common.EBoost
+import hu.bme.thesis.logic.evolutionary.genetic.ECrossOverOperator
+import hu.bme.thesis.logic.evolutionary.genetic.ECrossOvers
+import hu.bme.thesis.logic.evolutionary.genetic.EMutateChildren
+import hu.bme.thesis.logic.evolutionary.genetic.ESelectSurvivors
+import hu.bme.thesis.logic.evolutionary.setup.BacterialAlgorithmSetup
+import hu.bme.thesis.logic.evolutionary.setup.GeneticAlgorithmSetup
 import hu.bme.thesis.logic.specimen.DOnePartRepresentation
 import hu.bme.thesis.logic.specimen.factory.OOnePartRepresentationFactory
-import hu.bme.thesis.logic.specimen.factory.OTwoPartRepresentationFactory
 import hu.bme.thesis.model.mtsp.*
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -15,7 +37,7 @@ import java.math.BigDecimal
 
 object OAlgorithmManager {
 
-    var algorithm: DGeneticAlgorithm<*>? = null
+    var algorithm: SEvolutionaryAlgorithm<DOnePartRepresentation>? = null
     var task: DTask? = null
     var settings: DSetting? = null
     private var minCost: Double = (Double.MAX_VALUE)
@@ -38,15 +60,36 @@ object OAlgorithmManager {
         lock.withLock {
             task?.let { task ->
                 settings?.let { settings ->
-                    algorithm = DGeneticAlgorithm(
+                    algorithm = GeneticAlgorithm(
                         OOnePartRepresentationFactory,
                         (settings.timeLimit_Second * BigDecimal(1000)).toLong(),
                         settings.iterLimit.toInt(),
                         task.costGraph,
                         task.salesmen,
+                        GeneticAlgorithmSetup(
+                            pause = EPause.DEFAULT,
+                            resume = EResume.DEFAULT,
+                            initialize = EInitialize.EVOLUTIONARY,
+                            clear = EClear.EVOLUTIONARY,
+                            run=ERunUntil.DEFAULT,
+                            cycle = ECycle.DEFAULT,
+                            iteration = EIteration.DEFAULT,
+                            cost = ECost.NO_CAPACITY,
+                            costOfEdge = ECostOfEdge.DEFAULT,
+                            costOfObjective = ECostOfObjective.DEFAULT,
+                            initializePopulation = EInicializePopulation.MODULO_STEPPER,
+                            orderByCost = EOrderPopulationByCost.RECALC_ALL,
+                            boost = EBoost.OPT2_STEP,
+                            selection = ESelectSurvivors.RANDOM,
+                            crossover = ECrossOvers.ORDERED,
+                            crossoverOperator = ECrossOverOperator.STATISTICAL_RACE,
+                            mutate = EMutateChildren.REVERSE
+                        )
+                        /*
                         EGeneticSetup.values()
                             .find { it.code.compareTo(settings.algorithm) == 0 }?.setup
                             ?: throw Exception("There is no setup with given name: ${settings.algorithm}")
+                            */
                     )
                 }
             }
@@ -116,8 +159,10 @@ object OAlgorithmManager {
 
                 val bestRout: Array<DGpsArray> =
                     best?.mapSlice { slice ->
-                        val gpsList = slice.map { value -> costGraph.objectives[value.toInt()].location }.toList()
-                        DGpsArray(values = gpsList.toTypedArray())
+                        runBlocking {
+                            val gpsList = slice.map { value -> costGraph.objectives[value].location }.toList()
+                            DGpsArray(values = gpsList.toTypedArray())
+                        }
                     }?.toList()?.toTypedArray() ?: arrayOf()
                 worst?.let { worst ->
                     if (worst.cost < maxCost) {
@@ -147,16 +192,14 @@ object OAlgorithmManager {
 
     fun step(): DResult = runBlocking {
         lock.withLock {
-            algorithm?.iterate()
+            algorithm?.iterate(true)
             calcResult()
         }
     }
 
-    fun iterate() = runBlocking {
-        lock.withLock {
-            algorithm?.iterate()
+    suspend fun iterate() = lock.withLock {
+            algorithm?.iterate(true)
         }
-    }
 
     fun cycle(): DResult = runBlocking {
         lock.withLock {

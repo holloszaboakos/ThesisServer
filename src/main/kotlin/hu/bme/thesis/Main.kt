@@ -2,7 +2,7 @@ package hu.bme.thesis
 
 import com.google.gson.Gson
 import hu.bme.thesis.logic.OAlgorithmManager
-import hu.bme.thesis.logic.genetic.steps.ECrossOverOperator
+import hu.bme.thesis.logic.evolutionary.genetic.ECrossOverOperator
 import hu.bme.thesis.model.mtsp.*
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -88,7 +88,7 @@ fun main(args: Array<String>) {
             .sortedBy { it.value.successRatio }
             .forEach { (operator, statistics) ->
                 println("name: ${operator.name}, value: $statistics")
-                outputFile.appendText("\nname: ${operator.name}, value: $statistics")
+                //outputFile.appendText("\nname: ${operator.name}, value: $statistics")
             }
         println()
     }

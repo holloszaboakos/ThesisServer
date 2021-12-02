@@ -2,6 +2,7 @@ package hu.bme.thesis.logic.greedy
 
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import hu.bme.thesis.logic.specimen.factory.SSpecimenRepresentationFactory
+import hu.bme.thesis.model.inner.setup.DNearestNeighbourSetup
 import hu.bme.thesis.model.mtsp.DGraph
 import hu.bme.thesis.model.mtsp.DSalesman
 import kotlin.random.Random
@@ -16,12 +17,15 @@ import kotlin.random.Random
 //Objective, 64 probability: 166245.0
 //Objective, 128 probability: 560772.0
 class NearestNeighbourTSPProbabilistic<S : ISpecimenRepresentation>(
-    permutationFactory: SSpecimenRepresentationFactory<S>,
-    costGraph: DGraph,
-    salesmen: Array<DSalesman>
-) : SNearestNeighbour<S>(permutationFactory, costGraph, salesmen) {
+    override var permutationFactory: SSpecimenRepresentationFactory<S>,
+    override var costGraph: DGraph,
+    override var salesmen: Array<DSalesman>,
+    override var setup: DNearestNeighbourSetup,
+    override var timeLimit: Long = 0L,
+    override var iterationLimit: Int = 0,
+) : SNearestNeighbour<S>(permutationFactory, costGraph, salesmen, setup, timeLimit, iterationLimit) {
 
-    override fun run(): S {
+    override suspend fun run(): S {
         var resultSpecimen: S? = null
         costGraph.edgesBetween.maxOf {
             it.values.maxOf { edge ->
@@ -80,7 +84,7 @@ class NearestNeighbourTSPProbabilistic<S : ISpecimenRepresentation>(
                 }
             }
             val subResultSpecimen = permutationFactory.produce(arrayOf(resultPermutation))
-            calcCost(subResultSpecimen)
+            cost(subResultSpecimen)
             if (resultSpecimen == null || (resultSpecimen?.cost ?: 0.0) > subResultSpecimen.cost) {
                 resultSpecimen = subResultSpecimen
                 println("$iteration out of ${costGraph.objectives.size} cost: ${resultSpecimen?.cost}")

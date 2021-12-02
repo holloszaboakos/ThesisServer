@@ -1,7 +1,8 @@
-package hu.bme.thesis.logic.genetic.steps
+package hu.bme.thesis.logic.evolutionary.genetic
 
-import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
+import hu.bme.thesis.logic.evolutionary.GeneticAlgorithm
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
+import kotlinx.coroutines.runBlocking
 import kotlin.math.pow
 import kotlin.random.Random
 
@@ -10,7 +11,7 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ) {
             val cut = arrayOf(
                 Random.nextInt(parents.first.permutationSize),
@@ -57,7 +58,7 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ) {
             val parentsL = parents.toList()
             val cut = arrayOf(Random.nextInt(parentsL.size), Random.nextInt(parentsL.size - 1))
@@ -107,7 +108,7 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ) {
             val primerParent = parents.first
             val seconderParent = parents.second
@@ -153,7 +154,7 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ) {
             val primerParent = parents.first
             val seconderParent = parents.second
@@ -200,7 +201,7 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ) {
             val primerParent = parents.first
             val seconderCopy = MutableList(parents.second.permutationSize) { parents.second[it] }
@@ -250,7 +251,7 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ) {
             val parentsL = parents.toList()
             val parentsInverse = Array(2) {
@@ -331,7 +332,7 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ) {
             val parentsL = parents.toList()
             val parentsInverses = List(2) { IntArray(child.permutationSize) { 0 } }
@@ -491,7 +492,7 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ) {
             val size = child.permutationSize / 4 + Random.nextInt(child.permutationSize / 4)
             val start = Random.nextInt(child.permutationSize - size)
@@ -528,7 +529,7 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ) {
             val childContains = Array(child.permutationSize) { false }
             val randomPermutation = (0 until child.permutationSize).shuffled()
@@ -575,7 +576,7 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ) {
             val parentsL = listOf(parents.first, parents.second)
             val childContains = BooleanArray(child.permutationSize) { false }
@@ -607,7 +608,7 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ) {
             val childContains = Array(child.permutationSize) { false }
             val randomPermutation = (0 until child.permutationSize).shuffled()
@@ -662,7 +663,7 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ) {
             val parentsL = parents.toList()
             val parentsInverze = Array(2) {
@@ -728,7 +729,7 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ) {
             val primaryInverz = Array(parents.first.permutationSize) { 0 }
             parents.first.forEachIndexed { index, value ->
@@ -778,27 +779,35 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ) {
             /*
             if (alg.iteration == 0 && iteration != -1){
                 iteration = -1
             }
              */
-            if (operators.isEmpty()) {
-                operators += values()
-                    .filter { it != this@STATISTICAL_RACE && it != STATISTICAL_RACE_WITH_LEADER }
-                    //.map { Pair(it, OperatorStatistics(1, 2, 0.5)) }
-                    .map { Pair(it, OperatorStatistics(0.0, 1, Int.MAX_VALUE.toDouble())) }
+            synchronized(operators) {
+                if (operators.isEmpty()) {
+                    operators += values()
+                        .filter { it != this@STATISTICAL_RACE && it != STATISTICAL_RACE_WITH_LEADER }
+                        //.map { Pair(it, OperatorStatistics(1, 2, 0.5)) }
+                        .map { Pair(it, OperatorStatistics(0.0, 1, Int.MAX_VALUE.toDouble())) }
+                }
             }
 
-            if (iteration != alg.iteration) {
-                iteration = alg.iteration
+            var newIteration: Boolean
+            synchronized(iteration) {
+                newIteration = iteration / 5 != alg.iteration / 5
+                if (newIteration)
+                    iteration = alg.iteration
+            }
+
+            if (newIteration) {
                 statistics?.let { statistics ->
                     synchronized(statistics) {
-                        statistics.run = (statistics.run + alg.population.size) * 9 / 10
+                        statistics.run = (statistics.run + alg.population.size) * 8 / 10
                         //statistics.improvement = statistics.improvement * 9 / 10
-                        statistics.success = statistics.success * 9 / 10
+                        statistics.success = statistics.success * 8 / 10
                         //statistics.successRatio = statistics.improvement / statistics.run.toDouble()
                         statistics.successRatio = statistics.success / statistics.run
                     }
@@ -826,7 +835,9 @@ enum class ECrossOverOperator {
 
             operator?.let { operator ->
                 statistics?.let { statistics ->
-                    operator.invoke(parents, child, alg)
+                    synchronized(operators) {
+                        operator.invoke(parents, child, alg)
+                    }
                     alg.cost(child)
                     /*    AuditWorkstation, ExpeditionArea*/
                     synchronized(statistics) {
@@ -836,12 +847,14 @@ enum class ECrossOverOperator {
                                         (alg.population.size - parents.second.orderInPopulation).toDouble().pow(2)
                         }
                         else*/ if (parents.first.cost > child.cost) {
-                            statistics.success += 1 / parents.first.cost
+                        statistics.success += (alg.iteration - parents.first.iteration) / child.cost /
+                                (parents.first.orderInPopulation + 1).toDouble().pow(2)
 
-                        }
+                    }
                         /*else*/ if (parents.second.cost > child.cost) {
-                            statistics.success += 1 / parents.second.cost
-                        }
+                        statistics.success += (alg.iteration - parents.second.iteration) / child.cost /
+                                (parents.second.orderInPopulation + 1).toDouble().pow(2)
+                    }
                     }
                 }
             }
@@ -855,7 +868,7 @@ enum class ECrossOverOperator {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
-            alg: DGeneticAlgorithm<S>
+            alg: GeneticAlgorithm<S>
         ): Unit {
             /*
             if (alg.iteration == 0 && iteration != -1){
@@ -928,7 +941,7 @@ enum class ECrossOverOperator {
     abstract operator fun <S : ISpecimenRepresentation> invoke(
         parents: Pair<S, S>,
         child: S,
-        alg: DGeneticAlgorithm<S>
+        alg: GeneticAlgorithm<S>
     )
 
     val operators = mutableMapOf<ECrossOverOperator, OperatorStatistics>()
