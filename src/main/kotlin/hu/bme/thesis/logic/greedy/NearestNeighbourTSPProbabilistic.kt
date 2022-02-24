@@ -17,13 +17,12 @@ import kotlin.random.Random
 //Objective, 64 probability: 166245.0
 //Objective, 128 probability: 560772.0
 class NearestNeighbourTSPProbabilistic<S : ISpecimenRepresentation>(
-    override var permutationFactory: SSpecimenRepresentationFactory<S>,
+    override var subSolutionFactory: SSpecimenRepresentationFactory<S>,
     override var costGraph: DGraph,
     override var salesmen: Array<DSalesman>,
     override var setup: DNearestNeighbourSetup,
     override var timeLimit: Long = 0L,
-    override var iterationLimit: Int = 0,
-) : SNearestNeighbour<S>(permutationFactory, costGraph, salesmen, setup, timeLimit, iterationLimit) {
+) : SNearestNeighbour<S>(subSolutionFactory, costGraph, salesmen, setup, timeLimit) {
 
     override suspend fun run(): S {
         var resultSpecimen: S? = null
@@ -83,7 +82,7 @@ class NearestNeighbourTSPProbabilistic<S : ISpecimenRepresentation>(
                     }
                 }
             }
-            val subResultSpecimen = permutationFactory.produce(arrayOf(resultPermutation))
+            val subResultSpecimen = subSolutionFactory.produce(arrayOf(resultPermutation))
             cost(subResultSpecimen)
             if (resultSpecimen == null || (resultSpecimen?.cost ?: 0.0) > subResultSpecimen.cost) {
                 resultSpecimen = subResultSpecimen

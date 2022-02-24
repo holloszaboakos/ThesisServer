@@ -4,6 +4,7 @@ import hu.bme.thesis.logic.common.AAlgorithm4VRP
 import hu.bme.thesis.logic.evolutionary.GeneticAlgorithm
 import hu.bme.thesis.logic.evolutionary.SEvolutionaryAlgorithm
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
+import kotlinx.coroutines.runBlocking
 import javax.xml.bind.TypeConstraintException
 
 enum class EClear {
@@ -13,7 +14,7 @@ enum class EClear {
                 is SEvolutionaryAlgorithm<S> ->
                     when (alg.state) {
                         AAlgorithm4VRP.State.RESUMED -> {
-                            alg.pause()
+                            runBlocking { alg.pause() }
                             alg.clear()
                         }
                         AAlgorithm4VRP.State.INITIALIZED -> {
@@ -32,11 +33,10 @@ enum class EClear {
         override fun <S : ISpecimenRepresentation> invoke(alg: AAlgorithm4VRP<S>) {
             when (alg.state) {
                 AAlgorithm4VRP.State.RESUMED -> {
-                    alg.pause()
+                    runBlocking { alg.pause() }
                     alg.clear()
                 }
                 AAlgorithm4VRP.State.INITIALIZED -> {
-                    alg.iteration = 0
                     alg.state = AAlgorithm4VRP.State.CREATED
                 }
                 else -> {

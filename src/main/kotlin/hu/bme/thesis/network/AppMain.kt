@@ -2,27 +2,25 @@ package hu.bme.thesis.network
 
 import com.codahale.metrics.Slf4jReporter
 import com.typesafe.config.ConfigFactory
+import hu.bme.thesis.network.apis.LifecicleApi
+import hu.bme.thesis.network.apis.SetupApi
+import hu.bme.thesis.network.apis.UpdateApi
 import io.ktor.application.*
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.apache.Apache
-import io.ktor.config.HoconApplicationConfig
+import io.ktor.client.*
+import io.ktor.client.engine.apache.*
+import io.ktor.config.*
 import io.ktor.features.*
-import io.ktor.gson.GsonConverter
+import io.ktor.gson.*
 import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.metrics.dropwizard.*
 import io.ktor.routing.*
-import io.ktor.util.*
-import hu.bme.thesis.network.apis.LifecicleApi
-import hu.bme.thesis.network.apis.SetupApi
-import hu.bme.thesis.network.apis.UpdateApi
 import java.util.concurrent.TimeUnit
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 
 
-@KtorExperimentalAPI
 internal val settings = HoconApplicationConfig(ConfigFactory.defaultApplication(HTTP::class.java.classLoader))
 
 object HTTP {

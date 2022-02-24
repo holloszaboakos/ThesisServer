@@ -3,10 +3,8 @@ package hu.bme.thesis.logic.evolutionary.common.control
 import hu.bme.thesis.logic.common.AAlgorithm4VRP
 import hu.bme.thesis.logic.evolutionary.BacterialAlgorithm
 import hu.bme.thesis.logic.evolutionary.SEvolutionaryAlgorithm
-import kotlinx.coroutines.runBlocking
 import hu.bme.thesis.logic.evolutionary.GeneticAlgorithm
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
-import kotlin.random.Random
 
 enum class EIteration {
     DEFAULT {
@@ -36,8 +34,8 @@ enum class EIteration {
                         orderByCost()
                     }
                 }
-                best = permutationFactory.copy(population.first())
-                worst = permutationFactory.copy(population.last())
+                best = subSolutionFactory.copy(population.first())
+                worst = subSolutionFactory.copy(population.last())
                 iteration++
                 if (manageLifeCycle)
                     state = AAlgorithm4VRP.State.INITIALIZED

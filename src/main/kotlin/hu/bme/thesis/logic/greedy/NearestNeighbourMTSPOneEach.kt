@@ -9,13 +9,12 @@ import hu.bme.thesis.model.mtsp.DSalesman
 //No Objective cost: cost of greedy: 6.1089406835078902E18
 //Objective cost: cost of greedy: 3.1999213104095421E18
 class NearestNeighbourMTSPOneEach<S : ISpecimenRepresentation>(
-    override var permutationFactory: SSpecimenRepresentationFactory<S>,
+    override var subSolutionFactory: SSpecimenRepresentationFactory<S>,
     override var costGraph: DGraph,
     override var salesmen: Array<DSalesman>,
     override var setup: DNearestNeighbourSetup,
     override var timeLimit: Long = 0L,
-    override var iterationLimit: Int = 0,
-) : SNearestNeighbour<S>(permutationFactory, costGraph, salesmen, setup, timeLimit, iterationLimit) {
+) : SNearestNeighbour<S>(subSolutionFactory, costGraph, salesmen, setup, timeLimit) {
     override suspend fun run(): S {
         val tours = Array(salesmen.size) { mutableListOf<Int>() }
         val costs = DoubleArray(salesmen.size) { 0.0 }
@@ -59,7 +58,7 @@ class NearestNeighbourMTSPOneEach<S : ISpecimenRepresentation>(
             }
 
         }
-        val resultSpecimen = permutationFactory.produce(tours.map { it.toIntArray() }.toTypedArray())
+        val resultSpecimen = subSolutionFactory.produce(tours.map { it.toIntArray() }.toTypedArray())
         cost(resultSpecimen)
         return resultSpecimen
     }

@@ -23,17 +23,22 @@ interface ISpecimenRepresentation {
      fun forEachIndexed(operation: (index:Int, value:Int) -> Unit)
      fun setEach(operation: (index:Int, value:Int) -> Int)
 
-     fun <T> mapSlice(mapper: (slice: Flow<Int>) -> T): Flow<T>
-     fun forEachSlice(operation: (slice: Flow<Int>) -> Unit)
-     fun forEachSliceIndexed(operation: (index: Int, slice: Flow<Int>) -> Unit)
+     fun <T> mapSlice(mapper: (slice: IntArray) -> T): Flow<T>
+     fun forEachSlice(operation: (slice: IntArray) -> Unit)
+     fun forEachSliceIndexed(operation: (index: Int, slice: IntArray) -> Unit)
      fun slice(indices:IntRange): Flow<Int>
 
      fun shuffle()
      fun first(selector: (value:Int) -> Boolean) : Int
 
-     suspend fun setData(data: Flow<Flow<Int>>)
-     fun getData():Flow<Flow<Int>>
+     suspend fun setData(data: Flow<IntArray>)
+     fun getData(): Flow<IntArray>
 
      fun checkFormat():Boolean
+
+     fun inverseOfPermutation():IntArray
+     fun sequentialOfPermutation():IntArray
+     fun copyOfPermutation():IntArray
+     fun <T:(Int,(Int)->Int)->Collection<Int>> copyOfPermutationBy(initializer:T):Collection<Int>
 
 }

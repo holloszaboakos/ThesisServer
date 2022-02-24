@@ -3,12 +3,8 @@ package hu.bme.thesis.logic.linkernighan
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import hu.bme.thesis.logic.specimen.factory.SSpecimenRepresentationFactory
 import hu.bme.thesis.model.mtsp.*
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import java.util.*
-import java.util.ArrayList
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 
 //usage:

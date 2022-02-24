@@ -11,7 +11,6 @@
  */
 package hu.bme.thesis.model.mtsp
 
-import java.math.BigDecimal
 import java.util.*
 import javax.persistence.*
 
@@ -45,10 +44,10 @@ data class DEdge(
     val length_Meter: Long = 0L,
     @OneToMany(cascade = [CascadeType.ALL])
     @OrderColumn(name = "orderInOwner")
-    val rout: Array<DGps> = arrayOf()
+    val route: Array<DGps> = arrayOf()
 ) {
     init {
-        rout.forEachIndexed { index, gps -> gps.orderInOwner = index }
+        route.forEachIndexed { index, gps -> gps.orderInOwner = index }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -61,7 +60,7 @@ data class DEdge(
         if (name != other.name) return false
         if (orderInOwner != other.orderInOwner) return false
         if (length_Meter != other.length_Meter) return false
-        if (!rout.contentEquals(other.rout)) return false
+        if (!route.contentEquals(other.route)) return false
 
         return true
     }
@@ -71,7 +70,7 @@ data class DEdge(
         result = 31 * result + name.hashCode()
         result = 31 * result + orderInOwner
         result = 31 * result + length_Meter.hashCode()
-        result = 31 * result + rout.contentHashCode()
+        result = 31 * result + route.contentHashCode()
         return result
     }
 }

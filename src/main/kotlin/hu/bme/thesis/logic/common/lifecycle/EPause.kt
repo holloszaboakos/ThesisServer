@@ -5,12 +5,12 @@ import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 
 enum class EPause {
     DEFAULT {
-        override fun <S : ISpecimenRepresentation> invoke(alg: AAlgorithm4VRP<S>) {
+        override suspend operator fun <S : ISpecimenRepresentation> invoke(alg: AAlgorithm4VRP<S>) {
             when (alg.state) {
                 AAlgorithm4VRP.State.RESUMED -> {
                     alg.state = AAlgorithm4VRP.State.INITIALIZED
-                    alg.thread?.join()
-                    alg.thread = null
+                    alg.job?.join()
+                    alg.job = null
                 }
                 else -> {
                 }
@@ -18,5 +18,5 @@ enum class EPause {
         }
     };
 
-    abstract operator fun <S : ISpecimenRepresentation>invoke(alg: AAlgorithm4VRP<S>)
+    abstract suspend operator fun <S : ISpecimenRepresentation>invoke(alg: AAlgorithm4VRP<S>)
 }

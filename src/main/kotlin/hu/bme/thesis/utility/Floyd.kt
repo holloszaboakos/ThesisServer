@@ -3,7 +3,7 @@ package hu.bme.thesis.utility
 import hu.bme.thesis.model.mtsp.DEdgeArray
 
 fun Floyd(edgesBetween: Array<DEdgeArray>, objectivesIndices: IntRange) {
-    var improvement = false
+    var improvement: Boolean
     for (count in objectivesIndices) {
         println(count)
         improvement = false

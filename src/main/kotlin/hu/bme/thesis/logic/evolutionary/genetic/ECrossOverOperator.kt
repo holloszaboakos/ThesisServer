@@ -2,11 +2,11 @@ package hu.bme.thesis.logic.evolutionary.genetic
 
 import hu.bme.thesis.logic.evolutionary.GeneticAlgorithm
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
-import kotlinx.coroutines.runBlocking
 import kotlin.math.pow
 import kotlin.random.Random
 
 enum class ECrossOverOperator {
+
     PARTIALLY_MATCHED {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
@@ -22,11 +22,8 @@ enum class ECrossOverOperator {
             cut.sort()
             val primerParent = parents.first
             val seconderParent = parents.second
-            val secunderCopy = MutableList(seconderParent.permutationSize) { seconderParent[it] }
-            val secunderInverz = Array(seconderParent.permutationSize) { 0 }
-            secunderCopy.forEachIndexed { index, value ->
-                secunderInverz[value] = index
-            }
+            val seconderCopy = seconderParent.copyOfPermutationBy(::MutableList) as MutableList
+            val seconderInverse = seconderParent.inverseOfPermutation()
 
             //copy parent middle to child
             //start mapping
@@ -34,13 +31,13 @@ enum class ECrossOverOperator {
                 if (index in cut[0]..cut[1])
                     child.permutationSize
                 else {
-                    secunderCopy[secunderInverz[primerParent[index]]] = child.permutationSize
+                    seconderCopy[seconderInverse[primerParent[index]]] = child.permutationSize
                     primerParent[index]
                 }
             }
-            secunderCopy.removeIf { it == child.permutationSize }
+            seconderCopy.removeIf { it == child.permutationSize }
             //fill empty positions
-            secunderCopy.forEachIndexed { index, value ->
+            seconderCopy.forEachIndexed { index, value ->
                 child[cut[0] + index] = value
             }
 
@@ -68,17 +65,14 @@ enum class ECrossOverOperator {
 
             val primerParent = parents.first
             val seconderParent = parents.second
-            val seconderCopy = MutableList(child.permutationSize) { seconderParent[it] }
-            val seconderInverz = Array(child.permutationSize) { 0 }
-            seconderCopy.forEachIndexed { index, value ->
-                seconderInverz[value] = index
-            }
+            val seconderCopy = seconderParent.copyOfPermutationBy(::MutableList) as MutableList
+            val seconderInverse = seconderParent.inverseOfPermutation()
 
             //clean child
             //copy parent middle to child
             child.setEach { index, _ ->
                 if (index in cut[0]..cut[1]) {
-                    seconderCopy[seconderInverz[primerParent[index]]] = child.permutationSize
+                    seconderCopy[seconderInverse[primerParent[index]]] = child.permutationSize
                     primerParent[index]
                 } else
                     child.permutationSize
@@ -112,17 +106,14 @@ enum class ECrossOverOperator {
         ) {
             val primerParent = parents.first
             val seconderParent = parents.second
-            val seconderCopy = MutableList(child.permutationSize) { seconderParent[it] }
-            val seconderInverz = Array(child.permutationSize) { 0 }
-            seconderCopy.forEachIndexed { index, value ->
-                seconderInverz[value] = index
-            }
+            val seconderCopy = seconderParent.copyOfPermutationBy(::MutableList) as MutableList
+            val seconderInverse = seconderParent.inverseOfPermutation()
 
             //clean child
             //copy parent middle to child
             child.setEach { valueIndex, _ ->
                 if (Random.nextBoolean()) {
-                    seconderCopy[seconderInverz[primerParent[valueIndex]]] = child.permutationSize
+                    seconderCopy[seconderInverse[primerParent[valueIndex]]] = child.permutationSize
                     primerParent[valueIndex]
                 } else
                     child.permutationSize
@@ -158,18 +149,15 @@ enum class ECrossOverOperator {
         ) {
             val primerParent = parents.first
             val seconderParent = parents.second
-            val seconderCopy = MutableList(child.permutationSize) { seconderParent[it] }
-            val seconderInverz = Array(child.permutationSize) { 0 }
-            seconderCopy.forEachIndexed { index, value ->
-                seconderInverz[value] = index
-            }
+            val seconderCopy = seconderParent.copyOfPermutationBy(::MutableList) as MutableList
+            val seconderInverse = seconderParent.inverseOfPermutation()
             val selected = BooleanArray(child.permutationSize) { Random.nextBoolean() && Random.nextBoolean() }
 
             //clean child
             //copy parent middle to child
             child.setEach { valueIndex, _ ->
                 if (selected[valueIndex]) {
-                    seconderCopy[seconderInverz[primerParent[valueIndex]]] = child.permutationSize
+                    seconderCopy[seconderInverse[primerParent[valueIndex]]] = child.permutationSize
                     primerParent[valueIndex]
                 } else
                     child.permutationSize
@@ -204,24 +192,21 @@ enum class ECrossOverOperator {
             alg: GeneticAlgorithm<S>
         ) {
             val primerParent = parents.first
-            val seconderCopy = MutableList(parents.second.permutationSize) { parents.second[it] }
-            val seconderInverz = IntArray(seconderCopy.size) { 0 }
-            seconderCopy.forEachIndexed { index, value ->
-                seconderInverz[value] = index
-            }
+            val seconderCopy = parents.second.copyOfPermutationBy(::MutableList) as MutableList
+            val seconderInverse = parents.second.inverseOfPermutation()
 
             //clean child
             //copy parent middle to child
             child.setEach { _, _ -> child.permutationSize }
 
             child[0] = primerParent[0]
-            var actualIndex = seconderInverz[child[0]]
+            var actualIndex = seconderInverse[child[0]]
             seconderCopy[actualIndex] = child.permutationSize
             //fill missing places of child
             if (actualIndex != 0)
                 while (actualIndex != 0) {
                     child[actualIndex] = primerParent[actualIndex]
-                    actualIndex = seconderInverz[primerParent[actualIndex]]
+                    actualIndex = seconderInverse[primerParent[actualIndex]]
                     seconderCopy[actualIndex] = child.permutationSize
                 }
             seconderCopy.removeIf { it == child.permutationSize }
@@ -255,14 +240,10 @@ enum class ECrossOverOperator {
         ) {
             val parentsL = parents.toList()
             val parentsInverse = Array(2) {
-                IntArray(child.permutationSize) { 0 }
+                parentsL[it].inverseOfPermutation()
             }
-            parentsL.forEachIndexed { parentIndex, parent ->
-                parent.forEachIndexed { index, value ->
-                    parentsInverse[parentIndex][value] = index
-                }
-            }
-            val randomPermutation = List(child.permutationSize) { it }.shuffled().toIntArray()
+            val randomPermutation = IntArray(child.permutationSize) { it }
+            randomPermutation.shuffle()
             var lastIndex = 0
             val childContains = BooleanArray(child.permutationSize) { false }
             child.setEach { _, _ -> child.permutationSize }
@@ -335,16 +316,12 @@ enum class ECrossOverOperator {
             alg: GeneticAlgorithm<S>
         ) {
             val parentsL = parents.toList()
-            val parentsInverses = List(2) { IntArray(child.permutationSize) { 0 } }
-            parentsL.forEachIndexed { index, parent ->
-                parent.forEachIndexed { valueIndex, value ->
-                    parentsInverses[index][value] = valueIndex
-                }
-            }
+            val parentsInverses = Array(2) { parentsL[it].inverseOfPermutation() }
 
             child.setEach { _, _ -> child.permutationSize }
             val childContains = BooleanArray(child.permutationSize) { false }
-            val randomPermutation = (0 until child.permutationSize).shuffled()
+            val randomPermutation = IntArray(child.permutationSize) { it }
+            randomPermutation.shuffle()
             var lastIndex = 0
 
             //O(n2)
@@ -496,14 +473,12 @@ enum class ECrossOverOperator {
         ) {
             val size = child.permutationSize / 4 + Random.nextInt(child.permutationSize / 4)
             val start = Random.nextInt(child.permutationSize - size)
-            val seconderCopy = MutableList(parents.second.permutationSize) { parents.second[it] }
-            val seconderInverz = Array(seconderCopy.size) { 0 }
-            seconderCopy.forEachIndexed { index, value ->
-                seconderInverz[value] = index
-            }
+            val seconderCopy = parents.second.copyOfPermutationBy(::MutableList) as MutableList
+            val seconderInverse = parents.second.inverseOfPermutation()
+
             child.setEach { index, _ ->
                 if (index < size) {
-                    seconderCopy[seconderInverz[parents.first[index + start]]] = child.permutationSize
+                    seconderCopy[seconderInverse[parents.first[index + start]]] = child.permutationSize
                     parents.first[index + start]
                 } else
                     child.permutationSize
@@ -532,7 +507,8 @@ enum class ECrossOverOperator {
             alg: GeneticAlgorithm<S>
         ) {
             val childContains = Array(child.permutationSize) { false }
-            val randomPermutation = (0 until child.permutationSize).shuffled()
+            val randomPermutation = IntArray(child.permutationSize) { it }
+            randomPermutation.shuffle()
             var lastIndex = 0
 
             child.setEach { index, _ ->
@@ -611,21 +587,12 @@ enum class ECrossOverOperator {
             alg: GeneticAlgorithm<S>
         ) {
             val childContains = Array(child.permutationSize) { false }
-            val randomPermutation = (0 until child.permutationSize).shuffled()
+            val randomPermutation = IntArray(child.permutationSize) { it }
+            randomPermutation.shuffle()
             var lastIndex = 0
             val parentsL = listOf(parents.first, parents.second)
-            val parentsInverze = Array(2) {
-                Array(parentsL[it].permutationSize) { 0 }
-            }
-            parentsL.forEachIndexed { parentIndex, parent ->
-                parent.forEachIndexed { index, value ->
-                    parentsInverze[parentIndex][value] = index
-                }
-            }
             val parentsNeighbouring = List(2) { parentIndex ->
-                Array(parents.first.permutationSize) { index ->
-                    parentsL[parentIndex][(parentsInverze[parentIndex][index] + 1) % parentsL[parentIndex].permutationSize]
-                }
+                parentsL[parentIndex].sequentialOfPermutation()
             }
             child.setEach { _, _ -> child.permutationSize }
             child[0] = (0 until child.permutationSize).random()
@@ -666,20 +633,11 @@ enum class ECrossOverOperator {
             alg: GeneticAlgorithm<S>
         ) {
             val parentsL = parents.toList()
-            val parentsInverze = Array(2) {
-                IntArray(child.permutationSize) { 0 }
-            }
-            parentsL.forEachIndexed { parentIndex, parent ->
-                parent.forEachIndexed { index, value ->
-                    parentsInverze[parentIndex][value] = index
-                }
-            }
             val parentsNeighbouring = List(2) { parentIndex ->
-                Array(parentsL[parentIndex].permutationSize) { index ->
-                    parentsL[parentIndex][(parentsInverze[parentIndex][index] + 1) % parentsL[parentIndex].permutationSize]
-                }
+                parentsL[parentIndex].sequentialOfPermutation()
             }
-            val randomPermutation = List(child.permutationSize) { it }.shuffled()
+            val randomPermutation = IntArray(child.permutationSize) { it }
+            randomPermutation.shuffle()
             var lastIndex = 0
             var size = Random.nextInt(child.permutationSize / 2) + 1
             var parentIndex = 0
@@ -725,16 +683,14 @@ enum class ECrossOverOperator {
 
         }
     },
+
     DISTANCE_PRESERVING {
         override fun <S : ISpecimenRepresentation> invoke(
             parents: Pair<S, S>,
             child: S,
             alg: GeneticAlgorithm<S>
         ) {
-            val primaryInverz = Array(parents.first.permutationSize) { 0 }
-            parents.first.forEachIndexed { index, value ->
-                primaryInverz[value] = index
-            }
+            val primaryInverse = parents.first.inverseOfPermutation()
             child.setEach { index, _ ->
                 if (parents.first[index] == parents.second[index])
                     parents.first[index]
@@ -743,7 +699,7 @@ enum class ECrossOverOperator {
             }
             child.setEach { index, value ->
                 if (value == -1)
-                    parents.second[primaryInverz[parents.second[index]]]
+                    parents.second[primaryInverse[parents.second[index]]]
                 else
                     value
             }
@@ -861,6 +817,7 @@ enum class ECrossOverOperator {
 
         }
     },
+
     STATISTICAL_RACE_WITH_LEADER {
         var iteration = -1
         private var operator: ECrossOverOperator? = null

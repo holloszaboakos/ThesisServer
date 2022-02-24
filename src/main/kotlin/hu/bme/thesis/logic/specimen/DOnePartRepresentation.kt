@@ -1,9 +1,9 @@
 package hu.bme.thesis.logic.specimen
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
+import hu.bme.thesis.utility.inverse
+import hu.bme.thesis.utility.isPermutation
+import hu.bme.thesis.utility.sequential
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
@@ -11,7 +11,7 @@ import kotlin.concurrent.write
 
 data class DOnePartRepresentation(
     override val objectiveCount: Int,
-    private val permutation: IntArray,
+    val permutation: IntArray,
     override var inUse: Boolean = true,
     override var costCalculated: Boolean = false,
     override var cost: Double = -1.0,
@@ -78,26 +78,32 @@ data class DOnePartRepresentation(
         permutation.forEachIndexed { index: Int, value: Int -> permutation[index] = operation(index, value) }
     }
 
-    override fun <T> mapSlice(mapper: (slice: Flow<Int>) -> T): Flow<T> = lock.read {
+    override fun <T> mapSlice(mapper: (slice: IntArray) -> T): Flow<T> = lock.read {
         val result = mutableListOf<MutableList<Int>>(mutableListOf())
-        permutation.forEach { value->
-            if(value<objectiveCount)
+        permutation.forEach { value ->
+            if (value < objectiveCount)
                 result.last().add(value)
             else
                 result.add(mutableListOf())
         }
-        result.asFlow().map { mapper(it.asFlow()) }
+        result.asFlow().map { mapper(it.toIntArray()) }
     }
 
-    override fun forEachSlice(operation: (slice: Flow<Int>) -> Unit) = lock.read {
-        runBlocking { mapSlice { it }.toList() }
-            .forEach { slice -> operation(slice) }
+    override fun forEachSlice(operation: (slice: IntArray) -> Unit) = lock.read {
+        runBlocking {
+            mapSlice { it }
+                .toList()
+                .forEach { slice -> operation(slice) }
+        }
     }
 
-    override fun forEachSliceIndexed(operation: (index: Int, slice: Flow<Int>) -> Unit): Unit = lock.read {
-        val collected = runBlocking { mapSlice { it }.toList() }
-        collected.forEachIndexed { index, flow ->
-            operation(index, flow)
+    override fun forEachSliceIndexed(operation: (index: Int, slice: IntArray) -> Unit): Unit = lock.read {
+        runBlocking {
+            mapSlice { it }
+                .toList()
+                .forEachIndexed { index, flow ->
+                    operation(index, flow)
+                }
         }
     }
 
@@ -110,10 +116,10 @@ data class DOnePartRepresentation(
     override fun shuffle() = lock.write { permutation.shuffle() }
     override fun first(selector: (Int) -> Boolean): Int = lock.read { permutation.first(selector) }
 
-    override suspend fun setData(data: Flow<Flow<Int>>) {
+    override suspend fun setData(data: Flow<IntArray>) {
         var counter = 0
         data.collectIndexed { index, array ->
-            array.collect {
+            array.forEach {
                 permutation[counter] = it
                 counter++
             }
@@ -124,23 +130,25 @@ data class DOnePartRepresentation(
         }
     }
 
-    override fun getData(): Flow<Flow<Int>> {
+    override fun getData(): Flow<IntArray> {
         lock.read {
             return mapSlice { list -> list }
         }
     }
 
     override fun checkFormat(): Boolean {
-        val contains = BooleanArray(permutationSize) { false }
-        var result = true
-        permutation.forEach {
-            if (it !in permutation.indices || contains[it])
-                result = false
-            else
-                contains[it] = true
-        }
+        val result = permutation.isPermutation()
         return if (permutation.filter { it >= objectiveCount }.size != salesmanCount - 1)
             false
         else result
     }
+
+    override inline fun inverseOfPermutation() = permutation.inverse()
+
+    override inline fun sequentialOfPermutation() = permutation.sequential()
+
+    override inline fun copyOfPermutation() = permutation.copyOf()
+
+    override inline fun <T : (Int, (Int) -> Int) -> Collection<Int>> copyOfPermutationBy(initializer: T) =
+        initializer(permutation.size) { permutation[it] }
 }

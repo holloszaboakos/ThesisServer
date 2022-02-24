@@ -1,7 +1,9 @@
 package hu.bme.thesis.logic.specimen
 
+import hu.bme.thesis.utility.inverse
+import hu.bme.thesis.utility.isPermutation
+import hu.bme.thesis.utility.sequential
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
 
 data class DTwoPartRepresentation(
     val permutation: IntArray,
@@ -53,31 +55,31 @@ data class DTwoPartRepresentation(
         permutation.forEachIndexed { index: Int, value: Int -> permutation[index] = operation(index, value) }
     }
 
-    override fun <T> mapSlice(mapper: (slice: Flow<Int>) -> T): Flow<T> {
+    override fun <T> mapSlice(mapper: (slice: IntArray) -> T): Flow<T> {
         var geneIndex = 0
         return flow {
             for (sliceLength in sliceLengths) {
                 val slice = permutation.slice(geneIndex until (geneIndex + sliceLength))
                 geneIndex += sliceLength
-                emit(mapper(slice.asFlow()))
+                emit(mapper(slice.toIntArray()))
             }
         }
     }
 
-    override fun forEachSlice(operation: (slice: Flow<Int>) -> Unit) {
+    override fun forEachSlice(operation: (slice: IntArray) -> Unit) {
         var geneIndex = 0
         sliceLengths.forEach { sliceLength ->
             val slice = permutation.slice(geneIndex until (geneIndex + sliceLength))
-            operation(slice.asFlow())
+            operation(slice.toIntArray())
             geneIndex += sliceLength
         }
     }
 
-    override fun forEachSliceIndexed(operation: (index: Int, slice: Flow<Int>) -> Unit) {
+    override fun forEachSliceIndexed(operation: (index: Int, slice: IntArray) -> Unit) {
         var geneIndex = 0
         sliceLengths.forEachIndexed { index, sliceLength ->
             val slice = permutation.slice(geneIndex until (geneIndex + sliceLength))
-            operation(index, slice.asFlow())
+            operation(index, slice.toIntArray())
             geneIndex += sliceLength
         }
     }
@@ -92,30 +94,32 @@ data class DTwoPartRepresentation(
 
     override fun first(selector: (Int) -> Boolean): Int = permutation.first(selector)
 
-    override suspend fun setData(data: Flow<Flow<Int>>) {
+    override suspend fun setData(data: Flow<IntArray>) {
         var shift = 0
         data.collectIndexed { sliceIndex, slice ->
             sliceLengths[sliceIndex] = slice.toList().size
-            slice.collectIndexed { index, value -> permutation[shift + index] = value }
+            slice.forEachIndexed{ index, value -> permutation[shift + index] = value }
             shift += sliceLengths[sliceIndex]
         }
     }
 
-    override fun getData(): Flow<Flow<Int>> {
+    override fun getData(): Flow<IntArray> {
         return mapSlice { list -> list }
     }
 
     override fun checkFormat(): Boolean {
-        val contains = BooleanArray(permutation.size) { false }
-        var result = true
-        permutation.forEach {
-            if (it !in permutation.indices || contains[it])
-                result = false
-            else
-                contains[it] = true
-        }
+        val result = permutation.isPermutation()
         return if (sliceLengths.sum() != salesmanCount)
             false
         else result
     }
+
+    override inline fun inverseOfPermutation() = permutation.inverse()
+
+    override inline fun sequentialOfPermutation()=permutation.sequential()
+
+    override inline fun copyOfPermutation() = permutation.copyOf()
+
+    override inline fun <T:(Int,(Int)->Int)->Collection<Int>> copyOfPermutationBy(initializer:T)=
+        initializer(permutation.size){permutation[it]}
 }

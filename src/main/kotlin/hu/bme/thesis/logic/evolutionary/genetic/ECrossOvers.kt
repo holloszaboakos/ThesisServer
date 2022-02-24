@@ -11,8 +11,7 @@ enum class ECrossOvers {
             val parent = alg.population.filter { it.inUse }.shuffled()
 
             runBlocking {
-                coroutineScope {
-                    parent.forEachIndexed { index, primerParent ->
+                val jobs = parent.mapIndexed { index, primerParent ->
                         launch(Dispatchers.Default) {
                             val seconderParent =
                                 if (index % 2 == 0)
@@ -22,7 +21,7 @@ enum class ECrossOvers {
                             alg.crossoverOperator(Pair(primerParent, seconderParent), children[index])
                         }
                     }
-                }
+                jobs.forEach{it.join()}
             }
 
         }
