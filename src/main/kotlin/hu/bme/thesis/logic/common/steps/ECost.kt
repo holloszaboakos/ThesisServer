@@ -3,7 +3,6 @@ package hu.bme.thesis.logic.common.steps
 import hu.bme.thesis.logic.common.AAlgorithm4VRP
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import hu.bme.thesis.model.mtsp.DEdge
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 
 enum class ECost {
@@ -15,8 +14,7 @@ enum class ECost {
             alg.run {
                 var sumCost = 0.0
                 var geneIndex = 0
-                specimen.forEachSliceIndexed { sliceIndex, sliceFlow ->
-                    val slice = runBlocking { sliceFlow.toList() }
+                specimen.forEachSliceIndexed { sliceIndex, slice ->
                     val salesman = salesmen[sliceIndex]
                     var cost = salesman.basePrice_Euro
                     slice.map { it }.forEachIndexed { index, value ->

@@ -211,17 +211,16 @@ object OHibernateManager {
         return mapped
     }
 
-    inline fun <reified T>findByName(tableName: String?,name:String?): T = lock.withLock{
+    inline fun <reified L>findByName(tableName: String?,name:String?): L = lock.withLock{
         tableName ?: throw Exception("tableName should not be null")
         name ?: throw Exception("name should not be null")
         val session = openSession()
         val transaction = session.beginTransaction()
         val mapped = session
-            .createNamedQuery("findByName$tableName", T::class.java)
+            .createNamedQuery("findByName$tableName", L::class.java)
             .setParameter("name",name)
             .resultList
-            .map { it as T }
-            .first()
+            .first()!!
         closeSession(session,transaction)
         return mapped
     }

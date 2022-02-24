@@ -7,15 +7,15 @@ import hu.bme.thesis.model.mtsp.DEdge
 import hu.bme.thesis.model.mtsp.DGraph
 import hu.bme.thesis.model.mtsp.DObjective
 import hu.bme.thesis.model.mtsp.DSalesman
+import kotlinx.coroutines.Job
 import kotlin.properties.Delegates
 
 abstract class AAlgorithm4VRP<S : ISpecimenRepresentation>(
-    open val permutationFactory: SSpecimenRepresentationFactory<S>,
+    open val subSolutionFactory: SSpecimenRepresentationFactory<S>,
     open val costGraph: DGraph,
     open val salesmen: Array<DSalesman>,
     open val setup: AAlgorithm4VRPSetup,
     open val timeLimit: Long,
-    open val iterationLimit: Int,
 ) {
     enum class State {
         CREATED,
@@ -29,7 +29,7 @@ abstract class AAlgorithm4VRP<S : ISpecimenRepresentation>(
         var resume = 0L
     }
 
-    var thread: Thread? = null
+    var job: Job? = null
 
     var state: State by Delegates.observable(State.CREATED)
     { _, oldValue, newValue ->
@@ -70,10 +70,9 @@ abstract class AAlgorithm4VRP<S : ISpecimenRepresentation>(
             else
                 (System.currentTimeMillis() - timeOf.resume + timeOf.running) / 1000.0
 
-    var iteration = 0
 
 
-    fun pause() = setup.pause(this)
+    suspend fun pause() = setup.pause(this)
     suspend fun resume() = setup.resume(this)
     fun initialize() = setup.initialize(this)
     fun clear() = setup.clear(this)

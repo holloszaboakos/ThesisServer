@@ -1,12 +1,10 @@
 package hu.bme.thesis.logic.evolutionary
 
-import com.google.common.math.IntMath.sqrt
 import hu.bme.thesis.logic.evolutionary.setup.BacterialAlgorithmSetup
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import hu.bme.thesis.logic.specimen.factory.SSpecimenRepresentationFactory
 import hu.bme.thesis.model.mtsp.DGraph
 import hu.bme.thesis.model.mtsp.DSalesman
-import java.math.RoundingMode
 
 class BacterialAlgorithm<S : ISpecimenRepresentation>(
     permutationFactory: SSpecimenRepresentationFactory<S>,

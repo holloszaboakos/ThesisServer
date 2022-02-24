@@ -15,7 +15,7 @@ enum class EProduceMutant {
             segmentSize: Int
         ): S {
             alg.run {
-                return permutationFactory.copy(specimen)
+                return subSolutionFactory.copy(specimen)
                     .also { clone ->
                         runBlocking {
                             clone.slice(segmentPosition until (segmentPosition + segmentSize))

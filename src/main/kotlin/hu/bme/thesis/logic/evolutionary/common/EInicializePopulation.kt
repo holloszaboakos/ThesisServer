@@ -1,7 +1,6 @@
 package hu.bme.thesis.logic.evolutionary.common
 
 import hu.bme.thesis.logic.evolutionary.SEvolutionaryAlgorithm
-import kotlinx.coroutines.launch
 import hu.bme.thesis.logic.specimen.DOnePartRepresentation
 import hu.bme.thesis.logic.specimen.DTwoPartRepresentation
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation

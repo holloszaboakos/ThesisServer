@@ -9,13 +9,12 @@ import hu.bme.thesis.model.mtsp.DSalesman
 //no toCenter, no Objective, cost: cost of greedy: 187076.0
 //no toCenter, Objective, cost: cost of greedy: 186222.0
 class NearestNeighbourTSP<S : ISpecimenRepresentation>(
-    override var permutationFactory: SSpecimenRepresentationFactory<S>,
+    override var subSolutionFactory: SSpecimenRepresentationFactory<S>,
     override var costGraph: DGraph,
     override var salesmen: Array<DSalesman>,
     override var setup: DNearestNeighbourSetup,
     override var timeLimit: Long = 0L,
-    override var iterationLimit: Int = 0,
-) : SNearestNeighbour<S>(permutationFactory, costGraph, salesmen, setup, timeLimit, iterationLimit) {
+) : SNearestNeighbour<S>(subSolutionFactory, costGraph, salesmen, setup, timeLimit) {
     override suspend fun run(): S {
         val startIndex = (0 until costGraph.objectives.size)
             .minByOrNull {
@@ -44,7 +43,7 @@ class NearestNeighbourTSP<S : ISpecimenRepresentation>(
                 } ?: -1
             contains[resultPermutation[geneIndex]] = true
         }
-        val resultSpecimen = permutationFactory.produce(arrayOf(resultPermutation))
+        val resultSpecimen = subSolutionFactory.produce(arrayOf(resultPermutation))
         cost(resultSpecimen)
         return resultSpecimen
     }

@@ -8,10 +8,9 @@ import hu.bme.thesis.model.mtsp.DGraph
 import hu.bme.thesis.model.mtsp.DSalesman
 
 sealed class SNearestNeighbour<S : ISpecimenRepresentation>(
-    override var permutationFactory: SSpecimenRepresentationFactory<S>,
+    override var subSolutionFactory: SSpecimenRepresentationFactory<S>,
     override var costGraph: DGraph,
     override var salesmen: Array<DSalesman>,
     override var setup: DNearestNeighbourSetup,
     override var timeLimit: Long = 0L,
-    override var iterationLimit: Int = 0,
-) : AAlgorithm4VRP<S>(permutationFactory, costGraph, salesmen, setup, timeLimit, iterationLimit)
+) : AAlgorithm4VRP<S>(subSolutionFactory, costGraph, salesmen, setup, timeLimit)

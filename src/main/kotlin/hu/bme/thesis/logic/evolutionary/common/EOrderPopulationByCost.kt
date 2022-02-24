@@ -2,10 +2,10 @@ package hu.bme.thesis.logic.evolutionary.common
 
 import hu.bme.thesis.logic.evolutionary.SEvolutionaryAlgorithm
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
-import io.ktor.utils.io.*
 import io.ktor.utils.io.core.internal.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 enum class EOrderPopulationByCost {
     RECALC_ALL {
@@ -13,12 +13,14 @@ enum class EOrderPopulationByCost {
         override fun <S : ISpecimenRepresentation> invoke(alg: SEvolutionaryAlgorithm<S>) {
             alg.run {
                 runBlocking {
-                        population.asFlow()
-                            .filter { !it.costCalculated }
-                            .buffer(100)
-                            .collect { specimen ->
+                    val jobs = population.asSequence()
+                        .filter { !it.costCalculated }
+                        .map { specimen ->
+                            launch(Dispatchers.Default) {
                                 cost(specimen)
                             }
+                        }.toList()
+                    jobs.forEach { it.join() }
                 }
                 population.sortBy { it.cost }
                 population.asSequence()

@@ -11,15 +11,16 @@ import hu.bme.thesis.model.mtsp.DSalesman
 sealed class SEvolutionaryAlgorithm<S : ISpecimenRepresentation>(
     permutationFactory: SSpecimenRepresentationFactory<S>,
     timeLimit: Long = 0L,
-    iterationLimit: Int = 0,
+    val iterationLimit: Int = 0,
     costGraph: DGraph,
     salesmen: Array<DSalesman>,
     override val setup: SEvolutionaryAlgorithmSetup,
-    sizeOfPopulation:Int
-) : AAlgorithm4VRP<S>(permutationFactory, costGraph, salesmen, setup,timeLimit, iterationLimit) {
+    sizeOfPopulation: Int
+) : AAlgorithm4VRP<S>(permutationFactory, costGraph, salesmen, setup, timeLimit) {
 
+    var iteration = 0
     var population: ArrayList<S> = if (costGraph.objectives.size != 1)
-        ArrayList(List(sizeOfPopulation){
+        ArrayList(List(sizeOfPopulation) {
             permutationFactory.produce(
                 Array(salesmen.size) { index ->
                     if (index == 0)
@@ -39,7 +40,7 @@ sealed class SEvolutionaryAlgorithm<S : ISpecimenRepresentation>(
 
     override suspend fun run() = setup.run(this)
     fun cycle() = setup.cycle(this)
-    fun iterate(manageLifeCycle:Boolean) = setup.iteration(this,manageLifeCycle)
+    fun iterate(manageLifeCycle: Boolean) = setup.iteration(this, manageLifeCycle)
 
     fun initializePopulation() = setup.initializePopulation(this)
     fun orderByCost() = setup.orderByCost(this)

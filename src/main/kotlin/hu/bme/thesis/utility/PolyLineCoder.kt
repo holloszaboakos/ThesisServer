@@ -3,7 +3,6 @@ package hu.bme.thesis.utility
 import hu.bme.thesis.model.otp.EncodedPolylineBean
 import hu.bme.thesis.model.mtsp.DGps
 import org.locationtech.jts.geom.*
-import java.math.BigDecimal
 import java.util.*
 
 
@@ -28,25 +27,29 @@ object PolylineEncoder {
     }
 
     fun createEncodings(geometry: Geometry): EncodedPolylineBean {
-        return if (geometry is LineString) {
-            val string: LineString = geometry
-            val coordinates: Array<DGps?> = string.getCoordinates().map { coordinate ->
-                DGps(
-                    lattitude = (coordinate.x.toFloat()),
-                    longitude = (coordinate.y.toFloat())
-                )
-            }.toTypedArray()
-            createEncodings(CoordinateList(coordinates))
-        } else if (geometry is MultiLineString) {
-            val mls = geometry
-            createEncodings(CoordinateList(mls.coordinates.map { coordinate ->
-                DGps(
-                    lattitude = (coordinate.x.toFloat()),
-                    longitude = (coordinate.y.toFloat())
-                )
-            }.toTypedArray()))
-        } else {
-            throw IllegalArgumentException(geometry.toString())
+        return when (geometry) {
+            is LineString -> {
+                val string: LineString = geometry
+                val coordinates: Array<DGps?> = string.getCoordinates().map { coordinate ->
+                    DGps(
+                        latitude = (coordinate.x.toFloat()),
+                        longitude = (coordinate.y.toFloat())
+                    )
+                }.toTypedArray()
+                createEncodings(CoordinateList(coordinates))
+            }
+            is MultiLineString -> {
+                val mls = geometry
+                createEncodings(CoordinateList(mls.coordinates.map { coordinate ->
+                    DGps(
+                        latitude = (coordinate.x.toFloat()),
+                        longitude = (coordinate.y.toFloat())
+                    )
+                }.toTypedArray()))
+            }
+            else -> {
+                throw IllegalArgumentException(geometry.toString())
+            }
         }
     }
 
@@ -57,14 +60,14 @@ object PolylineEncoder {
      * @param level
      * @return
      */
-    fun createEncodings(points: Iterable<DGps?>, level: Int): EncodedPolylineBean {
+    private fun createEncodings(points: Iterable<DGps?>, level: Int): EncodedPolylineBean {
         val encodedPoints = StringBuilder()
         val encodedLevels = StringBuilder()
         var plat = 0
         var plng = 0
         var count = 0
         points.filterNotNull().forEach {point ->
-            val late5 = floor1e5(point.lattitude.toDouble())
+            val late5 = floor1e5(point.latitude.toDouble())
             val lnge5 = floor1e5(point.longitude.toDouble())
             val dlat = late5 - plat
             val dlng = lnge5 - plng
@@ -91,7 +94,7 @@ object PolylineEncoder {
             val rLon = decodeSignedNumberWithIndex(pointString, strIndex)
             lon += rLon[0] * 1e-5
             strIndex = rLon[1]
-            points.add(DGps(lattitude = (lat.toFloat()), longitude = (lon.toFloat())))
+            points.add(DGps(latitude = (lat.toFloat()), longitude = (lon.toFloat())))
         }
         return points
     }
@@ -151,7 +154,7 @@ object PolylineEncoder {
         var v : Int
         var shift = 0
         do {
-            v = value[indexCounter++].toInt() - 63
+            v = value[indexCounter++].code - 63
             num = num or (v and 0x1f shl shift)
             shift += 5
         } while (v >= 0x20)
@@ -166,7 +169,7 @@ object PolylineEncoder {
     ) : AbstractList<DGps?>() {
 
         override fun get(index: Int): DGps {
-            return DGps(lattitude = (lat[offset + index].toFloat()), longitude = (lon[offset + index].toFloat()))
+            return DGps(latitude = (lat[offset + index].toFloat()), longitude = (lon[offset + index].toFloat()))
         }
 
         override val size: Int

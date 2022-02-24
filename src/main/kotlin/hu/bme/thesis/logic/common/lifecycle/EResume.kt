@@ -2,12 +2,9 @@ package hu.bme.thesis.logic.common.lifecycle
 
 import hu.bme.thesis.logic.common.AAlgorithm4VRP
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
-import javafx.application.Application.launch
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlin.concurrent.thread
 
 enum class EResume {
     DEFAULT {
@@ -18,7 +15,7 @@ enum class EResume {
                     alg.resume()
                 }
                 AAlgorithm4VRP.State.INITIALIZED -> {
-                    launch{
+                    alg.job = launch(Dispatchers.Default){
                         alg.state = AAlgorithm4VRP.State.RESUMED
                         alg.run()
                     }

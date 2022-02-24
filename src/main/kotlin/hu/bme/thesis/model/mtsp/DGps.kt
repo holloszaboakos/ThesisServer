@@ -11,14 +11,13 @@
 */
 package hu.bme.thesis.model.mtsp
 
-import java.math.BigDecimal
 import java.util.*
 import javax.persistence.*
 
 
 /**
  * 
- * @param lattitude 
+ * @param latitude
  * @param longitude 
  */
 @Entity
@@ -38,7 +37,7 @@ data class DGps(
     @Column(name = "id", length = 255)
     var id: String = UUID.randomUUID().toString(),
     var orderInOwner: Int = 0,
-    val lattitude: Float = 0.0f,
+    val latitude: Float = 0.0f,
     val longitude: Float = 0.0f
 ) {
 

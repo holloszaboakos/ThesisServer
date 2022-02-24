@@ -26,7 +26,6 @@ import hu.bme.thesis.logic.evolutionary.setup.GeneticAlgorithmSetup
 import hu.bme.thesis.logic.specimen.DOnePartRepresentation
 import hu.bme.thesis.logic.specimen.factory.OOnePartRepresentationFactory
 import hu.bme.thesis.model.mtsp.*
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -60,13 +59,13 @@ object OAlgorithmManager {
         lock.withLock {
             task?.let { task ->
                 settings?.let { settings ->
-                    algorithm = GeneticAlgorithm(
+                    algorithm = BacterialAlgorithm(
                         OOnePartRepresentationFactory,
                         (settings.timeLimit_Second * BigDecimal(1000)).toLong(),
                         settings.iterLimit.toInt(),
                         task.costGraph,
                         task.salesmen,
-                        GeneticAlgorithmSetup(
+                        BacterialAlgorithmSetup(
                             pause = EPause.DEFAULT,
                             resume = EResume.DEFAULT,
                             initialize = EInitialize.EVOLUTIONARY,
@@ -79,11 +78,12 @@ object OAlgorithmManager {
                             costOfObjective = ECostOfObjective.DEFAULT,
                             initializePopulation = EInicializePopulation.MODULO_STEPPER,
                             orderByCost = EOrderPopulationByCost.RECALC_ALL,
-                            boost = EBoost.OPT2_STEP,
-                            selection = ESelectSurvivors.RANDOM,
-                            crossover = ECrossOvers.ORDERED,
-                            crossoverOperator = ECrossOverOperator.STATISTICAL_RACE,
-                            mutate = EMutateChildren.REVERSE
+                            boost = EBoost.OPT2_CYCLE_ON_BEST_AND_LUCKY,
+                            geneTransfer = EGeneTransfer.FROM_BETTER_TO_WORSE,
+                            geneTransferOperator = EGeneTransferOperator.INTO_POSITION,
+                            mutate = EMutate.DEFAULT,
+                            mutateSpecimen = EMutateSpecimen.KEEP_ORIGINAL,
+                            produceMutant = EProduceMutant.SHUFFLE
                         )
                         /*
                         EGeneticSetup.values()

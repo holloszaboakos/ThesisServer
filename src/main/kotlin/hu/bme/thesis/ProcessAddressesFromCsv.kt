@@ -42,7 +42,7 @@ fun main() {
             if (data[indexOfLocationLatitude].compareTo("NULL") != 0) {
                 val latitude = data[indexOfLocationLatitude].toFloat()
                 val longitude = data[indexOfLocationLongitude].toFloat()
-                gpses.add(DGps(lattitude = latitude, longitude = longitude))
+                gpses.add(DGps(latitude = latitude, longitude = longitude))
                 i++
             }
         }
@@ -157,18 +157,18 @@ fun main() {
 
 fun planRout(from: DGps, to: DGps): DEdge? {
     var response = requestRoot(
-        from.lattitude.toDouble(),
+        from.latitude.toDouble(),
         from.longitude.toDouble(),
-        to.lattitude.toDouble(),
+        to.latitude.toDouble(),
         to.longitude.toDouble()
     )
 
     repeat(3) {
         if (response.plan?.itineraries?.get(0)?.legs?.get(0)?.legGeometry?.points == null) {
             response = requestRoot(
-                from.lattitude.toDouble(),
+                from.latitude.toDouble(),
                 from.longitude.toDouble(),
-                to.lattitude.toDouble(),
+                to.latitude.toDouble(),
                 to.longitude.toDouble()
             )
         }
@@ -179,10 +179,10 @@ fun planRout(from: DGps, to: DGps): DEdge? {
             leg.distance?.let { distance ->
                 return DEdge(
                     UUID.randomUUID().toString(),
-                    "hungarian example from: (${from.lattitude},${from.longitude}) to: (${to.lattitude},${to.longitude})",
+                    "hungarian example from: (${from.latitude},${from.longitude}) to: (${to.latitude},${to.longitude})",
                     0,
                     (distance.toLong()),
-                    rout = arrayOf()//PolylineEncoder.decode(points).toTypedArray()
+                    route = arrayOf()//PolylineEncoder.decode(points).toTypedArray()
                 )
             }
         }

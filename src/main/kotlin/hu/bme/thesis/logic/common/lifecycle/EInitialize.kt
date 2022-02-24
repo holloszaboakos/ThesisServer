@@ -18,8 +18,8 @@ enum class EInitialize {
                                 initializePopulation()
                                 orderByCost()
                                 boost()
-                                best = permutationFactory.copy(population.first())
-                                worst = permutationFactory.copy(population.last())
+                                best = subSolutionFactory.copy(population.first())
+                                worst = subSolutionFactory.copy(population.last())
                                 state = AAlgorithm4VRP.State.INITIALIZED
                             }
                             else -> {
@@ -35,8 +35,8 @@ enum class EInitialize {
                                 println("orderByCost")
                                 orderByCost()
                                 println("orderedByCost")
-                                best = permutationFactory.copy(population.first())
-                                worst = permutationFactory.copy(population.last())
+                                best = subSolutionFactory.copy(population.first())
+                                worst = subSolutionFactory.copy(population.last())
                                 state = AAlgorithm4VRP.State.INITIALIZED
                             }
                             else -> {

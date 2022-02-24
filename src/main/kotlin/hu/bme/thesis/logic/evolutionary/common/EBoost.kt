@@ -135,8 +135,15 @@ enum class EBoost {
         private var bestCost = Double.MAX_VALUE
         private var improve = false
         private var reset = true
+        private var order :IntArray? = null
+        private var lastChecked = 0
         override fun <S : ISpecimenRepresentation> invoke(alg: SEvolutionaryAlgorithm<S>) {
+
             val best = alg.population.first()
+            if(!improve || best.cost != bestCost || order == null){
+                order = (0 until best.permutationSize).shuffled().toIntArray()
+                lastChecked = 0
+            }
             if (!improve && best.cost == bestCost) {
                 if (reset) {
                     //EMutateChildren.RESET(alg)
@@ -149,8 +156,8 @@ enum class EBoost {
             improve = false
             bestCost = best.cost
             var tempGene: Int
-            outer@ for (firstIndex in (0 until best.permutationSize - 1)) {
-                for (secondIndex in (firstIndex + 1 until best.permutationSize)) {
+            outer@ for (firstIndex in order!!.slice(lastChecked until best.permutationSize-1)) {
+                for (secondIndex in order!!.slice(firstIndex + 1 until best.permutationSize)) {
                     tempGene = best[firstIndex]
                     best[firstIndex] = best[secondIndex]
                     best[secondIndex] = tempGene
@@ -166,6 +173,7 @@ enum class EBoost {
                         best.cost = bestCost
                     }
                 }
+                lastChecked++
             }
 
         }
@@ -196,7 +204,6 @@ enum class EBoost {
         }
 
         override fun <S : ISpecimenRepresentation> invoke(alg: SEvolutionaryAlgorithm<S>) = runBlocking {
-            coroutineScope {
 
                 println("BOOST")
                 launch(Dispatchers.Default) {
@@ -205,17 +212,17 @@ enum class EBoost {
                 println("BOOSTED")
                 alg.population
                     .slice(1 until alg.population.size)
-                    .forEachIndexed { index, it ->
+                    .mapIndexedNotNull {  index, it ->
                         if (Random.nextInt(10) == 0) {
                             launch(Dispatchers.Default) {
                                 opt2Cycle(alg, it, index + 1)
                                 println("BOOSTED")
                             }
-                        }
+                        }else null
+                    }.forEach{
+                        it.join()
                     }
             }
-
-        }
     },
 
     NO_BOOST {

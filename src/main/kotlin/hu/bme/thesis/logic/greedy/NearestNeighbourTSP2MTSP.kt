@@ -8,13 +8,12 @@ import hu.bme.thesis.model.mtsp.DSalesman
 import kotlinx.coroutines.flow.toList
 
 class NearestNeighbourTSP2MTSP<S : ISpecimenRepresentation>(
-    override var permutationFactory: SSpecimenRepresentationFactory<S>,
+    override var subSolutionFactory: SSpecimenRepresentationFactory<S>,
     override var costGraph: DGraph,
     override var salesmen: Array<DSalesman>,
     override var setup: DNearestNeighbourSetup,
     override var timeLimit: Long = 0L,
-    override var iterationLimit: Int = 0,
-) : SNearestNeighbour<S>(permutationFactory, costGraph, salesmen, setup, timeLimit, iterationLimit) {
+) : SNearestNeighbour<S>(subSolutionFactory, costGraph, salesmen, setup, timeLimit) {
     override suspend fun run(): S {
         var bestSpecimen : S? = null
         for(permutationIndex in costGraph.objectives.indices){
@@ -39,7 +38,7 @@ class NearestNeighbourTSP2MTSP<S : ISpecimenRepresentation>(
                 contains[resultPermutation[geneIndex]] = true
             }
 
-            val resultSpecimen = permutationFactory.produce(arrayOf(resultPermutation))
+            val resultSpecimen = subSolutionFactory.produce(arrayOf(resultPermutation))
             cost(resultSpecimen)
             if(bestSpecimen == null || bestSpecimen.cost > resultSpecimen.cost)
                 bestSpecimen = resultSpecimen

@@ -21,7 +21,6 @@ import hu.bme.thesis.model.mtsp.*
 import hu.bme.thesis.utility.PolylineEncoder
 import hu.bme.thesis.utility.requestRoot
 import hu.bme.thesis.network.Paths
-import java.math.BigDecimal
 import java.util.*
 
 // ktor 0.9.x is missing io.ktor.locations.DELETE, this adds it.
@@ -81,7 +80,7 @@ fun Route.UpdateApi() {
                             "",
                             0,
                             (distance).toLong(),
-                            rout = PolylineEncoder.decode(points).toTypedArray()
+                            route = PolylineEncoder.decode(points).toTypedArray()
                         )
                     )
                 }

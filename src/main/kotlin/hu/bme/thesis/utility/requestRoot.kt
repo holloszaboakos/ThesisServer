@@ -13,7 +13,5 @@ fun requestRoot(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Respons
                 + "&time=3:50pm&date=2-25-2019&mode=CAR,WALK&maxWalkDistance=60000&arriveBy=false"
     ).execute().returnContent().asString()
 
-    val response: Response = Gson().fromJson(s, Response::class.java)
-
-    return response
+    return Gson().fromJson(s, Response::class.java)
 }

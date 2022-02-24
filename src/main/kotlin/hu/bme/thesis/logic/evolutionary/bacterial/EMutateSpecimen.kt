@@ -18,7 +18,8 @@ enum class EMutateSpecimen {
                 val randomPosition = Random.nextInt(0 until (specimen.permutationSize - segmentSize))
 
                 val clones = MutableList(cloneCount + 1) {
-                    if (it == 0) specimen else produceMutant(
+                    if (it == 0) specimen
+                    else produceMutant(
                         specimen,
                         randomPosition,
                         segmentSize

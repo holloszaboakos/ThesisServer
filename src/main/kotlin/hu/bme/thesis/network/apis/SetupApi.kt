@@ -181,7 +181,7 @@ fun Route.SetupApi() {
                         if (edge.id.isBlank())
                             edge.id = UUID.randomUUID().toString()
                         edge.orderInOwner = edgeIndex
-                        edge.rout.forEachIndexed { indexEdge, gps ->
+                        edge.route.forEachIndexed { indexEdge, gps ->
                             if (gps.id.isBlank())
                                 gps.id = UUID.randomUUID().toString()
                             gps.orderInOwner = indexEdge
@@ -192,7 +192,7 @@ fun Route.SetupApi() {
                     if (edge.id.isBlank())
                         edge.id = UUID.randomUUID().toString()
                     edge.orderInOwner = index
-                    edge.rout.forEachIndexed { indexEdge, gps ->
+                    edge.route.forEachIndexed { indexEdge, gps ->
                         if (gps.id.isBlank())
                             gps.id = UUID.randomUUID().toString()
                         gps.orderInOwner = indexEdge
@@ -202,7 +202,7 @@ fun Route.SetupApi() {
                     if (edge.id.isBlank())
                         edge.id = UUID.randomUUID().toString()
                     edge.orderInOwner = index
-                    edge.rout.forEachIndexed { indexEdge, gps ->
+                    edge.route.forEachIndexed { indexEdge, gps ->
                         if (gps.id.isBlank())
                             gps.id = UUID.randomUUID().toString()
                         gps.orderInOwner = indexEdge
