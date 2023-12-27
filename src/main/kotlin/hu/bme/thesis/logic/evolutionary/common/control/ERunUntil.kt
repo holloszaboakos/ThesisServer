@@ -11,7 +11,7 @@ enum class ERunUntil {
             alg.run {
                 state = AAlgorithm4VRP.State.RESUMED
                 while (
-                    runTime_Second < timeLimit
+                    runTimeInSeconds < timeLimit
                     && iteration < iterationLimit
                     && state == AAlgorithm4VRP.State.RESUMED
                 ) runBlocking {

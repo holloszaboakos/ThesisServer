@@ -2,7 +2,7 @@ package hu.bme.thesis.logic.evolutionary.genetic
 
 import hu.bme.thesis.logic.evolutionary.GeneticAlgorithm
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
-import hu.bme.thesis.utility.slice
+import hu.bme.thesis.utility.extention.slice
 
 enum class ESelectSurvivors {
     RANDOM {

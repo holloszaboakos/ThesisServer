@@ -1,7 +1,6 @@
 package hu.bme.thesis.logic.common.lifecycle
 
 import hu.bme.thesis.logic.common.AAlgorithm4VRP
-import hu.bme.thesis.logic.evolutionary.GeneticAlgorithm
 import hu.bme.thesis.logic.evolutionary.SEvolutionaryAlgorithm
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import kotlinx.coroutines.runBlocking

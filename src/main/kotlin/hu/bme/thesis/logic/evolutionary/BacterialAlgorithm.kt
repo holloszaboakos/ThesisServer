@@ -23,19 +23,19 @@ class BacterialAlgorithm<S : ISpecimenRepresentation>(
     100
 ) {
 
-    fun mutate() = setup.mutate(
-        this,
-        7,
-        100
-    )
+    //val generationLimit = 10000
+    val geneCount = population.first().permutationIndices.count()
+    //val populationSize = 100
+    //val mutationCount = 10
+    val cloneCount = 7
+    val cloneSegmentLength = 100
+    val cloneCycleCount = 18 //gene count / clone segment length
+    val geneTransferSegmentLength= 10
+    val injectionCount = 40 //40% of ps
 
-    fun mutateSpecimen(specimen: S, cloneCount: Int, segmentSize: Int) =
-        setup.mutateSpecimen(this, specimen, cloneCount, segmentSize)
+    fun mutate() = setup.mutate( this)
 
-    fun produceMutant(specimen: S, segmentPosition: Int, segmentSize: Int) =
-        setup.produceMutant(this, specimen, segmentPosition, segmentSize)
-
-    fun geneTransfer() = setup.geneTransfer(this,10)
-    fun geneTransferOperator(from: S, to: S, segmentSize: Int) =
-        setup.geneTransferOperator(this, from, to, segmentSize)
+    fun geneTransfer() = setup.geneTransfer(this)
+    fun geneTransferOperator(from: S, to: S) =
+        setup.geneTransferOperator(this, from, to)
 }

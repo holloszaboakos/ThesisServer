@@ -63,7 +63,7 @@ abstract class AAlgorithm4VRP<S : ISpecimenRepresentation>(
                 }
         }
     }
-    val runTime_Second: Double
+    val runTimeInSeconds: Double
         get() =
             if (state != State.RESUMED)
                 timeOf.running / 1000.0

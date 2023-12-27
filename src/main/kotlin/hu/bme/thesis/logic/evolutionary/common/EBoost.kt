@@ -6,6 +6,8 @@ import kotlinx.coroutines.*
 import kotlin.random.Random
 
 enum class EBoost {
+
+
     OPT2 {
         override fun <S : ISpecimenRepresentation> invoke(alg: SEvolutionaryAlgorithm<S>) {
             val best = alg.population[0]
@@ -14,8 +16,8 @@ enum class EBoost {
             var tempGene: Int
             while (improve) {
                 improve = false
-                for (firstIndex in (0 until best.permutationSize - 1).shuffled()) {
-                    for (secondIndex in (firstIndex + 1 until best.permutationSize).shuffled()) {
+                for (firstIndex in (0 until best.permutationIndices.count() - 1).shuffled()) {
+                    for (secondIndex in (firstIndex + 1 until best.permutationIndices.count()).shuffled()) {
                         tempGene = best[firstIndex]
                         best[firstIndex] = best[secondIndex]
                         best[secondIndex] = tempGene
@@ -41,8 +43,8 @@ enum class EBoost {
             val worst = alg.population.last()
             val oldCost = worst.cost
             var tempGene: Int
-            OUTER@ for (firstIndex in (0 until worst.permutationSize - 1).shuffled()) {
-                for (secondIndex in (firstIndex + 1 until worst.permutationSize).shuffled()) {
+            OUTER@ for (firstIndex in (0 until worst.permutationIndices.count() - 1).shuffled()) {
+                for (secondIndex in (firstIndex + 1 until worst.permutationIndices.count()).shuffled()) {
                     tempGene = worst[firstIndex]
                     worst[firstIndex] = worst[secondIndex]
                     worst[secondIndex] = tempGene
@@ -69,8 +71,8 @@ enum class EBoost {
             var tempGene: Int
             while (improve) {
                 improve = false
-                for (firstIndex in (0 until worst.permutationSize - 1).shuffled()) {
-                    for (secondIndex in (firstIndex + 1 until worst.permutationSize).shuffled()) {
+                for (firstIndex in (0 until worst.permutationIndices.count() - 1).shuffled()) {
+                    for (secondIndex in (firstIndex + 1 until worst.permutationIndices.count()).shuffled()) {
                         tempGene = worst[firstIndex]
                         worst[firstIndex] = worst[secondIndex]
                         worst[secondIndex] = tempGene
@@ -109,8 +111,8 @@ enum class EBoost {
             improve = false
             bestCost = best.cost
             var tempGene: Int
-            for (firstIndex in (0 until best.permutationSize - 1).asSequence().shuffled()) {
-                for (secondIndex in (firstIndex + 1 until best.permutationSize).asSequence().shuffled()) {
+            for (firstIndex in (0 until best.permutationIndices.count() - 1).asSequence().shuffled()) {
+                for (secondIndex in (firstIndex + 1 until best.permutationIndices.count()).asSequence().shuffled()) {
                     tempGene = best[firstIndex]
                     best[firstIndex] = best[secondIndex]
                     best[secondIndex] = tempGene
@@ -118,7 +120,7 @@ enum class EBoost {
                     if (best.cost < bestCost) {
                         bestCost = best.cost
                         improve = true
-                        println("best: $bestCost")
+                        //println("best: $bestCost")
                     } else {
                         tempGene = best[firstIndex]
                         best[firstIndex] = best[secondIndex]
@@ -135,13 +137,13 @@ enum class EBoost {
         private var bestCost = Double.MAX_VALUE
         private var improve = false
         private var reset = true
-        private var order :IntArray? = null
+        private var order: IntArray? = null
         private var lastChecked = 0
         override fun <S : ISpecimenRepresentation> invoke(alg: SEvolutionaryAlgorithm<S>) {
 
             val best = alg.population.first()
-            if(!improve || best.cost != bestCost || order == null){
-                order = (0 until best.permutationSize).shuffled().toIntArray()
+            if (!improve || best.cost != bestCost || order == null) {
+                order = (0 until best.permutationIndices.count()).shuffled().toIntArray()
                 lastChecked = 0
             }
             if (!improve && best.cost == bestCost) {
@@ -156,8 +158,8 @@ enum class EBoost {
             improve = false
             bestCost = best.cost
             var tempGene: Int
-            outer@ for (firstIndex in order!!.slice(lastChecked until best.permutationSize-1)) {
-                for (secondIndex in order!!.slice(firstIndex + 1 until best.permutationSize)) {
+            outer@ for (firstIndex in order!!.slice(lastChecked until best.permutationIndices.count() - 1)) {
+                for (secondIndex in order!!.slice(firstIndex + 1 until best.permutationIndices.count())) {
                     tempGene = best[firstIndex]
                     best[firstIndex] = best[secondIndex]
                     best[secondIndex] = tempGene
@@ -180,49 +182,65 @@ enum class EBoost {
     },
 
     OPT2_CYCLE_ON_BEST_AND_LUCKY {
-        private fun <S : ISpecimenRepresentation> opt2Cycle(alg: SEvolutionaryAlgorithm<S>, specimen: S, index: Int) {
+        var positionPairs: MutableList<Pair<Int, Int>> = mutableListOf()
+        var geneIndex: Int = 0
+
+        private fun <S : ISpecimenRepresentation> opt2Cycle(alg: SEvolutionaryAlgorithm<S>, specimen: S) {
             var bestCost = specimen.cost
             var tempGene: Int
-            for (firstIndex in 0 until specimen.permutationSize - 1) {
-                for (secondIndex in firstIndex + 1 until specimen.permutationSize) {
-                    tempGene = specimen[firstIndex]
-                    specimen[firstIndex] = specimen[secondIndex]
-                    specimen[secondIndex] = tempGene
+            positionPairs
+                .slice(geneIndex until (geneIndex + specimen.permutationSize))
+                .forEach { indexes ->
+                    tempGene = specimen[indexes.first]
+                    specimen[indexes.first] = specimen[indexes.second]
+                    specimen[indexes.second] = tempGene
                     alg.cost(specimen)
                     if (specimen.cost < bestCost) {
                         bestCost = specimen.cost
                     } else {
-                        tempGene = specimen[firstIndex]
-                        specimen[firstIndex] = specimen[secondIndex]
-                        specimen[secondIndex] = tempGene
+                        tempGene = specimen[indexes.first]
+                        specimen[indexes.first] = specimen[indexes.second]
+                        specimen[indexes.second] = tempGene
                         specimen.cost = bestCost
                     }
+                    print(".")
                 }
-                if (firstIndex % 100 == 0)
-                    print(".$index")
-            }
+            geneIndex += specimen.permutationSize
+            println()
         }
 
         override fun <S : ISpecimenRepresentation> invoke(alg: SEvolutionaryAlgorithm<S>) = runBlocking {
-
-                println("BOOST")
-                launch(Dispatchers.Default) {
-                    opt2Cycle(alg, alg.population.first(), 0)
-                }
-                println("BOOSTED")
-                alg.population
-                    .slice(1 until alg.population.size)
-                    .mapIndexedNotNull {  index, it ->
-                        if (Random.nextInt(10) == 0) {
-                            launch(Dispatchers.Default) {
-                                opt2Cycle(alg, it, index + 1)
-                                println("BOOSTED")
-                            }
-                        }else null
-                    }.forEach{
-                        it.join()
+            if (positionPairs.isEmpty()) {
+                val geneCount = alg.population.first().permutationSize
+                println("LOAD DATA")
+                for (firstIndex in 0 until geneCount - 1) {
+                    for (secondIndex in firstIndex + 1 until geneCount) {
+                        positionPairs.add(Pair(firstIndex, secondIndex))
+                        print(".")
                     }
+                    println()
+                }
+                println("SHUFFLE DATA")
+                positionPairs.shuffle()
             }
+            if (geneIndex == positionPairs.size) {
+                println("SHUFFLE DATA")
+                positionPairs.shuffle()
+                geneIndex = 0
+            }
+            println("BOOST")
+            opt2Cycle(alg, alg.population.first())
+            println("BOOSTED")
+            alg.population
+                .slice(1 until alg.population.size)
+                .forEachIndexed { _, it ->
+                    if (Random.nextInt(10) == 0) {
+                        opt2Cycle(alg, it)
+                        println("BOOSTED")
+                    }
+                }
+
+        }
     },
 
     NO_BOOST {

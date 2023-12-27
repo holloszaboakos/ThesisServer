@@ -10,6 +10,7 @@ interface ISpecimenRepresentation {
      var orderInPopulation: Int
      val objectiveCount: Int
      val salesmanCount: Int
+     val permutationIndices: IntRange
      val permutationSize: Int
 
      operator fun get(index: Int): Int
@@ -23,16 +24,16 @@ interface ISpecimenRepresentation {
      fun forEachIndexed(operation: (index:Int, value:Int) -> Unit)
      fun setEach(operation: (index:Int, value:Int) -> Int)
 
-     fun <T> mapSlice(mapper: (slice: IntArray) -> T): Flow<T>
+     fun <T> mapSlice(mapper: (slice: IntArray) -> T): Collection<T>
      fun forEachSlice(operation: (slice: IntArray) -> Unit)
      fun forEachSliceIndexed(operation: (index: Int, slice: IntArray) -> Unit)
-     fun slice(indices:IntRange): Flow<Int>
+     fun slice(indices:IntRange): Collection<Int>
 
      fun shuffle()
      fun first(selector: (value:Int) -> Boolean) : Int
 
-     suspend fun setData(data: Flow<IntArray>)
-     fun getData(): Flow<IntArray>
+     fun setData(data: Collection<IntArray>)
+     fun getData(): Collection<IntArray>
 
      fun checkFormat():Boolean
 

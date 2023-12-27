@@ -1,4 +1,4 @@
-package hu.bme.thesis
+package hu.bme.thesis.utility
 
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement

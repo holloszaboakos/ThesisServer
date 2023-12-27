@@ -1,4 +1,4 @@
-package hu.bme.thesis.utility
+package hu.bme.thesis.utility.extention
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectIndexed
@@ -18,9 +18,12 @@ fun <T> Flow<T>.slice(range: IntRange): Flow<T> = flow {
     }
 }
 
-fun <T> Flow<T>.shuffled(): Flow<T> = flow {
-    toList()
-        .asSequence()
-        .shuffled()
-        .forEach { emit(it) }
+
+fun <T> Flow<T>.shuffled(): Flow<T> {
+    return flow {
+        toList()
+            .asSequence()
+            .shuffled()
+            .forEach { emit(it) }
+    }
 }

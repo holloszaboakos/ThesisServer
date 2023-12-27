@@ -1,10 +1,9 @@
-package hu.bme.thesis
+package hu.bme.thesis.utility
 
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import hu.bme.thesis.model.mtsp.*
-import hu.bme.thesis.utility.requestRoot
 import java.io.File
 import java.math.BigDecimal
 import java.util.*
@@ -12,16 +11,18 @@ import kotlin.random.Random
 
 fun main() {
     val sourceFile = File("D:\\Git\\GitHub\\SourceCodes\\Kotlin\\Web\\ThesisServer\\input\\wapromAddress.csv")
+    /*
     val fileForEdgesFromCenter =
         File("D:\\Git\\GitHub\\SourceCodes\\Kotlin\\Web\\ThesisServer\\input\\hungarianExample\\fromCenter.json")
     val fileForEdgesToCenter =
         File("D:\\Git\\GitHub\\SourceCodes\\Kotlin\\Web\\ThesisServer\\input\\hungarianExample\\toCenter.json")
+     */
     val fileForEdgesBetween =
         File("D:\\Git\\GitHub\\SourceCodes\\Kotlin\\Web\\ThesisServer\\input\\hungarianExample\\between.json")
     val fileForSalesman =
         File("D:\\Git\\GitHub\\SourceCodes\\Kotlin\\Web\\ThesisServer\\input\\hungarianExample\\salesman.json")
-    val fileForObjectives =
-        File("D:\\Git\\GitHub\\SourceCodes\\Kotlin\\Web\\ThesisServer\\input\\hungarianExample\\objectives.json")
+    //val fileForObjectives =
+    //    File("D:\\Git\\GitHub\\SourceCodes\\Kotlin\\Web\\ThesisServer\\input\\hungarianExample\\objectives.json")
     val fileForSetup =
         File("D:\\Git\\GitHub\\SourceCodes\\Kotlin\\Web\\ThesisServer\\input\\hungarianExample\\setup.json")
 

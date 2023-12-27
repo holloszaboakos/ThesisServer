@@ -5,7 +5,6 @@ import hu.bme.thesis.logic.specimen.factory.SSpecimenRepresentationFactory
 import hu.bme.thesis.model.inner.setup.DNearestNeighbourSetup
 import hu.bme.thesis.model.mtsp.DGraph
 import hu.bme.thesis.model.mtsp.DSalesman
-import kotlinx.coroutines.flow.toList
 
 class NearestNeighbourTSP2MTSP<S : ISpecimenRepresentation>(
     override var subSolutionFactory: SSpecimenRepresentationFactory<S>,
@@ -45,8 +44,8 @@ class NearestNeighbourTSP2MTSP<S : ISpecimenRepresentation>(
         }
 
         bestSpecimen?.let {
-            val data = it.getData().toList()[0]
-            val newData = mutableListOf<IntArray>()
+            //val data = it.getData().toList()[0]
+            //val newData = mutableListOf<IntArray>()
 
 
         } ?: throw NullPointerException("bestSpecimen should not be null!")

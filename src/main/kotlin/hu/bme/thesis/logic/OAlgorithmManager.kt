@@ -33,7 +33,6 @@ import kotlinx.coroutines.sync.withLock
 
 import java.math.BigDecimal
 
-
 object OAlgorithmManager {
 
     var algorithm: SEvolutionaryAlgorithm<DOnePartRepresentation>? = null
@@ -59,13 +58,15 @@ object OAlgorithmManager {
         lock.withLock {
             task?.let { task ->
                 settings?.let { settings ->
+                    //algorithm = GeneticAlgorithm(
                     algorithm = BacterialAlgorithm(
                         OOnePartRepresentationFactory,
                         (settings.timeLimit_Second * BigDecimal(1000)).toLong(),
                         settings.iterLimit.toInt(),
                         task.costGraph,
                         task.salesmen,
-                        BacterialAlgorithmSetup(
+                        /*
+                        GeneticAlgorithmSetup(
                             pause = EPause.DEFAULT,
                             resume = EResume.DEFAULT,
                             initialize = EInitialize.EVOLUTIONARY,
@@ -78,12 +79,29 @@ object OAlgorithmManager {
                             costOfObjective = ECostOfObjective.DEFAULT,
                             initializePopulation = EInicializePopulation.MODULO_STEPPER,
                             orderByCost = EOrderPopulationByCost.RECALC_ALL,
+                            boost = EBoost.OPT2_STEP,
+                            mutate = EMutateChildren.SWAP,
+                            crossover = ECrossOvers.ORDERED,
+                            crossoverOperator = ECrossOverOperator.STATISTICAL_RACE,
+                            selection = ESelectSurvivors.RANDOM
+                        )*/
+                        BacterialAlgorithmSetup(
+                            pause = EPause.DEFAULT,
+                            resume = EResume.DEFAULT,
+                            initialize = EInitialize.EVOLUTIONARY,
+                            clear = EClear.EVOLUTIONARY,
+                            run = ERunUntil.DEFAULT,
+                            cycle = ECycle.DEFAULT,
+                            iteration = EIteration.DEFAULT,
+                            cost = ECost.NO_CAPACITY,
+                            costOfEdge = ECostOfEdge.DEFAULT,
+                            costOfObjective = ECostOfObjective.DEFAULT,
+                            initializePopulation = EInicializePopulation.MODULO_STEPPER,
+                            orderByCost = EOrderPopulationByCost.RECALC_ALL,
                             boost = EBoost.OPT2_CYCLE_ON_BEST_AND_LUCKY,
-                            geneTransfer = EGeneTransfer.FROM_BETTER_TO_WORSE,
+                            geneTransfer = EGeneTransfer.TOURNAMENT,
                             geneTransferOperator = EGeneTransferOperator.INTO_POSITION,
-                            mutate = EMutate.DEFAULT,
-                            mutateSpecimen = EMutateSpecimen.KEEP_ORIGINAL,
-                            produceMutant = EProduceMutant.SHUFFLE
+                            mutate = EMutate.SIMULATED_ANNEALING_TOUCH_ALL_CONTINUES_SEGMENT
                         )
                         /*
                         EGeneticSetup.values()
@@ -198,8 +216,8 @@ object OAlgorithmManager {
     }
 
     suspend fun iterate() = lock.withLock {
-            algorithm?.iterate(true)
-        }
+        algorithm?.iterate(true)
+    }
 
     fun cycle(): DResult = runBlocking {
         lock.withLock {

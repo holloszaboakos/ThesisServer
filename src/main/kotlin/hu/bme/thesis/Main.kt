@@ -2,6 +2,7 @@ package hu.bme.thesis
 
 import com.google.gson.Gson
 import hu.bme.thesis.logic.OAlgorithmManager
+import hu.bme.thesis.logic.common.steps.ECost
 import hu.bme.thesis.logic.evolutionary.genetic.ECrossOverOperator
 import hu.bme.thesis.model.mtsp.*
 import kotlinx.coroutines.runBlocking
@@ -69,7 +70,6 @@ fun main(args: Array<String>) {
         )
     } ?: throw Error("WTF")
 
-    incompleteSetup = null
     edgesBetween = null
     edgesFromCenter = null
     edgesToCenter = null
@@ -82,7 +82,7 @@ fun main(args: Array<String>) {
     OAlgorithmManager.prepare()
     OAlgorithmManager.start()
     val outputFile = File("$outputFolderPath\\statistics.txt")
-    for (index in 0 until setup.task.costGraph.objectives.size * setup.task.costGraph.objectives.size * setup.task.costGraph.objectives.size) {
+    for (index in 0 until 500){//setup.task.costGraph.objectives.size * setup.task.costGraph.objectives.size * setup.task.costGraph.objectives.size) {
         val duration = measureTime {
             runBlocking {
                 OAlgorithmManager.iterate()
@@ -91,6 +91,8 @@ fun main(args: Array<String>) {
         val bestCost = OAlgorithmManager.algorithm?.best?.cost ?: -1
         val worstCost = OAlgorithmManager.algorithm?.worst?.cost ?: -1
         println("step:$index timeElapsed: ${duration.toLong(DurationUnit.MILLISECONDS)}, bestCost $bestCost, worstCost $worstCost")
+        println("fitness cost call count: ${ECost.fitnessCallCount}")
+
         outputFile.appendText("\nstep:$index timeElapsed: ${duration.toDouble(DurationUnit.MILLISECONDS)}, bestCost $bestCost, worstCost $worstCost")
         ECrossOverOperator.STATISTICAL_RACE.operators.entries
             .sortedBy { it.value.successRatio }

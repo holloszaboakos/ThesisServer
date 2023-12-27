@@ -13,8 +13,8 @@ import java.util.*
 class LinKernighanTSP<S : ISpecimenRepresentation>(
     //The instance variables definitions
     var permutationFactory: SSpecimenRepresentationFactory<S>,
-    private val coordinates: Array<DGps>, //The instance variables definitions
-    private val size: Int,
+    //private val coordinates: Array<DGps>, //The instance variables definitions
+    size: Int,
     private val salesmen: Array<DSalesman>,
     private val costGraph: DGraph
 ) {

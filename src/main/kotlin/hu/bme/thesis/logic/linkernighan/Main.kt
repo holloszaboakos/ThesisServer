@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
     val toCenterFilePath = argMap["-toCenterFilePath"] ?: throw Error("No inputFilePath given")
     val salesmanFilePath = argMap["-salesmanFilePath"] ?: throw Error("No inputFilePath given")
     val objectivesFilePath = argMap["-objectivesFilePath"] ?: throw Error("No inputFilePath given")
-    val outputFolderPath = argMap["-outputFolderPath"] ?: throw Error("No inputFilePath given")
+    //val outputFolderPath = argMap["-outputFolderPath"] ?: throw Error("No inputFilePath given")
 
     val setupFile = File(setupFilePath)
     val betweenFile = File(betweenFilePath)
@@ -51,13 +51,13 @@ fun main(args: Array<String>) {
         )
     } ?: throw Error("WTF")
 
-    incompleteSetup = null
     edgesBetween = null
     edgesFromCenter = null
     edgesToCenter = null
     salesmen = null
     objectives = null
 
+    /*
     val lk = LinKernighanTSP(
         OOnePartRepresentationFactory,
         setup.task.costGraph.objectives.map { it.location }.toTypedArray(),
@@ -65,6 +65,7 @@ fun main(args: Array<String>) {
         setup.task.salesmen,
         setup.task.costGraph
     )
+     */
     //lk.runAlgorithm()
-    println(lk.result.cost)
+    //println(lk.result.cost)
 }
