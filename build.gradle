@@ -31,20 +31,21 @@ repositories {
 }
 
 dependencies {
-    testCompile group: "junit", name: "junit", version: "4.12"
-    compile 'org.clojure:java.jdbc:0.7.12'
-    compile 'org.hibernate:hibernate-core:5.6.1.Final'
-    compile 'mysql:mysql-connector-java:8.0.25'
-    compile 'org.apache.httpcomponents:httpclient:4.5.13'
-    compile 'org.apache.httpcomponents:fluent-hc:4.5.13'
-    compile "io.ktor:ktor-server-core:$ktor_version"
-    compile "io.ktor:ktor-server-netty:$ktor_version"
-    compile "io.ktor:ktor-metrics:$ktor_version"
-    compile "io.ktor:ktor-locations:$ktor_version"
-    compile "io.ktor:ktor-gson:$ktor_version"
-    compile "io.ktor:ktor-client-apache:$ktor_version"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    implementation name: 'otp-1.4.0-shaded'
+    testImplementation group: "junit", name: "junit", version: "4.12"
+    implementation 'org.clojure:java.jdbc:0.7.12'
+    implementation 'org.hibernate:hibernate-core:5.6.1.Final'
+    implementation 'mysql:mysql-connector-java:8.0.25'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation 'org.apache.httpcomponents:fluent-hc:4.5.13'
+    implementation "io.ktor:ktor-server-core:$ktor_version"
+    implementation "io.ktor:ktor-server-netty:$ktor_version"
+    implementation "io.ktor:ktor-metrics:$ktor_version"
+    implementation "io.ktor:ktor-locations:$ktor_version"
+    implementation "io.ktor:ktor-gson:$ktor_version"
+    implementation "io.ktor:ktor-client-apache:$ktor_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation 'org.locationtech.jts:jts-core:1.19.0'
+
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0'
 }
 

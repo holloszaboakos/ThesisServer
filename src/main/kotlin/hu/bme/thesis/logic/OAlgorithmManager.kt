@@ -1,21 +1,19 @@
 package hu.bme.thesis.logic
 
-import hu.bme.thesis.logic.genetic.EGeneticSetup
-import hu.bme.thesis.logic.genetic.DGeneticAlgorithm
-import hu.bme.thesis.logic.specimen.DOnePartRepresentation
+import hu.bme.thesis.logic.evolutionary.GeneticAlgorithm
+import hu.bme.thesis.logic.evolutionary.setup.EGeneticSetup
 import hu.bme.thesis.logic.specimen.factory.OOnePartRepresentationFactory
-import hu.bme.thesis.logic.specimen.factory.OTwoPartRepresentationFactory
+import hu.bme.thesis.model.inner.setup.AAlgorithm4VRPSetup
 import hu.bme.thesis.model.mtsp.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-
 import java.math.BigDecimal
 
 
 object OAlgorithmManager {
 
-    var algorithm: DGeneticAlgorithm<*>? = null
+    var algorithm: GeneticAlgorithm<*>? = null
     var task: DTask? = null
     var settings: DSetting? = null
     private var minCost: Double = (Double.MAX_VALUE)
@@ -38,12 +36,11 @@ object OAlgorithmManager {
         lock.withLock {
             task?.let { task ->
                 settings?.let { settings ->
-                    algorithm = DGeneticAlgorithm(
+                    algorithm = GeneticAlgorithm(
                         OOnePartRepresentationFactory,
                         (settings.timeLimit_Second * BigDecimal(1000)).toLong(),
                         settings.iterLimit.toInt(),
                         task.costGraph,
-                        task.costGraph.objectives,
                         task.salesmen,
                         EGeneticSetup.values()
                             .find { it.code.compareTo(settings.algorithm) == 0 }?.setup
@@ -117,7 +114,7 @@ object OAlgorithmManager {
 
                 val bestRout: Array<DGpsArray> =
                     best?.mapSlice { slice ->
-                        val gpsList = slice.map { value -> objectives[value.toInt()].location }.toList()
+                        val gpsList = slice.map { value -> costGraph.objectives[value.toInt()].location }.toList()
                         DGpsArray(values = gpsList.toTypedArray())
                     }?.toList()?.toTypedArray() ?: arrayOf()
                 worst?.let { worst ->
@@ -148,14 +145,14 @@ object OAlgorithmManager {
 
     fun step(): DResult = runBlocking {
         lock.withLock {
-            algorithm?.iterate()
+            algorithm?.iterate(true)
             calcResult()
         }
     }
 
     fun iterate() = runBlocking {
         lock.withLock {
-            algorithm?.iterate()
+            algorithm?.iterate(true)
         }
     }
 

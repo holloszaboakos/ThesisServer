@@ -2,7 +2,6 @@ package hu.bme.thesis
 
 import com.google.gson.Gson
 import hu.bme.thesis.logic.OAlgorithmManager
-import hu.bme.thesis.logic.genetic.steps.ECrossOverOperator
 import hu.bme.thesis.logic.common.steps.ECost
 import hu.bme.thesis.logic.evolutionary.genetic.ECrossOverOperator
 import hu.bme.thesis.model.mtsp.*

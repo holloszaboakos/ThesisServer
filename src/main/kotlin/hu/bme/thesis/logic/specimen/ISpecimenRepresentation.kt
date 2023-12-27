@@ -3,6 +3,7 @@ package hu.bme.thesis.logic.specimen
 import kotlinx.coroutines.flow.Flow
 
 interface ISpecimenRepresentation {
+     val sliceLengths: IntArray
      var inUse: Boolean
      var costCalculated: Boolean
      var cost: Double
