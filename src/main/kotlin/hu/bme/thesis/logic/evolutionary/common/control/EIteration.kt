@@ -22,14 +22,14 @@ enum class EIteration {
                     }
                     is BacterialAlgorithm<S> -> {
 
-                        println("geneTransfer")
-                        geneTransfer()
-                        println("mutate")
-                        mutate()
                         if (iteration % 50 == 0) {
                             println("boost")
                             boost()
                         }
+                        println("geneTransfer")
+                        geneTransfer()
+                        println("mutate")
+                        mutate()
                         println("orderByCost")
                         orderByCost()
                     }

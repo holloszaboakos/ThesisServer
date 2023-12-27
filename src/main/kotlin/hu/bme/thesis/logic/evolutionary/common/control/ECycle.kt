@@ -15,7 +15,7 @@ enum class ECycle {
                 val oldIterationCount = iteration
                 state = AAlgorithm4VRP.State.RESUMED
                 while (
-                    runTime_Second < timeLimit
+                    runTimeInSeconds < timeLimit
                     && iteration < iterationLimit
                     && iteration - oldIterationCount < costGraph.objectives.size
                 ) runBlocking {

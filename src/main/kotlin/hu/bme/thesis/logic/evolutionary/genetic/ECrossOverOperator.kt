@@ -14,8 +14,8 @@ enum class ECrossOverOperator {
             alg: GeneticAlgorithm<S>
         ) {
             val cut = arrayOf(
-                Random.nextInt(parents.first.permutationSize),
-                Random.nextInt(parents.first.permutationSize - 1)
+                Random.nextInt(parents.first.permutationIndices.count()),
+                Random.nextInt(parents.first.permutationIndices.count() - 1)
             )
             if (cut[0] == cut[1])
                 cut[1]++
@@ -325,7 +325,7 @@ enum class ECrossOverOperator {
             var lastIndex = 0
 
             //O(n2)
-            val table = Array(parents.first.permutationSize) { valueIndex ->
+            val table = Array(parents.first.permutationIndices.count()) { valueIndex ->
                 val neighbours = mutableSetOf<Int>()
 
                 parentsL.forEachIndexed { parentIndex, parent ->
@@ -395,17 +395,17 @@ enum class ECrossOverOperator {
             alg: DGeneticAlgorithm<S>
         )  {
             val parentsInverse = listOf(
-                Array(parents.first.permutationSize) {
+                Array(parents.first.permutationIndices.count()) {
                     parents.first.indexOf(it)
                 },
-                Array(parents.second.permutationSize) {
+                Array(parents.second.permutationIndices.count()) {
                     parents.second.indexOf(it)
                 }
             )
             var longestSliceSize = 0
             var foundSlices = listOf<IntArray>()
-            for (firstValue in 0 until parents.first.permutationSize - 1) {
-                for (secondValue in firstValue until parents.first.permutationSize) {
+            for (firstValue in 0 until parents.first.permutationIndices.count() - 1) {
+                for (secondValue in firstValue until parents.first.permutationIndices.count()) {
                     if (
                         parentsInverse[0][firstValue] - parentsInverse[0][secondValue]
                         ==
@@ -451,7 +451,7 @@ enum class ECrossOverOperator {
                 indices[0].forEach { geneIndex ->
                     child[geneIndex] = foundSlices[cheaperIndex][geneIndex - indices[0].first]
                 }
-                (indices[0].last + 1 until parents.first.permutationSize).forEach { geneIndex ->
+                (indices[0].last + 1 until parents.first.permutationIndices.count()).forEach { geneIndex ->
                     child[geneIndex] = parents.toList()[0][geneIndex]
                 }
             }

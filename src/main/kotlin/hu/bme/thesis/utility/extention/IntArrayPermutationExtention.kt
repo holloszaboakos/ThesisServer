@@ -1,4 +1,4 @@
-package hu.bme.thesis.utility
+package hu.bme.thesis.utility.extention
 
 fun IntArray.isPermutation(): Boolean {
     val contains = BooleanArray(size) { false }
@@ -25,5 +25,11 @@ fun IntArray.sequential(): IntArray {
     forEachIndexed { value, index ->
         result[value] = this[(index + 1) % size]
     }
+    return result
+}
+
+fun IntArray.shuffled(): IntArray {
+    val result = copyOf()
+    result.shuffle()
     return result
 }

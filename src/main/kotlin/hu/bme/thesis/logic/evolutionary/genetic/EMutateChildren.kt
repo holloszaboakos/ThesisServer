@@ -2,9 +2,7 @@ package hu.bme.thesis.logic.evolutionary.genetic
 
 import hu.bme.thesis.logic.evolutionary.GeneticAlgorithm
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
-import hu.bme.thesis.utility.slice
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.toList
+import hu.bme.thesis.utility.extention.slice
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
@@ -14,32 +12,32 @@ enum class EMutateChildren {
 
     RESET {
         override fun <S  : ISpecimenRepresentation> invoke(alg: GeneticAlgorithm<S>) = runBlocking {
-            val basePermutation = List(alg.best?.permutationSize ?: 0) { it }.shuffled().toIntArray()
+            val basePermutation = List(alg.best?.permutationIndices?.count() ?: 0) { it }.shuffled().toIntArray()
             if (alg.costGraph.objectives.size > 1)
                 alg.population.asSequence()
                     .filter { it.iteration == alg.iteration }
                     .shuffled()
                     .slice(0 until ( alg.population.size / 16))
                     .forEachIndexed { instanceIndex, child ->
-                        if (instanceIndex < child.permutationSize) {
-                            val step = instanceIndex % (child.permutationSize - 1) + 1
+                        if (instanceIndex < child.permutationIndices.count()) {
+                            val step = instanceIndex % (child.permutationIndices.count() - 1) + 1
                             if (step == 1) {
                                 basePermutation.shuffle()
                             }
-                            val newContains = BooleanArray(child.permutationSize){false}
-                            val newPermutation = IntArray(child.permutationSize) { -1 }
+                            val newContains = BooleanArray(child.permutationIndices.count()){false}
+                            val newPermutation = IntArray(child.permutationIndices.count()) { -1 }
                             var baseIndex = step
-                            for (newIndex in 0 until child.permutationSize) {
+                            for (newIndex in 0 until child.permutationIndices.count()) {
                                 if (newContains[basePermutation[baseIndex]])
-                                    baseIndex = (baseIndex + 1) % child.permutationSize
+                                    baseIndex = (baseIndex + 1) % child.permutationIndices.count()
                                 newPermutation[newIndex] = basePermutation[baseIndex]
                                 newContains[basePermutation[baseIndex]] = true
-                                baseIndex = (baseIndex + step) % child.permutationSize
+                                baseIndex = (baseIndex + step) % child.permutationIndices.count()
                             }
 
                             val breakPoints = newPermutation
                                 .mapIndexed { index, value ->
-                                    if (value < child.permutationSize)
+                                    if (value < child.permutationIndices.count())
                                         -1
                                     else
                                         index
@@ -48,11 +46,10 @@ enum class EMutateChildren {
                                 .toMutableList()
 
                             breakPoints.add(0, -1)
-                            breakPoints.add(child.permutationSize)
-                            var it = -1
-                            child.setData(flow {
-                                it++
+                            breakPoints.add(child.permutationIndices.count())
+                            child.setData(List(breakPoints.size - 1) {
                                 newPermutation.slice((breakPoints[it] + 1) until breakPoints[it + 1])
+                                    .toIntArray()
 
                             })
 

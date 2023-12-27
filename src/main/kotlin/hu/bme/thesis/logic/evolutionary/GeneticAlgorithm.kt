@@ -13,7 +13,14 @@ class GeneticAlgorithm<S : ISpecimenRepresentation>(
     costGraph: DGraph,
     salesmen: Array<DSalesman>,
     override val setup: GeneticAlgorithmSetup
-) : SEvolutionaryAlgorithm<S>(permutationFactory, timeLimit, iterationLimit, costGraph, salesmen, setup,4 * (costGraph.objectives.size + salesmen.size)){
+) : SEvolutionaryAlgorithm<S>(
+    permutationFactory,
+    timeLimit,
+    iterationLimit,
+    costGraph,
+    salesmen,
+    setup,
+    4 * (costGraph.objectives.size + salesmen.size)){
 
     fun selection() = setup.selection(this)
     fun crossover() = setup.crossover(this)

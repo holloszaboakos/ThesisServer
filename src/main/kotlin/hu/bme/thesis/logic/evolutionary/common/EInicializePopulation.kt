@@ -44,12 +44,9 @@ enum class EInicializePopulation {
 
                     breakPoints.add(0, -1)
                     breakPoints.add(sizeOfPermutation)
-                    var it = -1
                     runBlocking {
-                        instance.setData(flow {
-                            it++
-                            newPermutation.slice((breakPoints[it] + 1) until breakPoints[it + 1])
-
+                        instance.setData(List(breakPoints.size - 1) {
+                            newPermutation.slice((breakPoints[it] + 1) until breakPoints[it + 1]).toIntArray()
                         })
                     }
                     instance.iteration = 0

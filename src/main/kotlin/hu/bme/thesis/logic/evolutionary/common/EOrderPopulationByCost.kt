@@ -9,19 +9,13 @@ import kotlinx.coroutines.runBlocking
 
 enum class EOrderPopulationByCost {
     RECALC_ALL {
-        @OptIn(DangerousInternalIoApi::class)
         override fun <S : ISpecimenRepresentation> invoke(alg: SEvolutionaryAlgorithm<S>) {
             alg.run {
-                runBlocking {
-                    val jobs = population.asSequence()
-                        .filter { !it.costCalculated }
-                        .map { specimen ->
-                            launch(Dispatchers.Default) {
-                                cost(specimen)
-                            }
-                        }.toList()
-                    jobs.forEach { it.join() }
-                }
+                population.asSequence()
+                    .filter { !it.costCalculated }
+                    .map { specimen ->
+                        cost(specimen)
+                    }.toList()
                 population.sortBy { it.cost }
                 population.asSequence()
                     .forEachIndexed { index, it ->

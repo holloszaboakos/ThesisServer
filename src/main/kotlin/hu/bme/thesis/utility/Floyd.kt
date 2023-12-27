@@ -11,6 +11,7 @@ fun Floyd(edgesBetween: Array<DEdgeArray>, objectivesIndices: IntRange) {
             for (toIndex in objectivesIndices) {
                 if (fromIndex == toIndex)
                     break
+
                 val routCost =
                     edgesBetween[fromIndex].values[toIndex - if (fromIndex > toIndex) 0 else 1].length_Meter
                 for (threwIndex in objectivesIndices) {

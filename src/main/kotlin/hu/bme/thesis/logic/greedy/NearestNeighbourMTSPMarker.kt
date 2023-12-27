@@ -15,8 +15,8 @@ class NearestNeighbourMTSPMarker<S : ISpecimenRepresentation>(
 ) : SNearestNeighbour<S>(subSolutionFactory, costGraph, salesmen, setup, timeLimit) {
     override suspend fun run(): S {
         val tours = Array(salesmen.size) { mutableListOf<Int>() }
-        val costs = DoubleArray(salesmen.size) { 0.0 }
-        val contains = BooleanArray(costGraph.objectives.size) { false }
+        //val costs = DoubleArray(salesmen.size) { 0.0 }
+        //val contains = BooleanArray(costGraph.objectives.size) { false }
         //TODO("Not yet implemented")
         val resultSpecimen = subSolutionFactory.produce(tours.map { it.toIntArray() }.toTypedArray())
         cost(resultSpecimen)

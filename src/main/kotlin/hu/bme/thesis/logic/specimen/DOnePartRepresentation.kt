@@ -1,8 +1,8 @@
 package hu.bme.thesis.logic.specimen
 
-import hu.bme.thesis.utility.inverse
-import hu.bme.thesis.utility.isPermutation
-import hu.bme.thesis.utility.sequential
+import hu.bme.thesis.utility.extention.inverse
+import hu.bme.thesis.utility.extention.isPermutation
+import hu.bme.thesis.utility.extention.sequential
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -44,7 +44,7 @@ data class DOnePartRepresentation(
 
     constructor(other: DOnePartRepresentation) : this(
         other.objectiveCount,
-        other.permutation,
+        other.permutation.clone(),
         other.inUse,
         other.costCalculated,
         other.cost,
@@ -52,6 +52,8 @@ data class DOnePartRepresentation(
     )
 
     override val salesmanCount: Int = permutation.size - objectiveCount + 1
+
+    override val permutationIndices: IntRange = permutation.indices
     override val permutationSize: Int = permutation.size
 
     override operator fun get(index: Int) = lock.read {
@@ -78,7 +80,7 @@ data class DOnePartRepresentation(
         permutation.forEachIndexed { index: Int, value: Int -> permutation[index] = operation(index, value) }
     }
 
-    override fun <T> mapSlice(mapper: (slice: IntArray) -> T): Flow<T> = lock.read {
+    override fun <T> mapSlice(mapper: (slice: IntArray) -> T): Collection<T> = lock.read {
         val result = mutableListOf<MutableList<Int>>(mutableListOf())
         permutation.forEach { value ->
             if (value < objectiveCount)
@@ -86,7 +88,7 @@ data class DOnePartRepresentation(
             else
                 result.add(mutableListOf())
         }
-        result.asFlow().map { mapper(it.toIntArray()) }
+        result.map { mapper(it.toIntArray()) }
     }
 
     override fun forEachSlice(operation: (slice: IntArray) -> Unit) = lock.read {
@@ -107,18 +109,16 @@ data class DOnePartRepresentation(
         }
     }
 
-    override fun slice(indices: IntRange): Flow<Int> = lock.read {
-        flow {
-            emitAll(permutation.slice(indices).asFlow())
-        }
+    override fun slice(indices: IntRange): Collection<Int> = lock.read {
+        permutation.slice(indices)
     }
 
     override fun shuffle() = lock.write { permutation.shuffle() }
     override fun first(selector: (Int) -> Boolean): Int = lock.read { permutation.first(selector) }
 
-    override suspend fun setData(data: Flow<IntArray>) {
+    override fun setData(data: Collection<IntArray>) {
         var counter = 0
-        data.collectIndexed { index, array ->
+        data.forEachIndexed { index, array ->
             array.forEach {
                 permutation[counter] = it
                 counter++
@@ -130,7 +130,7 @@ data class DOnePartRepresentation(
         }
     }
 
-    override fun getData(): Flow<IntArray> {
+    override fun getData(): Collection<IntArray> {
         lock.read {
             return mapSlice { list -> list }
         }
@@ -143,12 +143,48 @@ data class DOnePartRepresentation(
         else result
     }
 
-    override inline fun inverseOfPermutation() = permutation.inverse()
+    override fun inverseOfPermutation() = permutation.inverse()
 
-    override inline fun sequentialOfPermutation() = permutation.sequential()
+    override fun sequentialOfPermutation() = permutation.sequential()
 
-    override inline fun copyOfPermutation() = permutation.copyOf()
+    override fun copyOfPermutation() = permutation.copyOf()
 
-    override inline fun <T : (Int, (Int) -> Int) -> Collection<Int>> copyOfPermutationBy(initializer: T) =
+    override fun <T : (Int, (Int) -> Int) -> Collection<Int>> copyOfPermutationBy(initializer: T) =
         initializer(permutation.size) { permutation[it] }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as DOnePartRepresentation
+
+        if (objectiveCount != other.objectiveCount) return false
+        if (!permutation.contentEquals(other.permutation)) return false
+        if (inUse != other.inUse) return false
+        if (costCalculated != other.costCalculated) return false
+        if (cost != other.cost) return false
+        if (iteration != other.iteration) return false
+        if (orderInPopulation != other.orderInPopulation) return false
+        if (lock != other.lock) return false
+        if (salesmanCount != other.salesmanCount) return false
+        if (permutationIndices != other.permutationIndices) return false
+        if (permutationSize != other.permutationSize) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = objectiveCount
+        result = 31 * result + permutation.contentHashCode()
+        result = 31 * result + inUse.hashCode()
+        result = 31 * result + costCalculated.hashCode()
+        result = 31 * result + cost.hashCode()
+        result = 31 * result + iteration
+        result = 31 * result + orderInPopulation
+        result = 31 * result + lock.hashCode()
+        result = 31 * result + salesmanCount
+        result = 31 * result + permutationIndices.hashCode()
+        result = 31 * result + permutationSize
+        return result
+    }
 }

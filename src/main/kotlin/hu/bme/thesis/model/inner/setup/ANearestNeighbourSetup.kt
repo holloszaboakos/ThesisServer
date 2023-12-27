@@ -16,4 +16,4 @@ data class DNearestNeighbourSetup(
     override val cost: ECost,
     override val costOfEdge: ECostOfEdge,
     override val costOfObjective: ECostOfObjective,
-    ):AAlgorithm4VRPSetup(pause, resume, initialize, clear, cost, costOfEdge, costOfObjective)
+    ) : AAlgorithm4VRPSetup(pause, resume, initialize, clear, cost, costOfEdge, costOfObjective)

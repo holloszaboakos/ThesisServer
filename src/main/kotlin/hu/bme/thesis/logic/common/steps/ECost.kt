@@ -3,14 +3,15 @@ package hu.bme.thesis.logic.common.steps
 import hu.bme.thesis.logic.common.AAlgorithm4VRP
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import hu.bme.thesis.model.mtsp.DEdge
-import kotlinx.coroutines.runBlocking
 
 enum class ECost {
+
     NO_CAPACITY {
         override fun <S : ISpecimenRepresentation> invoke(
             alg: AAlgorithm4VRP<S>,
             specimen: ISpecimenRepresentation
         ) {
+            ECost.fitnessCallCount++
             alg.run {
                 var sumCost = 0.0
                 var geneIndex = 0
@@ -72,6 +73,10 @@ enum class ECost {
             }
         }
     };
+
+    companion object {
+        var fitnessCallCount = 0
+    }
 
     abstract operator fun <S : ISpecimenRepresentation> invoke(
         alg: AAlgorithm4VRP<S>,

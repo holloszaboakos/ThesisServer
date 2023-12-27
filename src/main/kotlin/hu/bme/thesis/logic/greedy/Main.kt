@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
     val toCenterFilePath = argMap["-toCenterFilePath"] ?: throw Error("No inputFilePath given")
     val salesmanFilePath = argMap["-salesmanFilePath"] ?: throw Error("No inputFilePath given")
     val objectivesFilePath = argMap["-objectivesFilePath"] ?: throw Error("No inputFilePath given")
-    val outputFolderPath = argMap["-outputFolderPath"] ?: throw Error("No inputFilePath given")
+    //val outputFolderPath = argMap["-outputFolderPath"] ?: throw Error("No inputFilePath given")
 
     val setupFile = File(setupFilePath)
     val betweenFile = File(betweenFilePath)
@@ -35,7 +35,7 @@ fun main(args: Array<String>) {
     val objectivesFile = File(objectivesFilePath)
 
     val gson = Gson()
-    var incompleteSetup: DSetup? = gson.fromJson(setupFile.readText(), DSetup::class.java)
+    val incompleteSetup: DSetup? = gson.fromJson(setupFile.readText(), DSetup::class.java)
     var edgesBetween: Array<DEdgeArray>? = gson.fromJson(betweenFile.readText(), Array<DEdgeArray>::class.java)
     var edgesFromCenter: Array<DEdge>? = gson.fromJson(fromCenterFile.readText(), Array<DEdge>::class.java)
     var edgesToCenter: Array<DEdge>? = gson.fromJson(toCenterFile.readText(), Array<DEdge>::class.java)
@@ -60,7 +60,7 @@ fun main(args: Array<String>) {
         )
     } ?: throw Error("WTF")
 
-    incompleteSetup = null
+    //incompleteSetup = null
     edgesBetween = null
     edgesFromCenter = null
     edgesToCenter = null

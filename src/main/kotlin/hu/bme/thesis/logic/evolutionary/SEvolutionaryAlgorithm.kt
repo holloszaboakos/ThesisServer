@@ -1,7 +1,6 @@
 package hu.bme.thesis.logic.evolutionary
 
 import hu.bme.thesis.logic.common.AAlgorithm4VRP
-import hu.bme.thesis.logic.evolutionary.setup.GeneticAlgorithmSetup
 import hu.bme.thesis.logic.evolutionary.setup.SEvolutionaryAlgorithmSetup
 import hu.bme.thesis.logic.specimen.ISpecimenRepresentation
 import hu.bme.thesis.logic.specimen.factory.SSpecimenRepresentationFactory

@@ -35,8 +35,6 @@ class BacterialAlgorithmSetup(
     val geneTransfer: EGeneTransfer,
     val geneTransferOperator: EGeneTransferOperator,
     val mutate: EMutate,
-    val mutateSpecimen: EMutateSpecimen,
-    val produceMutant: EProduceMutant,
 ) : SEvolutionaryAlgorithmSetup(
     pause,
     resume,

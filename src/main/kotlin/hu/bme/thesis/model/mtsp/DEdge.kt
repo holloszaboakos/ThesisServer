@@ -1,6 +1,6 @@
 /**
  * DRP
- * This is the hu.bme.thesis.main server of QLM's DRP system
+ * This is the hu.bme.thesis.utility.main server of QLM's DRP system
  *
  * OpenAPI spec version: 1.0.0
  * Contact: akos.hollo-szabo@qlndc.hu
@@ -73,5 +73,7 @@ data class DEdge(
         result = 31 * result + route.contentHashCode()
         return result
     }
+
 }
+
 

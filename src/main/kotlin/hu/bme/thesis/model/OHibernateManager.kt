@@ -211,7 +211,7 @@ object OHibernateManager {
         return mapped
     }
 
-    inline fun <reified L>findByName(tableName: String?,name:String?): L = lock.withLock{
+    inline fun <reified L>findByName(tableName: String?,name: String?): L = lock.withLock{
         tableName ?: throw Exception("tableName should not be null")
         name ?: throw Exception("name should not be null")
         val session = openSession()
