@@ -149,3 +149,10 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,kotlin,maven
+input/hungarianExample/between.json
+input/hungarianExample/fromCenter.json
+input/hungarianExample/objectives.json
+input/hungarianExample/salesman.json
+input/hungarianExample/setup.json
+input/hungarianExample/toCenter.json
+output/statistics1/statistics.txt
