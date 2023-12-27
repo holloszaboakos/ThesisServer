@@ -159,3 +159,4 @@ input/hungarianExample/setup.json
 input/hungarianExample/toCenter.json
 output/statistics1/statistics.txt
 output/statistics2/statistics.txt
+gradle/wrapper/gradle-wrapper.properties
