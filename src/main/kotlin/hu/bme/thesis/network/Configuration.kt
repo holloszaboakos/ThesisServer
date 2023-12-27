@@ -5,6 +5,7 @@ import io.ktor.auth.OAuthServerSettings
 import io.ktor.features.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 
@@ -20,7 +21,7 @@ import kotlin.time.toDuration
 @ExperimentalTime
 internal fun ApplicationHstsConfiguration(): HSTS.Configuration.() -> Unit {
     return {
-        maxAgeDuration = 365.0.toDuration(TimeUnit.DAYS)
+        maxAgeDuration = 365.0.toDuration(DurationUnit.DAYS)
         includeSubDomains = true
         preload = false
 

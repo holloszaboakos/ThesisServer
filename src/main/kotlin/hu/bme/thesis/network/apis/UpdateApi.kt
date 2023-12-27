@@ -1,6 +1,6 @@
 /**
  * DRP
- * This is the hu.bme.thesis.main server of QLM's DRP system
+ * This is the hu.bme.thesis.utility.main server of QLM's DRP system
  *
  * OpenAPI spec version: 1.0.0
  * Contact: akos.hollo-szabo@qlndc.hu
@@ -21,7 +21,6 @@ import hu.bme.thesis.model.mtsp.*
 import hu.bme.thesis.utility.PolylineEncoder
 import hu.bme.thesis.utility.requestRoot
 import hu.bme.thesis.network.Paths
-import java.math.BigDecimal
 import java.util.*
 
 // ktor 0.9.x is missing io.ktor.locations.DELETE, this adds it.
@@ -38,7 +37,7 @@ fun Route.UpdateApi() {
                     UUID.randomUUID().toString(),
                     "placeholder",
                     it.iteration.toLong(),
-                    it.runTime_Second.toLong()
+                    it.runTimeInSeconds.toLong()
                 )
             } ?: throw Exception("Algorithm should not be null")
         )
@@ -81,7 +80,7 @@ fun Route.UpdateApi() {
                             "",
                             0,
                             (distance).toLong(),
-                            rout = PolylineEncoder.decode(points).toTypedArray()
+                            route = PolylineEncoder.decode(points).toTypedArray()
                         )
                     )
                 }

@@ -1,6 +1,6 @@
 /**
  * DRP
- * This is the hu.bme.thesis.main server of QLM's DRP system
+ * This is the hu.bme.thesis.utility.main server of QLM's DRP system
  *
  * OpenAPI spec version: 1.0.0
  * Contact: akos.hollo-szabo@qlndc.hu
@@ -21,7 +21,7 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import hu.bme.thesis.logic.OAlgorithmManager
-import hu.bme.thesis.logic.genetic.EGeneticSetup
+import hu.bme.thesis.logic.evolutionary.setup.EGeneticSetup
 import hu.bme.thesis.model.OHibernateManager
 import hu.bme.thesis.model.mtsp.*
 import hu.bme.thesis.network.Paths
@@ -181,7 +181,7 @@ fun Route.SetupApi() {
                         if (edge.id.isBlank())
                             edge.id = UUID.randomUUID().toString()
                         edge.orderInOwner = edgeIndex
-                        edge.rout.forEachIndexed { indexEdge, gps ->
+                        edge.route.forEachIndexed { indexEdge, gps ->
                             if (gps.id.isBlank())
                                 gps.id = UUID.randomUUID().toString()
                             gps.orderInOwner = indexEdge
@@ -192,7 +192,7 @@ fun Route.SetupApi() {
                     if (edge.id.isBlank())
                         edge.id = UUID.randomUUID().toString()
                     edge.orderInOwner = index
-                    edge.rout.forEachIndexed { indexEdge, gps ->
+                    edge.route.forEachIndexed { indexEdge, gps ->
                         if (gps.id.isBlank())
                             gps.id = UUID.randomUUID().toString()
                         gps.orderInOwner = indexEdge
@@ -202,7 +202,7 @@ fun Route.SetupApi() {
                     if (edge.id.isBlank())
                         edge.id = UUID.randomUUID().toString()
                     edge.orderInOwner = index
-                    edge.rout.forEachIndexed { indexEdge, gps ->
+                    edge.route.forEachIndexed { indexEdge, gps ->
                         if (gps.id.isBlank())
                             gps.id = UUID.randomUUID().toString()
                         gps.orderInOwner = indexEdge

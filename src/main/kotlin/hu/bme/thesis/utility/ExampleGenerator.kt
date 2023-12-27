@@ -1,4 +1,4 @@
-package hu.bme.thesis
+package hu.bme.thesis.utility
 
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
@@ -18,14 +18,14 @@ fun main() {
                 name = "exampleTask",
                 costGraph = DGraph(
                     center = DGps(
-                        lattitude = 0.0f,
+                        latitude = 0.0f,
                         longitude = 0.0f,
                     ),
                     objectives = arrayOf(
                         DObjective(
                             name = "exampleObjective",
                             location = DGps(
-                                lattitude = 0.0f,
+                                latitude = 0.0f,
                                 longitude = 0.0f,
                             ),
                             time_Second = 0L,
@@ -37,9 +37,9 @@ fun main() {
                         DEdge(
                             name = "exampleEdges0ToCenter",
                             length_Meter = 0L,
-                            rout = arrayOf(
+                            route = arrayOf(
                                 DGps(
-                                    lattitude = 0.0f,
+                                    latitude = 0.0f,
                                     longitude = 0.0f
                                 )
                             )
@@ -47,9 +47,9 @@ fun main() {
                         DEdge(
                             name = "exampleEdges1ToCenter",
                             length_Meter = 0L,
-                            rout = arrayOf(
+                            route = arrayOf(
                                 DGps(
-                                    lattitude = 0.0f,
+                                    latitude = 0.0f,
                                     longitude = 0.0f
                                 )
                             )
@@ -59,9 +59,9 @@ fun main() {
                         DEdge(
                             name = "exampleEdges0FromCenter",
                             length_Meter = 0L,
-                            rout = arrayOf(
+                            route = arrayOf(
                                 DGps(
-                                    lattitude = 0.0f,
+                                    latitude = 0.0f,
                                     longitude = 0.0f
                                 )
                             )
@@ -69,9 +69,9 @@ fun main() {
                         DEdge(
                             name = "exampleEdges1FromCenter",
                             length_Meter = 0L,
-                            rout = arrayOf(
+                            route = arrayOf(
                                 DGps(
-                                    lattitude = 0.0f,
+                                    latitude = 0.0f,
                                     longitude = 0.0f
                                 )
                             )
@@ -83,9 +83,9 @@ fun main() {
                                 DEdge(
                                     name = "exampleEdgesBetween0to1",
                                     length_Meter = 0L,
-                                    rout = arrayOf(
+                                    route = arrayOf(
                                         DGps(
-                                            lattitude = 0.0f,
+                                            latitude = 0.0f,
                                             longitude = 0.0f
                                         )
                                     )
@@ -97,9 +97,9 @@ fun main() {
                                 DEdge(
                                     name = "exampleEdgesBetween1to0",
                                     length_Meter = 0L,
-                                    rout = arrayOf(
+                                    route = arrayOf(
                                         DGps(
-                                            lattitude = 0.0f,
+                                            latitude = 0.0f,
                                             longitude = 0.0f
                                         )
                                     )

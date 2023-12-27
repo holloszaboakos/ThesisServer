@@ -3,6 +3,8 @@ package hu.bme.thesis
 import com.google.gson.Gson
 import hu.bme.thesis.logic.OAlgorithmManager
 import hu.bme.thesis.logic.genetic.steps.ECrossOverOperator
+import hu.bme.thesis.logic.common.steps.ECost
+import hu.bme.thesis.logic.evolutionary.genetic.ECrossOverOperator
 import hu.bme.thesis.model.mtsp.*
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -17,6 +19,17 @@ import kotlin.time.measureTime
 //objective 1000, boost: none, operator:heuristic , mutation:reverse, population: 4 * customer : 162960.0 in 1700 iter
 //objective 1000,  boost: none, operator:heuristic , mutation:reverse, population: 4 * ( customer + transport unit)
 //step:10280 timeElapsed: 6635.5869, bestCost 152902.0, worstCost 2.9090193731010694E17
+
+//objective 1000, boost: none, operator:heuristic , mutation:reverse, population: 4 * customer : 162960.0 in 1700 iter
+//objective 1000,  boost: none, operator:heuristic , mutation:reverse, population: 4 * ( customer + transport unit)
+//step:10280 timeElapsed: 6635.5869, bestCost 152902.0, worstCost 2.9090193731010694E17
+//objective 1000, boost: otp_step, mutation:reset, population: 4 * customer : 184957
+//step:10601 timeElapsed: 1459, bestCost 168340.0, worstCost 7.5460522555858202E17
+
+//HEURISTIC
+//step:1303 timeElapsed: 865, bestCost 81704.0, worstCost 2.08111210262199552E17
+//step:11664 timeElapsed: 2935, bestCost 62372.0, worstCost 2.64034600537264864E17
+//step:25000 timeElapsed: 2935, bestCost 59024.0, worstCost 2.64034600537264864E17
 
 @ExperimentalTime
 fun main(args: Array<String>) {
@@ -74,7 +87,8 @@ fun main(args: Array<String>) {
     OAlgorithmManager.prepare()
     OAlgorithmManager.start()
     val outputFile = File("$outputFolderPath\\statistics.txt")
-    for (index in 0 until setup.task.costGraph.objectives.size * setup.task.costGraph.objectives.size * setup.task.costGraph.objectives.size) {
+    
+    for (index in 0 until 500){//setup.task.costGraph.objectives.size * setup.task.costGraph.objectives.size * setup.task.costGraph.objectives.size) {
         val duration = measureTime {
             runBlocking {
                 OAlgorithmManager.iterate()
@@ -82,13 +96,16 @@ fun main(args: Array<String>) {
         }
         val bestCost = OAlgorithmManager.algorithm?.best?.cost ?: -1
         val worstCost = OAlgorithmManager.algorithm?.worst?.cost ?: -1
-        println("step:$index timeElapsed: ${duration.toDouble(DurationUnit.MILLISECONDS)}, bestCost $bestCost, worstCost $worstCost")
+        println("step:$index timeElapsed: ${duration.toLong(DurationUnit.MILLISECONDS)}, bestCost $bestCost, worstCost $worstCost")
+        println("fitness cost call count: ${ECost.fitnessCallCount}")
+
         outputFile.appendText("\nstep:$index timeElapsed: ${duration.toDouble(DurationUnit.MILLISECONDS)}, bestCost $bestCost, worstCost $worstCost")
         ECrossOverOperator.STATISTICAL_RACE.operators.entries
             .sortedBy { it.value.successRatio }
             .forEach { (operator, statistics) ->
                 println("name: ${operator.name}, value: $statistics")
-                outputFile.appendText("\nname: ${operator.name}, value: $statistics")
+
+                //outputFile.appendText("\nname: ${operator.name}, value: $statistics")
             }
         println()
     }

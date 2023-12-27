@@ -1,6 +1,6 @@
 /**
 * DRP
-* This is the hu.bme.thesis.main server of QLM's DRP system
+* This is the hu.bme.thesis.utility.main server of QLM's DRP system
 *
 * OpenAPI spec version: 1.0.0
 * Contact: akos.hollo-szabo@qlndc.hu
@@ -48,12 +48,17 @@ data class DSalesman (
     val name: String="",
     var orderInOwner: Int=0,
     val workTime_SecondPerDay: Long= 0L,
+
     val volumeCapacity_Stere: Long= 0L,
     val weightCapacity_Gramm: Long= 0L,
+
     val vechicleSpeed_MeterPerSecond: Long= 0L,
+
     val payment_EuroPerSecond: Double= 0.0,
+
     val fuelConsuption_LiterPerMeter: Double= 0.0,
     val fuelPrice_EuroPerLiter: Double= 0.0,
+
     val basePrice_Euro: Double=0.0
 )
 
